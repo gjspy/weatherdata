@@ -569,7 +569,7 @@ class TerminalColours:
     
 
 class ThreadThatReturns(threading.Thread):
-	def __init__(self, target: Callable, name: str = None, args: list = [],
+	def __init__(self, target: Callable, name: str = "", args: list = [],
 				 kwargs: dict = {}, daemon: bool = False):
 		
 		super().__init__(None, target, name, args, kwargs, daemon = daemon)
@@ -582,8 +582,8 @@ class ThreadThatReturns(threading.Thread):
 	def run(self):
 		self._return = self._target(*self._args, **self._kwargs)
 	
-	def join(self, *args):
-		threading.Thread.join(self, *args)
+	def join(self, timeout: float | None = None):
+		threading.Thread.join(self, timeout)
 
 		return self._return
 
