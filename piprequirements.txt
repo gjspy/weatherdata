@@ -6,3 +6,4 @@ dotenv
 requests
 fastapi
 uvicorn
+gunicorn
