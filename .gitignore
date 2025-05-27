@@ -4,6 +4,7 @@ __pycache__/
 
 *_gitignore.*
 convertJSONtoMYSQL.py
+testserver.py
 
 # Ignore environment files
 .env
