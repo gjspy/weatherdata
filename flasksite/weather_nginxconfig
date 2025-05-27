@@ -1,6 +1,6 @@
 server {
 	listen 80;
-	server_name myweather.uksouth.cloudapp.azure.com;
+	server_name weather.uksouth.cloudapp.azure.com;
 
 	root /var/www/myweather/static;
 	index doc/main.html;
