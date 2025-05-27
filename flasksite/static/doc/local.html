@@ -1,0 +1,851 @@
+<div id="local" class="content-elem" location-selector="true" rendered="true">
+	<div class="sticky-bkg">
+		<img class="background" src="api/weather/current-photo?loc=x">
+	</div>
+	<div class="hero pane-1">
+		<div class="contents today">
+			<div class="title-bar">
+				<a class="main">Daily Summary</a>
+				<a class="sub">Results based on forecasts published 48 hours ago.</a>
+			</div>
+			
+			<div class="underline light thin moderate"></div>
+
+			<div class="rows">
+				<div id="mo-summary" class="summary-row" grade="A">
+					<svg class="logo" viewbox="0 0 200 200">
+						<use href="#mo-square"/>
+						<use href="#mo-text"/>
+					</svg>
+					<label class="grade" grade="A+">A<sup>+</sup></label>
+
+					<div class="detail" style="--col-1-wid: 145px; --col-2-wid: 25px; --col-3-wid: max-content; /*COL 2 WID = 40 IF A+. ELSE = 20. HOW TO SCALE THIS?*/">
+						<div class="detail-row">
+							<label class="condition">Temp:</label>
+							<label class="grade" grade="A">A</label>
+							<label class="cond-info">info from daily summary.</label>
+						</div>
+						<div class="detail-row">
+							<label class="condition">Precip:</label>
+							<label class="grade" grade="C">C</label>
+							<label class="cond-info">(???, 93%)</label>
+						</div>
+						<div class="detail-row">
+							<label class="condition">Wind:</label>
+							<label class="grade" grade="B">B</label>
+							<label class="cond-info">aaaaaaa</label>
+						</div>
+						<div class="detail-row">
+							<label class="condition">WT:</label>
+							<label class="grade" grade="F">F</label>
+							<label class="cond-info">(20%, 1%)</label>
+						</div>
+					</div>
+
+					<div class="underline light thin moderate"></div>
+				</div>
+				<div id="bbc-summary" class="summary-row">
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label class="grade" grade="C">C</label>
+					<div class="detail" style="--col-1-wid: 145px; --col-2-wid: 25px; --col-3-wid: max-content; /*COL 2 WID = 40 IF A+. ELSE = 20. HOW TO SCALE THIS?*/">
+						<div class="detail-row">
+							<label class="condition">Temp:</label>
+							<label class="grade" grade="A">A</label>
+							<label class="cond-info">(0.5degC, 55%)</label>
+						</div>
+						<div class="detail-row">
+							<label class="condition">Precip:</label>
+							<label class="grade" grade="C">C</label>
+							<label class="cond-info">(???, 93%)</label>
+						</div>
+						<div class="detail-row">
+							<label class="condition">Wind:</label>
+							<label class="grade" grade="B">B</label>
+							<label class="cond-info">aaa</label>
+						</div>
+						<div class="detail-row">
+							<label class="condition">WT:</label>
+							<label class="grade" grade="F">F</label>
+							<label class="cond-info">(20%, 1%)</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="hero pane-2">
+		<div class="contents predictions">
+			<div class="title-bar">
+				<a class="main">As predicted.. Or not!</a>
+				<a class="sub">Select below different forecast types & sources.</a>
+			</div>
+			<div class="option-row">
+				<div class="orgs">
+					<svg class="logo" viewbox="0 0 200 200">
+						<use href="#mo-square"/>
+						<use href="#mo-text"/>
+					</svg>
+					<input type="radio" id="select-mo" name="org-select" checked="true">
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<input type="radio" id="select-bbc" name="org-select">
+				</div>
+
+				<div class="fcst-type-bar fcst-freq">
+					<label class="fcst-option selected">Hourly</label>
+					<label class="fcst-option">3-Hourly</label>
+				</div>
+				<div class="fcst-type-bar fcst-time">
+					<label class="fcst-option selected">24H</label>
+					<label class="fcst-option">48H</label>
+					<label class="fcst-option">...</label>
+				</div>
+				
+			</div>
+			
+			<div class="underline light thin most"></div>
+			<div class="flex-grow">
+				<label class="date">26/02/2025</label>
+				<div class="key-cont">
+					<label>Forecast</label>
+					<div class="underline light thin moderate"></div>
+					<label>Actual</label>
+				</div>
+				<div class="periods">
+					<div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div>
+					<div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div>
+					<div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div>
+					<div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div>
+					<div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div>
+					<div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div><div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div>
+					<div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div>
+					<div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div>
+					<div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div>
+					<div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div>
+					<div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div><div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div><div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div><div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div><div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div><div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div><div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div><div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div>
+					<div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div><div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div><div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div><div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div><div class="period hourly">
+						<a class="time">1PM</a>
+						<div class="info">
+							<div class="obs">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+							<div class="underline light thin moderate"></div>
+							<div class="fcst">
+								<img class="wt" src="static/icon/100/partlycloudy.png">
+								<a class="temp">10.1°C</a>
+								<a class="wind_s">23.4 km/h</a>
+								<a class="rain">1.2mm/h</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="pane-3">
+		<div class="contents">
+			<div class="calendar">
+				<div class="date blank">
+					<label class="datetxt">31</label>
+					
+				</div>
+				<div class="date">
+					<label class="datetxt">1 Apr</label>
+					<svg class="logo" viewbox="0 0 200 200">
+						<use href="#mo-square"/>
+						<use href="#mo-text"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">02</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">03</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="B">B</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">04</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">05</label>
+					<svg class="logo" viewbox="0 0 200 200">
+						<use href="#mo-square"/>
+						<use href="#mo-text"/>
+					</svg>
+					<label grade="A+">A<sup>+</sup></label>
+				</div>
+				<div class="date">
+					<label class="datetxt">06</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div><div class="date">
+					<label class="datetxt">31</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A+">A<sup>+</sup></label>
+				</div>
+				<div class="date">
+					<label class="datetxt">1 Apr</label>
+					<svg class="logo" viewbox="0 0 200 200">
+						<use href="#mo-square"/>
+						<use href="#mo-text"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">02</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">03</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="B">B</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">04</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">05</label>
+					<svg class="logo" viewbox="0 0 200 200">
+						<use href="#mo-square"/>
+						<use href="#mo-text"/>
+					</svg>
+					<label grade="A+">A<sup>+</sup></label>
+				</div>
+				<div class="date">
+					<label class="datetxt">06</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div><div class="date">
+					<label class="datetxt">31</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A+">A<sup>+</sup></label>
+				</div>
+				<div class="date">
+					<label class="datetxt">1 Apr</label>
+					<svg class="logo" viewbox="0 0 200 200">
+						<use href="#mo-square"/>
+						<use href="#mo-text"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">02</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">03</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="B">B</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">04</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">05</label>
+					<svg class="logo" viewbox="0 0 200 200">
+						<use href="#mo-square"/>
+						<use href="#mo-text"/>
+					</svg>
+					<label grade="A+">A<sup>+</sup></label>
+				</div>
+				<div class="date">
+					<label class="datetxt">06</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div><div class="date">
+					<label class="datetxt">31</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A+">A<sup>+</sup></label>
+				</div>
+				<div class="date">
+					<label class="datetxt">1 Apr</label>
+					<svg class="logo" viewbox="0 0 200 200">
+						<use href="#mo-square"/>
+						<use href="#mo-text"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">02</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">03</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="B">B</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">04</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">05</label>
+					<svg class="logo" viewbox="0 0 200 200">
+						<use href="#mo-square"/>
+						<use href="#mo-text"/>
+					</svg>
+					<label grade="A+">A<sup>+</sup></label>
+				</div>
+				<div class="date">
+					<label class="datetxt">06</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div><div class="date">
+					<label class="datetxt">31</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A+">A<sup>+</sup></label>
+				</div>
+				<div class="date">
+					<label class="datetxt">1 Apr</label>
+					<svg class="logo" viewbox="0 0 200 200">
+						<use href="#mo-square"/>
+						<use href="#mo-text"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">02</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">03</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="B">B</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">04</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">05</label>
+					<svg class="logo" viewbox="0 0 200 200">
+						<use href="#mo-square"/>
+						<use href="#mo-text"/>
+					</svg>
+					<label grade="A+">A<sup>+</sup></label>
+				</div>
+				<div class="date">
+					<label class="datetxt">06</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div><div class="date">
+					<label class="datetxt">31</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A+">A<sup>+</sup></label>
+				</div>
+				<div class="date">
+					<label class="datetxt">1 Apr</label>
+					<svg class="logo" viewbox="0 0 200 200">
+						<use href="#mo-square"/>
+						<use href="#mo-text"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">02</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">03</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="B">B</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">04</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+				<div class="date">
+					<label class="datetxt">05</label>
+					<svg class="logo" viewbox="0 0 200 200">
+						<use href="#mo-square"/>
+						<use href="#mo-text"/>
+					</svg>
+					<label grade="A+">A<sup>+</sup></label>
+				</div>
+				<div class="date">
+					<label class="datetxt">06</label>
+					<svg class="logo" viewbox="0 0 1000 400">
+						<use href="#bbc-full"/>
+					</svg>
+					<label grade="A">A</label>
+				</div>
+			</div>
+			<div class="title-bar">
+				<a class="sub">Last month...</a>
+				<a class="main">Met Office was the most accurate</a>
+				<a class="sub">in your area.</a>
+			</div>
+		</div>
+	</div>
+</div>

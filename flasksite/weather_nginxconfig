@@ -2,7 +2,14 @@ server {
 	listen 80;
 	server_name myweather.uksouth.cloudapp.azure.com;
 
-	location / {
+	root /home/azureuser/weatherdata/flasksite/static;
+	index doc/main.html;
+
+	location /static {
+		try_files $uri $uri/ =404;
+	}
+
+	location /api {
 		proxy_pass http://127.0.0.1:8000;
 		proxy_set_header Host $host;
 		proxy_set_header X-Real-IP $remote_addr;

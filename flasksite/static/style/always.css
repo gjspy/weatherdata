@@ -1,0 +1,484 @@
+:root {
+	/* COLOURS */
+	--met-office: #D6DF23;
+	--met-office: #b9d532; /* dark bkg*/
+	--met-office: #d7df00; /* light */
+	--met-office-mono: #231F20;
+
+	--met-office-text: #0fbd00;
+	--bbc-text: #0997ce;
+
+	--bbc: #149edc;
+
+	--grade-APlus: #FF41D8;
+	--grade-A: #2EC918;
+	--grade-B: #23C5D5;
+	--grade-C: #FF5400;
+	--grade-D: #C40000;
+	--grade-F: #000000;
+
+	--period-thin-border: 0.75px solid rgba(0, 0, 0, .2);
+	
+}
+
+svg:not(.mono) [href="#mo-square"] {
+	fill: var(--met-office);
+}
+
+svg [href="#mo-text"], svg #mo-text {
+	fill: var(--met-office-mono);
+}
+
+g#bbc-full .ln2 {
+	fill: var(--bbc);
+}
+
+[grade="A+"] {
+	color: var(--grade-APlus) !important;
+}
+
+[grade="A+"]:has(sup) {
+	position: relative;
+}
+
+[grade="A+"] sup {
+	display: inline-flex; /* dont ask why flex, just makes it work! */
+	position: absolute;
+
+	font-size: 0.5em;
+
+	line-height: initial;
+}
+
+[grade="A"] {
+	color: var(--grade-A) !important;
+}
+
+[grade="B"] {
+	color: var(--grade-B) !important;
+}
+
+[grade="C"] {
+	color: var(--grade-C) !important;
+}
+
+[grade="D"] {
+	color: var(--grade-D) !important;
+}
+
+[grade="F"] {
+	color: var(--grade-F) !important;
+}
+
+div.underline.light {
+	background-color: rgba(0, 0, 0, .2);
+}
+
+div.underline.thin {
+	--size: min(1.5px, 1vh);
+	margin-top: calc(var(--size) * -1) !important;
+	height: var(--size);
+}
+
+div.underline.moderate {
+	width: 90%;
+	margin: 0 auto;
+}
+
+div.underline.most {
+	width: 94%;
+	margin: 0 auto;
+}
+
+div.underline.full {
+	width: 100%;
+	margin: 0 auto;
+}
+
+
+
+body {
+	--topbar-height: max(70px, 9vh);
+	--content-height: calc(100vh - var(--topbar-height));
+
+	margin: 0 !important;
+	overflow: hidden;
+}
+
+
+
+#topbar {
+	width: 100vw;
+
+	z-index: 102;
+	height: var(--topbar-height);
+
+	position: relative;
+
+	display: flex;
+	justify-content: space-between;
+	
+	/*background:rgb(0, 56, 10);*/
+	background: #80956d;
+	background: #8aabca;
+
+	img#logo {
+		height: 90%;
+
+		padding-top: calc(var(--topbar-height) * 0.05);
+		padding-left: calc(var(--topbar-height) * 0.05);
+	}
+
+	img#wordlogo {
+		height: 125%;
+		margin-top: calc(var(--topbar-height) * -0.1);
+	}
+
+	overflow: hidden;
+}
+
+#topbar #logocont {
+	height: 100%;
+}
+
+#topbar #logocont img {
+	display: inline;
+	float: left;
+	filter: drop-shadow(#000000 1px 1px 1px);
+}
+
+#topbar #topleft {
+	font-size: 25px;
+	font-family: "Viga", serif;
+	text-align: right;
+	height: 100%;
+	flex: 20%; /* WIP*/
+}
+
+#topbar #navbar {
+	display: flex;
+	gap: 10px;
+
+	align-items: flex-end;
+	justify-content: center;
+	
+	height: 100%;
+	width: fit-content;
+	padding-left: auto;
+
+	font-size: 30px;
+	font-family: "Viga", serif;
+	flex: 60%;/* WIP*/
+	
+	* {
+		color: white;
+	}
+}
+
+body:has(#content > [location-selector="true"]) #loc-card {
+	display: block;
+}
+
+#loc-card {
+	display: none; /* default status, unless needed */
+
+	position: absolute;
+	z-index: 100;
+	width: 10vw;
+
+	padding: 5px;
+	background:#8aabca;
+
+	/*filter: drop-shadow(0px 2px 2px black);*/
+	box-shadow: 1px 1px 0px black;
+	border: 1px solid black;
+	border-top: none;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+
+	margin-left: 10px;
+	color: white;
+
+	cursor: pointer;
+	user-select: none;
+}
+
+#loc-card:hover {
+	/*filter: drop-shadow(0px 3px 2px black);*/
+	box-shadow: 2px 2px 0px black;
+}
+
+#loc-card:active{
+	/*filter: drop-shadow(0px 1px 2px black);*/
+	box-shadow: 0px -1px 0px black;
+}
+
+#loc-card * {
+	vertical-align: middle;
+}
+
+#loc-card svg {
+	display: inline;
+	width: 35px;
+}
+
+#loc-card label {
+	display: inline;
+
+	font-family: Lilita One;
+	font-size: 1.6vw;
+	pointer-events: none;
+
+	filter: drop-shadow(1px 1px 0px black);
+}
+
+.sticky-bkg {
+	width: 100vw;
+	height: calc(var(--content-height) * 2);
+
+	position: absolute;
+}
+
+
+.sticky-bkg img {
+	width: 100vw;
+	height: var(--content-height);
+
+	overflow: hidden;
+	z-index: -1;
+
+	position: sticky;
+	top: 0;
+
+	object-fit: cover;
+	object-position: center;
+}
+
+.sticky-bkg::after {
+	content: var(--sticky-colour-gradient);
+
+	width: 100vw;
+	height: var(--content-height);
+
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	z-index: 1;
+
+	pointer-events: none;
+
+	background: var(--sticky-colour-gradient);
+}
+
+
+a.map-pin-tooltip {
+	opacity: 0; /* fade in, code sets inline style for opacity = 1 */
+	/*position: fixed;*/
+	position: absolute;
+
+	font-family: "Viga";
+
+	background: rgba(255,255,255,1);
+	border-radius: 5px;
+
+	padding: 2px 5px;
+
+	offset-anchor: bottom left;
+
+	text-wrap: nowrap; /**/
+
+	pointer-events: none;
+
+	transition: opacity 0.1s ease 0.03s;
+}
+
+.GMAMP-maps-pin-view {
+	transform-origin: bottom center;
+	transition: transform 0.03s ease;
+}
+
+/*.sticky-bkg .stopper {
+	height: calc(var(--content-height) * 2);
+	background: transparent;
+}*/
+
+#content {
+	height: var(--content-height);
+	width: 100vw;
+	overflow: hidden scroll;
+
+	scroll-behavior: auto !important; /* MUST BE, for scrollTo(instant) TO WORK. */
+	scrollbar-width: thin;
+
+	position: absolute;
+}
+
+#content:not(:has(.content-elem)),
+#content:has(.content-elem[rendered="false"]) {
+	display: none;
+}
+
+#content > * {
+	width: inherit;
+	height: fit-content;
+}
+
+
+
+.calendar {
+	--datetxt-size: calc(var(--date-square) * 0.08);
+
+	width: calc(var(--date-square) * 7);
+
+	position: relative;
+
+	background: white;
+
+	border-radius: 4px;
+	border: 1px solid black;
+	
+	z-index: 0;
+}
+
+.calendar .calendar-cont {
+	width: inherit;
+	height: calc(var(--date-square) * var(--n-weeks));
+
+	display: grid;
+	grid-template-columns: repeat(7, var(--date-square));
+	grid-template-rows: repeat(var(--n-weeks), var(--date-square));
+}
+
+.calendar .day-header {
+	width: calc(var(--date-square) * 7);
+	height: var(--datehead-size);
+
+	display: grid;
+	grid-template-columns: repeat(7, var(--date-square));
+	grid-template-rows: var(--datehead-size);
+
+	background-color: #e3e3e3;
+
+	/*padding: 1px 0;*/
+	
+}
+
+.calendar .day-header:not(:empty) {
+	border-bottom: var(--period-thin-border);
+}
+
+.calendar .day-header .day {
+	font-size: var(--datetxt-size);
+	line-height: var(--datetxt-size);
+	padding: 1px;
+
+	font-family: Roboto;
+	font-weight: 600;
+}
+
+.calendar .day-header .day:not(:first-child) {
+	border-left: var(--period-thin-border);
+}
+
+.calendar .date {
+	border-bottom: var(--period-thin-border);
+	background: white;
+	z-index: 2;
+}
+
+.calendar .date[floating] {
+	width: var(--date-square);
+	height: var(--date-square);
+
+	transition: opacity 0.15s ease;
+
+	opacity: 0;
+
+	border: 1px solid black !important;
+	border-top: none !important;
+	filter: drop-shadow(0px 4px 2px rgba(0, 0, 0, 0.733));
+}
+
+.calendar .date[floating] > * {
+	transition: opacity 0.3s 0.15s ease;
+	opacity: inherit;
+}
+
+.calendar .date:not(:nth-child(7n + 1)) {
+	border-left: var(--period-thin-border);
+}
+
+.calendar .date:not(:has(svg):has(label[grade])) {
+	background: #e3e3e3;
+}
+
+.calendar .date > svg {
+	display: block;
+	width: 100%;	
+}
+
+.calendar .date > svg:has(use[href="#mo-square"]) {
+	height: 45%;
+}
+
+.calendar .date > svg:has(use[href="#bbc-full"]) {
+	padding: 7% 0 3% 0;
+	height: 35%;
+}
+
+.calendar .date > svg:has(use[href="#equals"]) {
+	padding: 12.5% 0 0 0;
+	height: 20%;
+}
+
+.calendar .date:has(svg use[href="#equals"]) > label[grade] {
+	font-size: calc(var(--date-square) * 0.5);
+}
+
+.calendar .date label.datetxt {
+	font-family: Roboto;
+	font-weight: 800;
+	font-size: var(--datetxt-size);
+	line-height: var(--datetxt-size);
+
+	display: block;
+	margin: 3px 0 0 5px;
+}
+
+.calendar .date > label[grade] {
+	font-family: Luckiest Guy;
+	font-size: calc(var(--date-square) * 0.4);
+	width: 100%;
+	text-align: center;
+	display: block;
+}
+
+
+#popup-map {
+	width: 100vw;
+	height: 100vh;
+
+	z-index: 101;
+}
+
+#popup-map-cont {
+	width: inherit;
+	height: inherit;
+	z-index: 101;
+}
+
+#popup-map > a {
+	font-family: Lilita One;
+	font-size: min(3vw,6vh);
+
+	padding: 10px 15px;
+	color: rgb(223, 52, 164);
+	filter: drop-shadow(2px 2px 0px black);
+
+	position: absolute;
+	z-index: 102;
+}
+
+#popup-map.invisible, #popup-map:has(.invisible) {
+	display: none;
+}

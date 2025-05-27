@@ -1,0 +1,234 @@
+#changes {
+	--bkg: #b9ffcb;
+	--bkg: #e3ffea;
+	--sticky-colour-gradient: linear-gradient(to bottom, transparent 99%, var(--bkg) 100%);
+
+	--padding-lr: 6vw;
+
+	background: var(--bkg)
+}
+
+
+#changes > :not(.sticky-bkg) {
+	height: var(--content-height);
+	position: relative;
+}
+
+#changes .pane-1 .contents {
+	
+}
+
+#changes .title-bar {
+	position: relative;
+
+	margin-bottom: 1%;
+}
+
+#changes .title-bar .main {
+	--font-size: min(8vh,10vw);
+	color: #2992f3;
+	filter: drop-shadow(2px 2px 0px black);
+	font-family: "Lilita One", "Serif";
+	font-size: var(--font-size);
+	line-height: var(--font-size);
+	display: block;
+
+	width: fit-content;
+
+	padding-top: 2vh;
+}
+
+#changes .title-bar .sub {
+	--font-size: min(2vh,3vw);
+	font-family: "Viga";
+	font-size: var(--font-size);
+	line-height: var(--font-size);
+	display: block;
+	width: fit-content;
+
+	padding: 0.75% 0 0 1.5vw;
+}
+
+#changes .title-bar .right-items {
+	position: absolute;
+	right: 5%;
+	bottom: 0;
+}
+
+#changes .title-bar .right-items .sub {
+	--font-size: min(2.5vh,3.5vw);
+	padding: 0 5px 0 0 ;
+
+	display: inline;
+}
+
+#changes .title-bar .right-items .loc-name {
+	--font-size: min(6vh, 8vw);
+	display: inline;
+}
+
+
+#changes .pane-1 .contents {
+	--n-weeks: 1;
+	--content-width: calc(100vw - var(--padding-lr) * 2);
+	--date-square: calc(var(--content-width) / 7);
+
+	width: inherit;
+	height: fit-content;
+	box-sizing: border-box;
+
+	display: flex;
+	flex-direction: column;
+
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+
+	padding: 4vh var(--padding-lr) 2vh var(--padding-lr);
+}
+
+#changes .pane-1 .title-bar .right-items {
+	right: 10vw;
+}
+
+#changes .pane-1 .calendar {
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 2%;
+}
+
+#changes .pane-1 .calendar .date > div:not(.underline) {
+	height: calc(50% - var(--datetxt-size));
+
+	display: flex;
+	align-items: center;
+	justify-content: space-evenly;
+}
+
+#changes .pane-1 .calendar .date svg {
+	width: 50%;
+	max-height: 80%;
+}
+
+#changes .pane-1 .calendar .date label[grade] {
+	font-family: Luckiest Guy;
+	font-size: calc(var(--date-square) * 0.3);
+}
+
+#changes .pane-1 .calendar .date.highlight {
+	background: #ffffd5;
+}
+
+#changes .pane-1 .calendar :first-child {
+	border-top-left-radius: 4px;
+	border-bottom-left-radius: 4px;
+}
+
+#changes .pane-1 .calendar :last-child {
+	border-top-right-radius: 4px;
+	border-bottom-right-radius: 4px;
+}
+
+#changes .pane-1 .calendar-subtitle {
+	width: var(--content-width);
+	margin: 0.5% auto 0 auto;
+
+	font-family: Viga;
+	font-size: min(1.5vw, 1.5vh);
+}
+
+#changes .info-tables {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+
+	padding: 2% calc(var(--padding-lr)/2) 0 calc(var(--padding-lr)/2);
+	box-sizing: border-box;
+}
+
+#changes .entry {
+	width: 45%;
+
+	padding: 0.5% 1%;
+
+	background: white;
+	box-shadow: 5px 5px black;
+	border: 1px solid rgb(70,70,70);
+}
+
+
+#changes table.summary-table.change {
+	--n-grade-cols: 5;
+	--col-1-wid: 40%;
+
+	width: 100%;
+
+	font-size: 2vh;
+	font-family: "Roboto", sans-serif;
+	font-weight: 500;
+
+	border-collapse: collapse;
+}
+
+#changes table svg {
+	height: 7vh;
+}
+
+#changes table svg:has(use[href="#bbc-full"]) {
+	margin-right: 15px;
+}
+
+#changes table.summary-table tr :first-child {
+	font-size: 2vh;
+}
+
+#changes table.summary-table.change tr:first-child :first-child {
+	width: var(--col-1-wid);
+	text-align: right;
+}
+
+#changes table.summary-table.change tr:first-child :not(:first-child) {
+	width: calc(calc(100% - var(--col-1-wid)) / var(--n-grade-cols));
+}
+
+#changes table.summary-table.change td {
+	padding: 0;
+}
+
+#changes table.summary-table td[grade] {
+	font-family: "Luckiest Guy", serif;
+	font-size: 3.5vh;
+
+	
+}
+
+#changes table.summary-table.change tr :nth-child(n + 2) {
+	padding: 0 0 5px 5px;
+}
+
+
+#changes table.summary-table.change tr:not(:last-child) {
+	border-bottom: var(--period-thin-border);
+}
+
+#changes table.summary-table.change tr:first-child {
+	border-bottom: 1px solid black;
+}
+
+#changes table.summary-table.change tr :nth-child(2) {
+	border-left: 1px solid black;
+}
+
+#changes table.summary-table.change tr :nth-child(n + 3) {
+	border-left: var(--period-thin-border);
+}
+
+
+
+#changes .pane-2 .contents {
+	width: inherit;
+	height: inherit;
+	padding: 0 var(--padding-lr) 2vh var(--padding-lr);
+}
