@@ -4,3 +4,5 @@ mysql-connector-python
 lxml
 dotenv
 requests
+fastapi
+uvicorn

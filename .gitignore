@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 
 *_gitignore.*
+convertJSONtoMYSQL.py
 
 # Ignore environment files
 .env
