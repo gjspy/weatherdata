@@ -1,0 +1,6 @@
+SQLAlchemy
+beautifulsoup4
+mysql-connector-python
+lxml
+dotenv
+requests
