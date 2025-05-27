@@ -1,0 +1,13 @@
+[Unit]
+Description=Python Weather Data Collection (DB Feeder)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=~/weatherdata
+ExecStart=~/weatherdata/.venv/bin/python ~/weatherdata/main.py
+Restart=always
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=default.target
