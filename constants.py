@@ -1,6 +1,6 @@
 # HAS EVERY VARIABLE NEEDED AS OF 12/05/25
 
-from datetime import timedelta, timezone
+from datetime import timezone
 from platform import system
 from dotenv import load_dotenv
 from typing import Callable

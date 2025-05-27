@@ -1,18 +1,15 @@
 import logging.handlers
-from sqlalchemy import create_engine, Column, Integer, String, func, Engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine, Engine
 from sqlalchemy.orm import sessionmaker, Session
 
 from datetime import datetime, timezone, timedelta
 from datetime import time as datetime_time
 from bs4 import BeautifulSoup
 from typing import Callable
-from PIL import Image
 import threading # daemon = end when main thread ends
 import requests
 import logging
 import time
-import json
 import copy
 import re
 #DEPENDENCY: LXML FOR BS4, mysql-connector-python
