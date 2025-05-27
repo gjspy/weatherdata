@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=~/weatherdata
-ExecStart=~/weatherdata/.venv/bin/python ~/weatherdata/main.py
+WorkingDirectory=/home/azureuser/weatherdata
+ExecStart=/home/azureuser/weatherdata/.venv/bin/python /home/azureuser/weatherdata/main.py
 Restart=always
 Environment=PYTHONUNBUFFERED=1
 
