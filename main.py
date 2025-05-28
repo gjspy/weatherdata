@@ -1,4 +1,3 @@
-import logging.handlers
 from sqlalchemy import create_engine, Engine
 from sqlalchemy.orm import sessionmaker, Session
 
@@ -6,6 +5,7 @@ from datetime import datetime, timezone, timedelta
 from datetime import time as datetime_time
 from bs4 import BeautifulSoup
 from typing import Callable
+import logging.handlers
 import threading # daemon = end when main thread ends
 import requests
 import logging
@@ -369,7 +369,7 @@ def db_commit_loop(engine: Engine):
 		updates = next_item.get("updates")
 
 		if (query): task_detail.append(query.__name__)
-		if (objs): task_detail.append(f"add {len(objs)} objs")
+		if (objs): task_detail.append(f"add {len(objs)} objs: " + ",".join(o.__name__ for o in objs))
 		if (updates): task_detail.append(f"update {len(updates.keys())} items")
 
 		task_str = ""
@@ -585,7 +585,7 @@ def daily_fcst_evaluate(detail: str = "COMPAREcompare"):
 		logger.debug(f"KEY DOING {k}")
 		future_times = [fcst.future_time for fcst in rows]
 
-		mid, org, _ = k
+		mid, org, fcst_time = k
 		period = 3 if (org == "M3") else 24 if (org == "BD") else 1
 
 		obs = invoke_db(
@@ -596,8 +596,11 @@ def daily_fcst_evaluate(detail: str = "COMPAREcompare"):
 			),
 			wait = True
 		)
-	
-		changes = eval_day_of_forecast_instances(obs, rows, org)
+
+		try:
+			changes = eval_day_of_forecast_instances(obs, rows, org)
+		except Exception:
+			logger.exception(f"ERR EVALING KEY {k}")
 		if (not changes): continue
 
 		invoke_db(**changes, wait = False)
@@ -1061,22 +1064,26 @@ def do_job(func: str, detail: str | list[str], batch_time: datetime, wanted_mode
 
 
 	logger.info(f"{tracking}doing job {wanted_model_run_time}")
+	data_groups = []
 
-	match func:
-		case "BOBS" | "OOBS" | "B1FCST" | "BDFCST" | "M1FCST" | "M3FCST":
-			data_groups = get(func, detail, batch_time, wanted_model_run_time, tracking)
-		
-		case "MOBS":
-			data_groups = get_multi_from_one_request_moobs(func, detail, batch_time, wanted_model_run_time, tracking)
+	try:
+		match func:
+			case "BOBS" | "OOBS" | "B1FCST" | "BDFCST" | "M1FCST" | "M3FCST":
+				data_groups = get(func, detail, batch_time, wanted_model_run_time, tracking)
+			
+			case "MOBS":
+				data_groups = get_multi_from_one_request_moobs(func, detail, batch_time, wanted_model_run_time, tracking)
 
-		case "DOBS":
-			data_groups = get_multi_from_one_request_dpobs(func, detail, batch_time, wanted_model_run_time, tracking)
-		
-		case "CLEAN":
-			hourly_obs_clean("CLEANclean")
+			case "DOBS":
+				data_groups = get_multi_from_one_request_dpobs(func, detail, batch_time, wanted_model_run_time, tracking)
+			
+			case "CLEAN":
+				hourly_obs_clean("CLEANclean")
 
-		case "COMPARE":
-			daily_fcst_evaluate("COMPAREcompare")
+			case "COMPARE":
+				daily_fcst_evaluate("COMPAREcompare")
+	except Exception:
+		logger.exception(f"ERR DOING JOB {func}{detail}")
 
 	if (not data_groups):
 		logger.debug(f"{tracking}no data")

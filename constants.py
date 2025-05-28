@@ -13,6 +13,9 @@ DB_U = os.getenv("DB_U")
 DB_P = os.getenv("DB_P")
 DB_H = os.getenv("DB_H")
 
+if ("db2" in DB_H):
+	for i in range(100): print("USING DB2, NOT MAINDB.")
+
 CONNECION_URL = f"mysql+mysqlconnector://{DB_U}:{DB_P}@{DB_H}"
 CONNECTION_KWARGS = {
 	"pool_recycle": 1800, # avoid stale connections (eg after mySQL timeout)
@@ -116,6 +119,32 @@ RESULT_CONDITIONS = [
 ]
 
 PRECIP_PROB_THRESH_TO_COUNT_AS_FCSTED = 20
+
+
+WEATHER_BKGS_DIR = "static/backgrounds/"
+
+WEATHER_PHOTO_TO_WTS = {
+	"AS183401940": [2,3],
+	"AS308506241": [4,5,6,16,17],
+	"AS439173189": [7,8,9,10,11],
+	"AS291241545": [12,13,14,15]
+}
+
+def get_photo_from_wt(wt: int):
+	keys = list(WEATHER_PHOTO_TO_WTS.keys())
+	grouped_values = list(WEATHER_PHOTO_TO_WTS.values())
+
+	if (wt == -1): return WEATHER_BKGS_DIR + keys[0]
+
+	try: group_with_wt = [v for v in grouped_values if wt in v][0]
+	except: group_with_wt = grouped_values[0]
+
+	group_with_wt_index = grouped_values.index(group_with_wt)
+	photo_id = keys[group_with_wt_index]
+
+	return WEATHER_BKGS_DIR + photo_id
+
+
 
 SITE_INFO = [ # CONVENTION: USE mId for all storage.
 	{

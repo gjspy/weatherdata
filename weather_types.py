@@ -52,6 +52,7 @@ BBCD_WEATHER_TYPES = {
 	"Heavy Rain": 8,
 	"Fog": 17,
 	"Mist": 16,
+	"Hazy": None,
 	"Light Snow": 12,
 	"Thundery Showers": 10
 }

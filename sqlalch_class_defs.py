@@ -1,11 +1,12 @@
-from sqlalchemy import Column, Integer, ForeignKeyConstraint, UniqueConstraint, PrimaryKeyConstraint, ForeignKey, func, and_
+from sqlalchemy import Column, Integer, ForeignKeyConstraint, UniqueConstraint, PrimaryKeyConstraint, ForeignKey, and_, Engine
 from sqlalchemy.dialects.mysql import DATETIME, FLOAT, TINYINT, SMALLINT, CHAR, INTEGER, BOOLEAN
-from sqlalchemy.orm import Session, declarative_base, relationship
+from sqlalchemy.orm import Session, declarative_base, relationship, Mapped
 
 from datetime import datetime, timedelta
-from typing import Callable
+from typing import Callable, Any
 
 from constants import *
+import string_queries as squeries
 
 Base = declarative_base()
 
@@ -128,7 +129,7 @@ class Result(Base):
 
 	# if changing, edit RESULT_CONDITIONS constant
 
-	fcst = relationship("FCST")
+	fcst: Mapped[FCST] = relationship("FCST")
 
 	__table_args__ = (
 		UniqueConstraint('FCST_ID', 'PERIOD'),
@@ -136,6 +137,47 @@ class Result(Base):
 
 
 class Queries():
+
+	def query(query: Callable[[Session], Any], session_constructor: Callable[[], Session]):
+		session = session_constructor()
+
+		return query(session)
+		
+
+	# api queries
+
+	def get_recent_obs_urgent(mid: int | None = None) -> Callable[[Session], int | None]:
+		if (mid and mid != "wholeuk"): return (
+			lambda session:
+				session.query(DirtyOBS.wt) \
+					.filter(DirtyOBS.mid == mid) \
+					.order_by(DirtyOBS.dt.desc()) \
+					.limit(1)
+					.all()
+			)
+
+		return (
+			lambda session:
+				session.execute(squeries.GET_MOST_RECENT_AVG_WT_NATIONWIDE) \
+				.fetchall()
+			)
+
+	def get_results(interval: int, mid: int, orgs: list[str], count_per_org: int) -> Callable[[Session], list]:
+		return (
+			lambda session:
+				session.query(Result) \
+					.join(Result) \
+					.filter(
+						Result.period == interval,
+						FCST.mid == mid,
+						FCST.org.in_(orgs)
+					)# \
+					#.order_by(Result.org, Result.)
+			)
+
+
+
+	# collection queries
 
 	def get_default_obs(session: Session) -> list:
 		return session.query(CleanOBS) \
@@ -154,7 +196,7 @@ class Queries():
 				)
 			) \
 			.filter(
-				DirtyOBS.dt < func.now() - timedelta(hours = DB_CLEANUP_BUFFER_HOURS),
+				DirtyOBS.dt < datetime.now() - timedelta(hours = DB_CLEANUP_BUFFER_HOURS),
 				DirtyOBS.has_cleaned.is_(None),
 				CleanOBS.id.is_(None),
 				#DirtyOBS.mid == 3002, # TESTING
@@ -167,9 +209,8 @@ class Queries():
 	def get_fcsts_to_eval(session: Session) -> list:
 		return session.query(FCST) \
 			.filter(
-				FCST.fcst_time <= func.now() - timedelta(days = 1, hours = COMPARE_HOUR),
-				FCST.future_time < func.now() - timedelta(hours = COMPARE_HOUR), # NOT <=. 24 hours = midnight - 11pm.
-				#FCST.future_time < datetime(2025, 5, 12) - timedelta(hours = COMPARE_HOUR), # NOT <=. 24 hours = midnight - 11pm.
+				FCST.fcst_time <= datetime.now() - timedelta(days = 1, hours = COMPARE_HOUR),
+				FCST.future_time < datetime.now() - timedelta(hours = COMPARE_HOUR), # NOT inclusive. 24 hours = midnight -> 11pm.
 				FCST.obs_id.is_(None),
 				#FCST.org == "M3", # TESTING
 				#FCST.mid == 3002, # TESTING
@@ -178,6 +219,7 @@ class Queries():
 			.order_by(FCST.fcst_time.asc(), FCST.mid, FCST.future_time.asc()) \
 			.all() # dont limit at all, eval is very quick.
 	
+
 	def get_obs_between_times(earliest_inc: datetime, latest_exc: datetime, mid: int) -> Callable[[Session], list]:
 		return (
 			lambda session:
@@ -188,6 +230,7 @@ class Queries():
 				).order_by(CleanOBS.dt.asc()).all()
 		)
 			
+
 	def get_obs(mid: int, dt: datetime) -> Callable[[Session], list]:
 		return (
 			lambda session: 
