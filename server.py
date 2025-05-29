@@ -18,7 +18,7 @@ from flasksite.apihelpers import InterpretParam, get_json_graded_result, get_org
 from sqlalch_class_defs import Queries, Result
 from constants import *
 
-MAPSINIT_LOC = f"{SLASH}static{SLASH}script{SLASH}mapsinit.js"
+MAPSINIT_LOC = f"flasksite{SLASH}static{SLASH}script{SLASH}mapsinit.js"
 
 MAX_CACHE_AGE = 20 * 60 # seconds
 
@@ -108,7 +108,7 @@ def get_mapsinit():
 	data = f.read()
 	f.close()
 
-	data.replace("__KEY__", GOOG_MAPS_API_K)
+	data = data.replace("__KEY__", GOOG_MAPS_API_K)
 
 	global_cache_manager.scripts.add("mapsinit", data)
 	return data
