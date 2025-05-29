@@ -463,7 +463,7 @@ def db_commit_loop(engine: Engine):
 			_id = next_item.get("id")
 
 			try:     logger.info(get_debug_str(tracking, next_item, ql, good))
-			except:  logger.info(f"completed task {_id} with {ql - 1} left. good? {not not good}.")
+			except Exception as err:  logger.info(f"completed task {_id} with {ql - 1} left. good? {not not good}. (couldnt get debug str {err})")
 
 			db_commit_queue.pop(0)
 		

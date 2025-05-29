@@ -20,7 +20,7 @@ server {
 
 	# match any first level path that hasnt been previously defined (static, api),
 	# excluding second level. [eg /, /local, /changes]
-	location ~ ^/[^/]*$ {
+	location ~ ^\/[^/]*$ {
 		try_files /doc/main.html =404;
 	}
 
