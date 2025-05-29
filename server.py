@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, Engine
 from sqlalchemy.orm import sessionmaker, Session
 
-from fastapi.responses import RedirectResponse, FileResponse
+from fastapi.responses import RedirectResponse, FileResponse, Response
 from fastapi import FastAPI, Query, HTTPException
 
 from datetime import datetime, timedelta
@@ -111,7 +111,7 @@ def get_mapsinit():
 	data = data.replace("__KEY__", GOOG_MAPS_API_K)
 
 	global_cache_manager.scripts.add("mapsinit", data)
-	return data
+	return Response(data, media_type = "application/javascript")
 
 
 
