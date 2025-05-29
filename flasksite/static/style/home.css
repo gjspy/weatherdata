@@ -315,7 +315,7 @@
 }
 
 #homepage table.summary-table {
-	font-size: 4vh;
+	font-size: 3vmin;
 	font-family: "Roboto", sans-serif;
 
 	border-collapse: collapse;
@@ -540,7 +540,7 @@
 	transition-delay: 0.5s, 0.5s;
 }
 
-#homepage .pane-3 .date:hover {
+#homepage .pane-3 .date[best]:hover {
 	background: var(--detail-bkg);
 	border-bottom: 1px solid rgba(0,0,0,0) !important;
 	transition-delay: 0s, 0s;
@@ -581,12 +581,12 @@
 	
 }
 
-#homepage .pane-3 .calendar:has(.date:hover) .date,
+#homepage .pane-3 .calendar:has(.date[best]:hover) .date,
 #homepage .pane-3 .calendar:has(.detail:hover) .detail {
 	transition-delay: 0s, 0s;
 }
 
-#homepage .pane-3 .calendar:has(.date:hover) .detail,
+#homepage .pane-3 .calendar:has(.date[best]:hover) .detail,
 #homepage .pane-3 .calendar:has(.detail:hover) .detail {
 	top: var(--date-square);
 

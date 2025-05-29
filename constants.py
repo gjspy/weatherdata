@@ -1,6 +1,6 @@
 # HAS EVERY VARIABLE NEEDED AS OF 12/05/25
 
-from datetime import timezone
+from datetime import datetime, timezone, timedelta
 from platform import system
 from dotenv import load_dotenv
 from typing import Callable
@@ -13,14 +13,16 @@ DB_U = os.getenv("DB_U")
 DB_P = os.getenv("DB_P")
 DB_H = os.getenv("DB_H")
 
-if ("db2" in DB_H):
-	for i in range(100): print("USING DB2, NOT MAINDB.")
+if ("maindb" in DB_H):
+	for i in range(100): print("USING MAINDB, NOT DB2. DB2 IS *NOW* THE DB USED BY COLLECTION.SERVICE")
 
 CONNECION_URL = f"mysql+mysqlconnector://{DB_U}:{DB_P}@{DB_H}"
 CONNECTION_KWARGS = {
 	"pool_recycle": 1800, # avoid stale connections (eg after mySQL timeout)
 	"pool_pre_ping": True # check if connection is alive before using
 }
+
+MY_API_K = os.getenv("MY_API_K")
 
 MO_GS_K = os.getenv("MO_GS_K")
 MO_IM_K = os.getenv("MO_IM_K")
@@ -109,6 +111,16 @@ OBS_CONDITIONS = [
 	"vis", "snow_tot"
 ]
 
+FCST_CONDITIONS = [
+	"scr_temp", "temp_min", "temp_max",
+	"feels_like", "precip_rt", "precip_tot",
+	"precip_prob", "wt", "wind_s",
+	"wind_d", "wind_g", "hum",
+	"prs", "vis", "snow_tot",
+	"snow_prob", "hsnow_prob", "rain_prob",
+	"hrain_prob", "hail_prob", "sferics_prob"
+]
+
 NON_SPECIAL_CONDITIONS = ["scr_temp", "feels_like", "wind_s", "wind_d", "wind_g", "hum", "prs"]
 
 RESULT_CONDITIONS = [
@@ -118,21 +130,57 @@ RESULT_CONDITIONS = [
 	"s_p_rate", "s_p_type", "s_p_conf"
 ]
 
+JSONIFY_STORE_AS = {
+	"d_scr_temp": "t",
+	"d_feels_like": "f",
+	"s_wt": "w",
+	"d_wind_s": "ws",
+	"d_wind_d": "wd",
+	"d_wind_g": "wg",
+	"d_hum": None,
+	"d_prs": None,
+	"s_p_timing": "pt",
+	"s_p_rate": "pr",
+	"s_p_type": "pi", # for precip_intensity
+	"s_p_conf": "pc"
+}
+
+REVERSE_JSONIFY_STORE_AS = {v: k for k,v in JSONIFY_STORE_AS.items()}
+
 PRECIP_PROB_THRESH_TO_COUNT_AS_FCSTED = 20
 
 
 WEATHER_BKGS_DIR = "static/backgrounds/"
 
 WEATHER_PHOTO_TO_WTS = {
-	"AS183401940": [2,3],
-	"AS308506241": [4,5,6,16,17],
-	"AS439173189": [7,8,9,10,11],
-	"AS291241545": [12,13,14,15]
+	"DAY": {
+		"AS183401940": [2,3],
+		"AS308506241": [4,5,6,16,17],
+		"AS439173189": [7,10],
+		"AS277518383": [8,9,11],
+		"AS291241545": [12,13,14,15]
+	},
+	"NIGHT": {
+		"AS202626040": [2,3],
+		"AS175661276": [4,5,6,16,17],
+		"AS439173189": [7,10],
+		"AS277518383": [8,9,11],
+		"AS291241545": [12,13,14,15]
+	}
 }
 
-def get_photo_from_wt(wt: int):
-	keys = list(WEATHER_PHOTO_TO_WTS.keys())
-	grouped_values = list(WEATHER_PHOTO_TO_WTS.values())
+def get_photo_from_wt(wt: int, time_aware: bool = True):
+	wt_map = WEATHER_PHOTO_TO_WTS["DAY"]
+
+	if (time_aware):
+		now = datetime.now(TIMEZONE).hour
+
+		if (now < 5 or now > 19):
+			wt_map = WEATHER_PHOTO_TO_WTS["NIGHT"]
+
+
+	keys = list(wt_map.keys())
+	grouped_values = list(wt_map.values())
 
 	if (wt == -1): return WEATHER_BKGS_DIR + keys[0]
 
@@ -142,9 +190,11 @@ def get_photo_from_wt(wt: int):
 	group_with_wt_index = grouped_values.index(group_with_wt)
 	photo_id = keys[group_with_wt_index]
 
-	return WEATHER_BKGS_DIR + photo_id
+	return WEATHER_BKGS_DIR + photo_id + ".jpeg"
 
 
+GRADES = ["F", "D", "C", "B", "A", "A+"]
+N_GRADES = len(GRADES)
 
 SITE_INFO = [ # CONVENTION: USE mId for all storage.
 	{
@@ -154,62 +204,56 @@ SITE_INFO = [ # CONVENTION: USE mId for all storage.
 		"long":-2.986,
 		"mId":"11004",
 		"bId":"6296609", # observer
-		"dId":"3321",
-        "alt_mId":"890196001"
+		"dId":"3321"
 	},
 	{
 		"name":"Scilly St Marys",
-		"clean_name":"ScillyStMarys",
+		"clean_name":"Scilly St Marys",
 		"special":"Southernmost",
 		"lat":49.913,
 		"long":-6.301,
 		"mId":"3031",
 		"bId":"6943072", # observer
 		#"bId": "6296590" airport to match met office
-		"dId":"3803",
-        "alt_mId":None
+		"dId":"3803"
 	},
 	{
-		"name":"Bournemouth a'pt",
+		"name":"Bournemouth (A'pt)",
 		"clean_name":"Bournemouth",
 		"lat":50.779,
 		"long":-1.835,
 		"mId":"10007",
 		"bId":"6296591", # observer
-		"dId":"3862",
-        "alt_mId":"867b371d-8bf9-ed11-913a-0003ff7a6da1"
+		"dId":"3862"
 	},
 	{
-		"name":"Heathrow",
+		"name":"Heathrow (A'pt)",
 		"clean_name":"Heathrow",
 		"lat":51.479,
 		"long":-0.4491,
 		"mId":"12004",
 		"bId":"2647216", # cant find observer
-		"dId":"3772",
-        "alt_mId":"90be51c3-081c-ee11-913a-201642ba4217"
+		"dId":"3772"
 	},
 	{
-		"name":"Manston (near Dover)",
+		"name":"Manston (Kent)",
 		"clean_name":"Manston",
 		"lat":51.3422,
 		"long":1.3461,
 		"mId":"5034",
 		#"bId":"2643095"
 		"bId":"2633371", # observer, yeovilton nearby
-		"dId":"3797",
-        "alt_mId": "40959233"
+		"dId":"3797"
 	},
 	{
-		"name":"Wattisham (A'fd) (near Ipswitch)",
+		"name":"Wattisham (A'fd)",
 		"clean_name":"Wattisham",
 		"lat":52.123,
 		"long":0.961,
 		"mId":"4023",
 		#"bId":"6296656" # airport to match met office
 		"bId":"2634663", # observer
-		"dId":"3590",
-        "alt_mId":"9ea887bf-0249-ea11-b699-0003ff59987e"
+		"dId":"3590"
 	},
 	{
 		"name":"Coleshill (Birmingham)",
@@ -218,80 +262,72 @@ SITE_INFO = [ # CONVENTION: USE mId for all storage.
 		"long":-1.689,
 		"mId":"3015",
 		"bId":"2652582",
-		"dId":"3535",
-        "alt_mId":"2a09ac88-33a3-e911-b083-0003ff59a71f"
+		"dId":"3535"
 	},
 	{
-		"name":"Watnall (nottingham)",
+		"name":"Watnall (Nottingham)",
 		"clean_name":"Watnall",
 		"lat":53.005,
 		"long":-1.25,
 		"mId":"3029",
 		"bId":"11902831",
-		"dId":"3354",
-        "alt_mId":"91443920-6f0c-ef11-a81c-002248a1f654"
+		"dId":"3354"
 	},
 	{
-		"name":"Waddington (A'pt) (lincoln)",
+		"name":"Waddington (A'pt) [Lincoln]",
 		"clean_name":"Waddington",
 		"lat":53.175,
 		"long":-0.521,
 		"mId":"6038",
 		#"bId":"6296675" airport to match met office
 		"bId": "2634923",
-		"dId":"3377",
-        "alt_mId":"942fa7bd-dc8a-ea11-99e5-0003ff59b198"
+		"dId":"3377"
 	},
 	{
-		"name":"Shawbury (shrewsbury)",
+		"name":"Shawbury",
 		"clean_name":"Shawbury",
 		"lat":52.794,
 		"long":-2.663,
 		"mId":"5026",
 		"bId":"2638111",
-		"dId":"3414",
-        "alt_mId":None
+		"dId":"3414"
 	},
 	{
-		"name":"Brize Norton (near Oxford)",
-		"clean_name":"BrizeNorton",
+		"name":"Brize Norton (Oxfordshire)",
+		"clean_name":"Brize Norton",
 		"lat":51.758,
 		"long":-1.576,
 		"mId":"7002",
 		"bId":"2654659",
-		"dId":"3649",
-        "alt_mId":"32232337-b82d-eb11-8441-0003ff597f33"
+		"dId":"3649"
 	},
 	{
-		"name":"Bedford (near Milton Keynes)",
+		"name":"Bedford",
 		"clean_name":"Bedford",
 		"lat":52.225,
 		"long":-0.464,
 		"mId":"5006",
 		"bId":"2656046",
-		"dId":"3560",
-        "alt_mId":"dfca94cc-dd4d-e611-9401-0003ff5987fd"
+		"dId":"3560"
 	},
 	{
-		"name":"St-Athan (A'pt) (cardiff)",
-		"clean_name":"StAthan",
+		"name":"St Athan (A'pt)",
+		"clean_name":"St Athan",
 		"lat":51.405,
 		"long":-3.44,
 		"mId":"3034",
 		#"bId":"6296584" airport to match met office
 		"bId": "2638854",
-		"dId":"3716",
-        "alt_mId":"34948343"
+		"dId":"3716"
 	},
 	{
-		"name":"Sennybridge (brecon beacons)",
+		"name":"Sennybridge (Brecon)",
 		"clean_name":"Sennybridge",
 		"lat":51.063,
 		"long":-3.614,
 		"mId":"2042",
 		"bId":"2638202",
-		"dId":"3507",
-        "alt_mId":None
+		"dId":"3507"
 	},
 	{
 		"name":"Trawsgoed (Aberystwyth)", # !! bbc = aberystwyth only
@@ -300,8 +336,7 @@ SITE_INFO = [ # CONVENTION: USE mId for all storage.
 		"long":-3.947,
 		"mId":"6049",
 		"bId":"2657782", # NOT AN OBSERVER!! CANT GET OBSERVER ID
-		"dId":"3503",
-        "alt_mId":"3428d818-73c5-e711-9402-0003ff59823c"
+		"dId":"3503"
 	},
 	#{
 	#	"name":"Lake Vyrnwy", # no bbc
@@ -311,23 +346,21 @@ SITE_INFO = [ # CONVENTION: USE mId for all storage.
 	#},
 	{
 		"name":"Valley (Holyhead)",
-		"clean_name":"Valley",
+		"clean_name":"Holyhead",
 		"lat":53.252,
 		"long":-4.537,
 		"mId":"1033",
 		"bId":"2635022", # observer
-		"dId":"3302",
-        "alt_mId":"91b73390-eeeb-ec11-b5cf-0003ff595eb4"
+		"dId":"3302"
 	},
 	{
 		"name":"Capel Curig",
-		"clean_name":"CapelCurig",
+		"clean_name":"Capel Curig",
 		"lat":53.093,
 		"long":-3.941,
 		"mId":"7003",
 		"bId":"2653850",
-		"dId":"3305",
-        "alt_mId":None
+		"dId":"3305"
 	},
 	{
 		"name":"Rhyl",
@@ -336,8 +369,7 @@ SITE_INFO = [ # CONVENTION: USE mId for all storage.
 		"long":-3.509,
 		"mId":"1029",
 		"bId":"2639409",
-		"dId":"3313",
-        "alt_mId":"1fd50d90-460b-ed11-b5cf-0003ff597f35"
+		"dId":"3313"
 	},
 	{
 		"name":"Crosby",
@@ -346,8 +378,7 @@ SITE_INFO = [ # CONVENTION: USE mId for all storage.
 		"long":-3.056,
 		"mId":"8002",
 		"bId":"3209584",
-		"dId":"3316",
-        "alt_mId":None
+		"dId":"3316"
 	},
 	{
 		"name":"Rostherne (near M'cr A'pt)",
@@ -356,8 +387,7 @@ SITE_INFO = [ # CONVENTION: USE mId for all storage.
 		"long":-2.3805,
 		"mId":"54059070",
 		"bId":"2639108", # not observer
-		"dId":"3351",
-        "alt_mId":"04756743-b966-ee11-a81c-000d3adf3c9e"
+		"dId":"3351"
 	},
 	{
 		"name":"Ronaldsway (Isle of Man)",
@@ -366,18 +396,16 @@ SITE_INFO = [ # CONVENTION: USE mId for all storage.
 		"long":-4.6321,
 		"mId":"22580942",
 		"bId":"3042189",
-		"dId":"3204",
-        "alt_mId":"25478447"
+		"dId":"3204"
 	},
 	{
-		"name":"Walney Island (A'pt) (Barrow-In-Furness, near WIndermere)",
-		"clean_name":"WalneyIsland",
+		"name":"Walney Island (A'pt) (Barrow-In-Furness)",
+		"clean_name":"Barrow-in-Furness",
 		"lat":54.125,
 		"long":-3.257,
 		"mId":"1035",
 		"bId":"6296607", # airport to match met office, cant get observer
-		"dId":"3214",
-        "alt_mId":"175f0d3a-103d-ef11-a81c-6045bddef696"
+		"dId":"3214"
 	},
 	{
 		"name":"Albemarle (Newcastle)", # bccs is newcastle only
@@ -386,8 +414,7 @@ SITE_INFO = [ # CONVENTION: USE mId for all storage.
 		"long":-1.88,
 		"mId":"3002",
 		"bId":"2641673",
-		"dId":"3238",
-        "alt_mId":"724926051"
+		"dId":"3238"
 	},
 	{
 		"name":"Edinburgh",
@@ -396,38 +423,34 @@ SITE_INFO = [ # CONVENTION: USE mId for all storage.
 		"long":-3.343,
 		"mId":"12009",
 		"bId":"2650225",
-		"dId":"3166",
-        "alt_mId":"b0732fa5-83c7-ef11-a81b-000d3ab96a94"
+		"dId":"3166"
 	},
 	{
-		"name":"Belfast A'pt",
+		"name":"Belfast (A'pt)",
 		"clean_name":"Belfast",
 		"lat":54.664,
 		"long":-6.224,
 		"mId":"5002",
 		"bId":"6296569", # best shot at observer, cant get named obsrever, goes to bad if searched
-		"dId":"3917",
-        "alt_mId":None
+		"dId":"3917"
 	},
 	{
-		"name":"Aberdeen A'pt",
+		"name":"Aberdeen (A'pt)",
 		"clean_name":"Aberdeen",
 		"lat":57.206,
 		"long":-2.202,
 		"mId":"1",
 		"bId":"2657832", # cant get observer
-		"dId":"3091",
-        "alt_mId":"16b1f54d-35ae-e911-b083-0003ff598cc1"
+		"dId":"3091"
 	},
 	{
 		"name":"Tulloch Bridge",
-		"clean_name":"TullochBridge",
+		"clean_name":"Tulloch Bridge",
 		"lat":56.867,
 		"long":-4.708,
 		"mId":"30",
 		"bId":"2649169", # cant get observer
-		"dId":"3047",
-        "alt_mId":None
+		"dId":"3047"
 	},
 	{
 		"name":"Baltasound (Shetland Islands)",
@@ -437,14 +460,25 @@ SITE_INFO = [ # CONVENTION: USE mId for all storage.
 		"long":-0.854,
 		"mId":"3006",
 		"bId":"2656431", # observer
-		"dId":"3002",
-        "alt_mId":"ba53481d-69ae-ee11-a81c-000d3ab7537e"
+		"dId":"3002"
 	}
 ]
 
 SITES_BY_ID = {o["mId"]: o for o in SITE_INFO}
 SITES_BY_DID = {o["dId"]: o for o in SITE_INFO}
 ALL_LOCIDS = [v["mId"] for v in SITE_INFO]
+
+
+SITE_INFO_INTED = []
+
+for v in SITE_INFO:
+	v = v.copy()
+	v["mId"] = int(v["mId"])
+	
+	SITE_INFO_INTED.append(v)
+
+SITES_BY_INTID = {o["mId"]: o for o in SITE_INFO_INTED}
+ALL_LOCIDS_INTED = [int(v) for v in ALL_LOCIDS]
 
 TRACKING_STR_LEN = max([len(v["mId"]) for v in SITE_INFO]) + 6 + 1
 
@@ -692,3 +726,10 @@ def most_common(ls: list[int]):
 		if (type(ls[0]) == str): most.sort(key=lambda x: ls.index(x[0]))
 	
 	return most[len(most) // 2][0] # median!!
+
+
+
+def get_datetime_today():
+	now = datetime.now(TIMEZONE)
+	
+	return datetime(now.year, now.month, now.day)

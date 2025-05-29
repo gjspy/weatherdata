@@ -1,17 +1,20 @@
 //const GRADES = {"A+": 1, "A": 2, "B": 3, "C": 4, "D": 5, "F": 6};
-const GRADES = ["F", "D", "D+", "C", "C+", "B", "B+", "A", "X", "A+"];
-const REAL_GRADES = ["F", "D", "C", "B", "A", "A+"];
+//const GRADES = ["F", "D", "D+", "C", "C+", "B", "B+", "A", "X", "A+"];
+const GRADES = ["F", "D", "C", "B", "A", "A+"];
 const GRADE_COLOURS = {"A+": "#FF41D8", "A": "#2EC918", "B": "#23C5D5", "C": "#FF5400", "D": "#C40000", "F": "#000000"}
+const COLOUR_TO_GRADE = Object.fromEntries(
+	Object.entries(GRADE_COLOURS).map( ([k,v]) => [v, k])
+);
 
 
-async function getApiWeekOfDailySummaries() {
-	let response = await fetch("/api/results/daily?period=7");
+async function getApiWeekOfDailySummaries(fcstTimeBufferDays) {
+	let response = await fetch(`/api/results/daily?day_date=yesterday&countback_days=7&fcst_time_buffer_days=${fcstTimeBufferDays}`);
 
 	return (await response.json());
 };
 
-async function getApiMonthOfDailySummaries() {
-	let response = await fetch(`/api/results/daily?period=${api.config.monthNDays}`);
+async function getApiMonthOfDailySummaries(fcstTimeBufferDays) {
+	let response = await fetch(`/api/results/daily?day_date=yesterday&countback_days=${api.config.monthNDays}&fcst_time_buffer_days=${fcstTimeBufferDays}`);
 
 	return (await response.json());
 };
@@ -19,7 +22,7 @@ async function getApiMonthOfDailySummaries() {
 async function fetchSiteInfo(isDict) {
 	isDict = Boolean(isDict);
 
-	let response = await fetch(`/api/site-info?dict=${isDict}`);
+	let response = await fetch(`/api/info/sites?dict=${isDict}`);
 
 	let json = await response.json();
 
@@ -35,6 +38,9 @@ async function fetchSiteInfo(isDict) {
 	
 	return json;
 };
+
+
+
 
 
 
@@ -101,7 +107,7 @@ async function initMap({selector, popup, colours, onPinSelect, data}={}) {
 	let pinsToMake = structuredClone(api.siteInfo);
 	// SORT by lat so northernmost drawn first, 
 	// dont want pinpoint overlapping a more southern pin bulge
-	pinsToMake.sort((a,b) => {return b.lat - a.lat;});
+	pinsToMake.sort((a,b) => { return b.lat - a.lat; });
 
 	let toHighlightRandom;
 	if (onPinSelect) toHighlightRandom = api.random.choice(pinsToMake);
@@ -112,10 +118,8 @@ async function initMap({selector, popup, colours, onPinSelect, data}={}) {
 		let colour = colours[loc.mId] || api.map.defaultColour;
 		let thisData;
 
-		if (data) {
-			for (let v of data) {
-				if (loc.mId === v.loc) {thisData = v; break;}
-			};
+		for (let v of data || []) {
+			if (loc.mId === v.loc) {thisData = v; break;}
 		};
 
 		let thisPin = new PinElement({
@@ -152,7 +156,7 @@ async function initMap({selector, popup, colours, onPinSelect, data}={}) {
 				selected = pinDOMElem;
 				setScale(selected, PIN_SCALE_SELECTED);
 
-				onPinSelect(thisData);
+				onPinSelect(thisData, colour);
 			};
 		});
 
@@ -261,9 +265,11 @@ function insertSVGByOrg(elemToReplaceOuterHTML, org) {
 };
 
 
-function FillSummaryTableGrades(table, gradeList) {
+function FillSummaryTableGrades(table, weatherEntries) {
 	let counts = {};
-	for (let grade of gradeList) {
+	for (let entry of weatherEntries) {
+		let grade = entry.ga;
+
 		if (!counts[grade]) counts[grade] = 0;
 		
 		counts[grade] ++;
@@ -272,7 +278,7 @@ function FillSummaryTableGrades(table, gradeList) {
 	let percs = {};
 	let totalPercs = 0;
 	for (let [grade, count] of Object.entries(counts)) {
-		let thisPerc = Math.floor((count / gradeList.length) * 100);
+		let thisPerc = Math.floor((count / weatherEntries.length) * 100);
 		percs[grade] = thisPerc;
 		totalPercs += thisPerc;
 	};
@@ -285,24 +291,39 @@ function FillSummaryTableGrades(table, gradeList) {
 	percs[maxPercGrade] += rem;
 
 
-	for (let grade of REAL_GRADES) {
+	for (let grade of GRADES) {
 		let valObj = table.querySelector(`tr:has(td[grade="${grade}"]) td:nth-child(2)`);
 		valObj.innerHTML = String(percs[grade] || 0) + "%";
 	};
 };
 
-function FillSummaryTableConditions(table, gradeDetail) {
-	let rows = table.querySelectorAll(`tr`);
+function FillSummaryTableConditions(table, orgDetail) {
+	let row = table.querySelector(`tr`);
 
-	let i = 0;
-	for (let [k,v] of Object.entries(gradeDetail)) {
-		let valObj = rows[i];
+	orgDetail = orgDetail || {r: {}};
+
+	for (let row of table.querySelectorAll("tr")) {
+		row.remove();
+	};
+
+	for (let [k,v] of Object.entries(api.summaryTableKeys)) {
+		let name = v[1];
+		let unit = v[2]
+		let value = orgDetail.r[k];
+		let grade = orgDetail.r["g" + k]
+
+		if (value === undefined) continue;
+
+		let valObj = row.cloneNode(true);
+
+		valObj.style.display = "";
 		
-		valObj.children[0].innerHTML = api.str.title(k) + ":";
-		valObj.children[1].innerHTML = v.grade;
-		api.dom.setElemGrade(valObj.children[1],v.grade);
-		valObj.children[2].innerHTML = String(v.perc) + "%";
-		i ++;
+		valObj.children[0].innerHTML = name + ":";
+		valObj.children[1].innerHTML = grade;
+		api.dom.setElemGrade(valObj.children[1], grade);
+		valObj.children[2].innerHTML = String(value) + " " + unit;
+
+		table.append(valObj);
 	};
 };
 
@@ -335,7 +356,12 @@ function chooseBestGrade(moGrade, bbcGrade, worst) {
 function fillOneGradeDateElem(dateElem, period, dt, calendarCont, worst, onHover) {
 	let gradeText = dateElem.querySelector("label[grade]");
 
-	let [bestOrg, bestGrade] = api.calc.chooseBestGrade(period.nationwideMO, period.nationwideBBC, worst);
+	let [bestOrg, bestGrade] = api.calc.chooseBestGrade(
+		(api.calc.getOrgFromPeriod(period, "MO")).ga,
+		(api.calc.getOrgFromPeriod(period, "BBC")).ga,
+		worst
+	);
+
 	api.dom.insertSVGByOrg(dateElem.querySelector("svg"), bestOrg);
 	api.dom.setElemGrade(gradeText, bestGrade);
 	dateElem.setAttribute("best", bestOrg);
@@ -376,7 +402,7 @@ function FillCalendar(selector, data, duration, calType, dateOnHover) {
 		};
 	};
 
-	function FillDayHeader() {
+	function FillDayHeader(startDate) {
 		let header = calendar.querySelector(".day-header");
 		let days = [];
 
@@ -384,11 +410,14 @@ function FillCalendar(selector, data, duration, calType, dateOnHover) {
 			days = api.datetime.daysMon0;
 
 		} else if (calType === "dynamicWeeksWithGaps") {
-			let startDate = new Date((new Date()).getTime() - (duration * 1000 * 60 * 60 * 24));
+			if (!startDate) startDate = new Date((new Date()).getTime() - (duration * 1000 * 60 * 60 * 24));
+
 			let startWeekday = api.datetime.getWeekdayFromDateSunday0ToMonday0(startDate);
+			console.log("STARTWEEKDAY", startWeekday);
 
 			for (let i = 0; i < 7; i++) {
-				days.push(api.datetime.daysMon0[(startWeekday + i) % 6]);
+				console.log(i, startWeekday + i, (startWeekday + i) % 7)
+				days.push(api.datetime.daysMon0[(startWeekday + i) % 7]);
 			};
 		} else if (calType === "dynamicWeeksNoGaps") {
 			// iter thru each period, days.push(period.dt.weekday)
@@ -447,25 +476,36 @@ function FillCalendar(selector, data, duration, calType, dateOnHover) {
 
 	let calendarCont = calendar.querySelector(".calendar-cont");
 
-	FillDayHeader();
-
 	let paramData = data;
+	let startDate;
+
+	console.log("old paramdata", paramData);
 
 	if (calType === "regularWeeks" || calType === "dynamicWeeksWithGaps") {
 		paramData = {};
+		startDate = new Date(data[0].ft)
 
 		for (let period of data) {
-			let dt = new Date(period.date * 1000); // Date() takes milliseconds, api = seconds.
+			let dt = new Date(period.ft);
+			console.log(period.ft, dt);
 			paramData[api.datetime.indentifierFromDate(dt)] = period;
 		};
 	};
 
+	console.log("new paramdata", paramData);
+
+	FillDayHeader(startDate);
+
 	if (calType === "regularWeeks") WithRegularWeeks(paramData, calendarCont);
-	else if (calType === "dynamicWeeksWithGaps") DefinedPeriods(paramData, calendarCont);
-}
+	else if (calType === "dynamicWeeksWithGaps") DefinedPeriods(paramData, calendarCont, startDate);
+};
 
 
 function setElemGrade(elem, grade) {
+	grade = grade || "";
+
+	if (grade.startsWith("#")) grade = COLOUR_TO_GRADE[grade];
+
 	elem.setAttribute("grade", grade);
 
 	grade = grade.replace("+", "<sup>+</sup>");
@@ -474,14 +514,14 @@ function setElemGrade(elem, grade) {
 
 
 function averageOfGrades(data, returnIntScore) {
-	let total = data.reduce((acc, v) => acc + REAL_GRADES.indexOf(v), 0);
+	let total = data.reduce((acc, v) => acc + GRADES.indexOf(v), 0);
 	let averageIndex = total / data.length;
 
 	if (returnIntScore === true) return averageIndex;
 
 	let closestIndex = Math.round(averageIndex);
 	
-	v = REAL_GRADES[closestIndex]
+	v = GRADES[closestIndex]
 	//if (v === "X") v = "A"
 
 	return v;
@@ -498,6 +538,67 @@ function hyperbolicAvgGrades(data) { // gets value furthest from median availabl
 	return grade;
 };
 
+function getGradeByLocArr(moData, bbcData) {
+	let gradesByLoc = [];
+
+	for (let mId of api.locIds) {
+		let mGrade = moData.filter( v => v.i === mId );
+		let bGrade = bbcData.filter( v => v.i === mId );
+
+		let o = {loc: mId};
+
+		if (mGrade && mGrade.length > 0) {
+			o.mo = mGrade[0];
+		};
+
+		if (bGrade && bGrade.length > 0) {
+			o.bbc = bGrade[0];
+		};
+
+		gradesByLoc.push(o);
+	};
+
+	return gradesByLoc;
+};
+
+function getOrgFromPeriod(period, org) {
+	if (org == "MO") return period.M1 || period.M3 || {data: []};
+	else if (org == "BBC") return period.B1 || period.BD || {data: []};
+};
+
+
+function getBestOrgFromPeriods(periods) {
+	let mo = [];
+	let bc = [];
+
+	for (let period of periods) {
+		let thisMo = [];
+
+		if (period.M1) thisMo.push(GRADES.indexOf(period.M1.ga));
+		if (period.M3) thisMo.push(GRADES.indexOf(period.M3.ga));
+
+		let bestMo = Math.max(thisMo);
+		if (bestMo) thisMo = GRADES[thisMo];
+
+		let thisBc = [];
+		if (period.B1) thisBc.push(GRADES.indexOf(period.B1.ga));
+		if (period.BD) thisBc.push(GRADES.indexOf(period.BD.ga));
+
+		let bestBc = Math.max(thisBc);
+		if (bestBc) thisBc = GRADES[thisBc];
+
+		if (thisMo) mo.push(thisMo);
+		if (thisBc) bc.push(thisBc);
+	};
+
+	let moAvg = api.calc.averageOfGrades(mo, true);
+	let bcAvg = api.calc.averageOfGrades(bc, true);
+
+	if (moAvg > bcAvg) return "MO";
+	else if (bcAvg > moAvg) return "BBC";
+	else return "EQUALS"
+};
+
 
 function getMapColours(data, mode) {
 	// mode = avg (simple)
@@ -506,14 +607,15 @@ function getMapColours(data, mode) {
 	let colours = {};
 
 	for (let loc of data) {
-		let grades = [loc.moGrade, loc.bbcGrade];
+		let grades = [];
+
+		if (loc.mo) grades.push(loc.mo.ga);
+		if (loc.bbc) grades.push(loc.bbc.ga);
+
 		let grade;
 
-		if (mode === "avg") {
-			grade = api.calc.averageOfGrades(grades);
-		} else if (mode === "hyp") {
-			grade = loc.hypAvg;
-		};
+		if (mode === "avg") grade = api.calc.averageOfGrades(grades);
+		else if (mode === "hyp") grade = api.calc.hyperbolicAvgGrades(grades)
 
 		colours[loc.loc] = GRADE_COLOURS[grade];
 	};
@@ -628,7 +730,10 @@ function initApi() {
 		calc: {
 			averageOfGrades: averageOfGrades,
 			hyperbolicAvgGrades: hyperbolicAvgGrades,
-			chooseBestGrade: chooseBestGrade
+			chooseBestGrade: chooseBestGrade,
+			getGradeByLocArr: getGradeByLocArr,
+			getOrgFromPeriod: getOrgFromPeriod,
+			getBestOrgFromPeriods: getBestOrgFromPeriods
 		},
 		random: {
 			int: randomInt,
@@ -672,19 +777,43 @@ function initApi() {
 		config: {
 			monthNDays: 30
 		},
-		grades: REAL_GRADES,
+		grades: GRADES,
 		
 		siteInfo: [],
-		siteInfoDict: {}
+		locIds: [],
+		siteInfoDict: {},
+		transferKeys: {
+			"t": ["d_scr_temp", "Temperature", "°C"],
+			"f": ["d_feels_like", "Feels Like", "°C"],
+			"w": ["s_wt", "Weather Type", "%"],
+			"ws": ["d_wind_s", "Wind Speed", "km/h"],
+			"wd": ["d_wind_d", "Wind Direction", "°"],
+			"wg": ["d_wind_g", "Wind Gust", "km/h"],
+			"pt": ["s_p_timing", "Precip Timing", "%"],
+			"pr": ["s_p_rate", "Precip Rate", "%"],
+			"pi": ["s_p_type", "Precip Intensity", "%"],
+			"pc": ["s_p_conf", "Precip Confidence", "%"],
+			"po": ["s_p_ovrl", "Precipitation", "%"]
+		},
+		summaryTableKeys: {}
 	};
 
 	window.api = api;
 
-	fetchSiteInfo(false).then((json) => {
-		window.api.siteInfo = json;
-	}); // TODO: RETRY THIS!
+	api.summaryTableKeys = {
+		"t": api.transferKeys.t,
+		"f": api.transferKeys.f,
+		"p": api.transferKeys.po,
+		"ws": api.transferKeys.ws,
+		"wg": api.transferKeys.wg,
+		"wd": api.transferKeys.wd,
+		"w": api.transferKeys.w
+	}
+
 
 	fetchSiteInfo(true).then((json) => {
+		window.api.siteInfo = Array.from(Object.values(json));
+		window.api.locIds = window.api.siteInfo.map( v => Number(v.mId) );
 		window.api.siteInfoDict = json;
 	}); // TODO: RETRY THIS!
 };

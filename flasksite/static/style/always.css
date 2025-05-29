@@ -313,10 +313,10 @@ a.map-pin-tooltip {
 	position: absolute;
 }
 
-#content:not(:has(.content-elem)),
+/*#content:not(:has(.content-elem)),
 #content:has(.content-elem[rendered="false"]) {
-	display: none;
-}
+	/*display: none;
+}*/
 
 #content > * {
 	width: inherit;

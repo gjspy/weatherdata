@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Integer, ForeignKeyConstraint, UniqueConstraint, PrimaryKeyConstraint, ForeignKey, and_, Engine
+from sqlalchemy import Column, Integer, ForeignKeyConstraint, UniqueConstraint, PrimaryKeyConstraint, ForeignKey, and_, Engine, func, text
 from sqlalchemy.dialects.mysql import DATETIME, FLOAT, TINYINT, SMALLINT, CHAR, INTEGER, BOOLEAN
-from sqlalchemy.orm import Session, declarative_base, relationship, Mapped
+from sqlalchemy.orm import Session, declarative_base, relationship, Mapped, selectinload
 
 from datetime import datetime, timedelta
 from typing import Callable, Any
@@ -35,8 +35,6 @@ class DirtyOBS(Base):
 	__table_args__ = (
         PrimaryKeyConstraint("MID", "ORG", "DT"),
     )
-
-
 
 
 class CleanOBS(Base): # MUST HAVE ROW WITH ID -1, FOR FCST WITHOUT OBS.
@@ -102,11 +100,14 @@ class FCST(Base):
 	hail_prob = Column("HAIL_PROB", SMALLINT)
 	sferics_prob = Column("SFERICS_PROB", SMALLINT)
 
+	# if changing, edit FCST_CONDIITONS constant.
+
 	obs = relationship("CleanOBS")
 
 	__table_args__ = (
 		UniqueConstraint('MID', 'ORG', 'FCST_TIME', 'FUTURE_TIME'),
 	)
+
 
 class Result(Base):
 	__tablename__ = "RESULTS"
@@ -135,19 +136,52 @@ class Result(Base):
 		UniqueConstraint('FCST_ID', 'PERIOD'),
 	)
 
+	def jsonify(self): 
+		return {
+			"i": self.fcst.mid,
+			"o": self.fcst.org,
+			"p": self.period,
+			"fc": self.fcst.fcst_time,
+			"ft": self.fcst.future_time,
+			"r": {
+				"t": self.d_scr_temp,
+				"f": self.d_feels_like,
+				"wt": self.s_wt,
+				"ws": self.d_wind_s,
+				"wd": self.d_wind_d,
+				"wg": self.d_wind_g,
+				"h": self.d_hum,
+				"p": self.d_prs,
+				"pti": self.s_p_timing,
+				"pr": self.s_p_rate,
+				"pty": self.s_p_type,
+				"pc": self.s_p_conf
+			}
+		}
+
+
+
+
 
 class Queries():
 
-	def query(query: Callable[[Session], Any], session_constructor: Callable[[], Session]):
+	def query(query: Callable[[Session], Any], session_constructor: Callable[[], Session], close_session: bool = True):
 		session = session_constructor()
 
-		return query(session)
+		resp = query(session)
+
+		if (close_session):
+			session.close()
+			return resp
 		
+		return resp, session
+		
+
 
 	# api queries
 
 	def get_recent_obs_urgent(mid: int | None = None) -> Callable[[Session], int | None]:
-		if (mid and mid != "wholeuk"): return (
+		if (mid and mid != "all"): return (
 			lambda session:
 				session.query(DirtyOBS.wt) \
 					.filter(DirtyOBS.mid == mid) \
@@ -159,21 +193,43 @@ class Queries():
 		return (
 			lambda session:
 				session.execute(squeries.GET_MOST_RECENT_AVG_WT_NATIONWIDE) \
-				.fetchall()
+					.fetchall()
 			)
 
-	def get_results(interval: int, mid: int, orgs: list[str], count_per_org: int) -> Callable[[Session], list]:
+
+	def get_daily_summaries(min_future_time_inc: datetime, max_future_time_exc: datetime, fcst_time_buffer_days: int) -> Callable[[Session], list | None]:
+		"""
+		gets the daily summary for every location/org for every day between given dates.
+
+		select * from results
+		join fcst on fcst.ID=results.FCST_ID
+		where results.period = 24
+		and fcst.fcst_time = SUBTIME(fcst.future_time, '1 00:00:00')
+		and fcst.future_time >= '2025-04-23 00:00:00'
+		and fcst.future_time < '2025-04-30 00:00:00'
+		and mid=11004
+		order by fcst.org, fcst.mid, fcst.FCST_TIME asc, fcst.future_time asc;
+		"""
+
 		return (
 			lambda session:
 				session.query(Result) \
-					.join(Result) \
+					.options(selectinload(Result.fcst))
 					.filter(
-						Result.period == interval,
-						FCST.mid == mid,
-						FCST.org.in_(orgs)
-					)# \
-					#.order_by(Result.org, Result.)
+						FCST.id == Result.fcst_id, # join ON this
+						Result.period == 24,
+						FCST.fcst_time == func.DATE_SUB(
+							FCST.future_time,
+							text(f"INTERVAL {fcst_time_buffer_days} DAY") # timedelta(days = x)
+						),
+						FCST.future_time >= min_future_time_inc,
+						FCST.future_time < max_future_time_exc
+					)
+					.order_by(FCST.org, FCST.mid, FCST.fcst_time.asc(), FCST.future_time.asc())
+					.all()
 			)
+
+
 
 
 

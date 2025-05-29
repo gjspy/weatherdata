@@ -4,6 +4,7 @@ __pycache__/
 
 *_gitignore.*
 convertJSONtoMYSQL.py
+mergeDB2andMAINDB.py
 nice_queries/
 
 # Ignore environment files

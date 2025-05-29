@@ -1,0 +1,137 @@
+02/02/25 main db code, collates test json -> db completely and correctly.
+lit review: researching js frameworks, researching responsive design
+
+03/02/25: added 3 hourly forcast that looks a week in advance
+started creating the logo
+in lesson: added sources to bibliography
+
+05/02/25: researched fonts, what size assets should be for efficiency (favicon)
+wrote page 1 of writeup, how data collection works and initial.
+created start of website, topbar navigation, and happy with logo and name.
+
+08/02/25: added bbc obs and fcst to database
+now happy with units being correct for all (km/h)
+
+09/02/25: started looking at hosting options
+started looking at grading: made basics for temperature.
+
+11/02/25: started to properly make landing page, hero section going well
+researched copyright/use of met office + bbc logos, fair dealing, "links to us" rules
+
+15/02/25: more grading
+
+17/02/25: added more detail to home page
+
+19/02/25: added data collection to write up
+
+23/02/25:
+added moaltobs
+developed comparisons, looking at daily summaries and mo3 and precip
+populated clean_obs table
+created grade boundaries table
+
+27/02/25:
+added responsive design to hero pane 1
+<meta> tag helped a lot
+completed pane-2 desktop and portrait view (without js)
+added gentle scroll snapping (proximity)
+made all weather icons for use
+
+03/03/25:
+applied changes to writeup
+
+05/03/25:
+submitted writeup 2
+
+06/03/25:
+swapped to main and local pages, made start on map embed. really good research!!
+
+11/03/25:
+lovely epq lesson, not submitted until next winter
+added client to proposal form and addressed ms sorta
+addressed ms to activity log sorta
+
+14/03/25:
+reserached hostng and databases
+
+08/04/25:
+added pane-2 to main from local
+started pane-3 of main
+added location select (popup map)
+CALENDAR FROM OUTLOOK!
+
+
+
+
+05/05/25 - 08/05/25:
+researching and wriitng up hosting
+
+09/05/25:
+chose azure, made account
+
+10/05/25: karcher, no work
+
+11/05/25:
+started db, installed mysql workbench, started conversion code for mysql
+
+12/05/25:
+finished conversion code for mysql, started collection code for db
+
+13/05/25: dead, no work
+
+18/05/25: finished collection code for db
+
+19/05/25: collection code now cleans
+
+20/05/25: started adding compare code
+
+26/05/25: finished db backend code!! 🥳
+
+27/05/25: launched vm!! service stopped running though, ran convertjson and clean of that
+
+28/05/25: fixed service so it stays on, fixed issue with autocompare, ran compare of db2, started api work actually
+
+29/05/25:
+checked compare of db2, swapped so db2 is used for service now.
+filled gap in db form while vm was testing. db2 now has all data from apr/may.
+** services start on sys reboot!! **
+
+080325 AND 090325 WHEN COMPILING DB, FIX THESE. IS TIME WHEN FCST WANT RECORDING.
+
+put a crown on something, make it more visible, reputation, show if theyre normally good
+rainbow of grades, put on logo?
+
+COLOUR OF PINS, MAKE IT STRIKING: PICK COL FROM MO OR BBC, WHICHEVER FURTHEST FROM MIDDLE (C?)
+NEED TO LOOK AT ACCESSIBILITY (ARIA)
+
+LOOK AT OWMOBS, IS IT WRONG TIME? DOING .fromtimestamp WHENS AVING TO JSON.
+
+fix trackpad scrolling on main page.
+
+LOOK AT BOOKMARKS: MO "HOW ACCURATE ARE PUBLIC FOECASTS"
+if editing __main__, in xml save nicely value editor, change to:
+v = v.replace("erly","").lower().replace(" ","") # !!
+bbc has been doing last_times all this time. bcs of that we have duplicates and batch_times == data_date. badbadbad!
+
+bbc in general, wts are qualitative, not quantitative
+
+make letter grades per part of forecast, then per forecast = mean/mode of letters
+per day = mean/mode of letters of forecasts, this can be compared to only daily (bbc)
+three hourly forecasts, dont try to interpolate, just have the 8 occurences per day be for the summary. can eb any number.
+
+MO daily is pointless, less than a week and three hourly is more than a week.
+
+LOOK AT WIND GUST SPEEDS
+LOOK AT RAIN RATES OBS VS FCST, IS OBS ALWAYS HIGHER?
+
+precip_rt is always mm/h, from owm and mofcst :)
+
+vps needed? for backend code, frontend could just run on github pages.
+
+chose innertube style because its easier for flow, inspo from youtube!!
+
+HOW TO MAKE SITE ACCESSIBLE!!!!
+
+rounded wind d to nearest comp[ass point
+
+look at aws

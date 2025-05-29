@@ -569,6 +569,7 @@ def eval_day_of_forecast_instances(obs: list[CleanOBS], forecasts: list[FCST], o
 		
 		else:
 			# need this, to differentiate between not processed fcsts and fcsts missing an obs.
+			print(f"{this_obs.id} is not hourly, but no _real_obs_hr.")
 			updates[hour] = {"obs_id": -1}
 		
 		
