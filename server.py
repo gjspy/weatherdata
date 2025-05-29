@@ -16,8 +16,9 @@ import os
 from flasksite.apienums import Descriptions as describe, Interval, LocId, Org
 from flasksite.apihelpers import InterpretParam, get_json_graded_result, get_organised_json_results
 from sqlalch_class_defs import Queries, Result
-import constants
+from constants import *
 
+MAPSINIT_LOC = f"{SLASH}static{SLASH}script{SLASH}mapsinit.js"
 
 MAX_CACHE_AGE = 20 * 60 # seconds
 
@@ -47,6 +48,7 @@ class CacheValues():
 
 class CacheManager():
 	current_wt = CacheValues()
+	scripts = CacheValues()
 	daily_summaries = CacheValues()
 
 
@@ -56,8 +58,8 @@ def create_session_constructor(engine: Engine) -> Callable[[], Session]:
 
 def connect_to_db():
 	engine = create_engine(
-		constants.CONNECION_URL,
-		**constants.CONNECTION_KWARGS
+		CONNECION_URL,
+		**CONNECTION_KWARGS
 	)
 
 	return engine
@@ -71,7 +73,7 @@ def connect_to_db():
 app = FastAPI()
 # uvicorn flasksite.testserver:app
 
-SLASH = constants.SLASH
+SLASH = SLASH
 
 global_cache_manager = CacheManager()
 global_engine = connect_to_db()
@@ -97,17 +99,31 @@ def get_favicon():
 	return FileResponse(f"flasksite{SLASH}static{SLASH}favicon.ico")
 
 
+@app.get("/api/formatted/mapsinit.js")
+def get_mapsinit():
+	cached = global_cache_manager.scripts.get("mapsinit")
+	if (cached): return cached
+
+	f = open(MAPSINIT_LOC, "r")
+	data = f.read()
+	f.close()
+
+	data.replace("__KEY__", GOOG_MAPS_API_K)
+
+	global_cache_manager.scripts.add("mapsinit", data)
+	return data
+
 
 
 @app.get("/api/info/sites")
 def get_site_info(dict: bool = True):
-	if (dict): return constants.SITES_BY_INTID
-	return constants.ALL_LOCIDS_INTED
+	if (dict): return SITES_BY_INTID
+	return ALL_LOCIDS_INTED
 
 
 @app.get("/api/info/keys")
 def get_store_as_keys():
-	return constants.REVERSE_JSONIFY_STORE_AS
+	return REVERSE_JSONIFY_STORE_AS
 
 
 
@@ -117,21 +133,21 @@ def get_store_as_keys():
 def current_photo(loc_id: str = "all", time_aware: bool = True):
 	cached_wt = global_cache_manager.current_wt.get(loc_id)
 
-	if (cached_wt): return RedirectResponse(constants.get_photo_from_wt(cached_wt, time_aware))
+	if (cached_wt): return RedirectResponse(get_photo_from_wt(cached_wt, time_aware))
 
 	got_wt = Queries.query(
 		Queries.get_recent_obs_urgent(loc_id),
 		global_session_constructor
 	)
 
-	if (not got_wt): return RedirectResponse(constants.get_photo_from_wt(-1, False))
+	if (not got_wt): return RedirectResponse(get_photo_from_wt(-1, False))
 
 	try: got_wt = got_wt[0][0]
-	except: return RedirectResponse(constants.get_photo_from_wt(-1, False))
+	except: return RedirectResponse(get_photo_from_wt(-1, False))
 
 	global_cache_manager.current_wt.add(loc_id, got_wt)
 
-	return RedirectResponse(constants.get_photo_from_wt(got_wt, time_aware))
+	return RedirectResponse(get_photo_from_wt(got_wt, time_aware))
 
 
 
@@ -195,7 +211,7 @@ def get_all_daily_results(
 
 @app.get("/api/debug/log-today")
 def get_logs(key: str):
-	if (key != constants.MY_API_K):
+	if (key != MY_API_K):
 		raise HTTPException(403)
 	
 	return FileResponse("collection.log")

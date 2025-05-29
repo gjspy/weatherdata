@@ -299,12 +299,15 @@ function FillSummaryTableGrades(table, weatherEntries) {
 
 function FillSummaryTableConditions(table, orgDetail) {
 	let row = table.querySelector(`tr`);
+	row.style.display = "";
 
 	orgDetail = orgDetail || {r: {}};
 
 	for (let row of table.querySelectorAll("tr")) {
 		row.remove();
 	};
+
+	let added = [];
 
 	for (let [k,v] of Object.entries(api.summaryTableKeys)) {
 		let name = v[1];
@@ -324,6 +327,13 @@ function FillSummaryTableConditions(table, orgDetail) {
 		valObj.children[2].innerHTML = String(value) + " " + unit;
 
 		table.append(valObj);
+		added.push(valObj);
+	};
+
+	if (added.length == 0) {
+		row.style.display = "none";
+
+		table.append(row);
 	};
 };
 
@@ -783,11 +793,11 @@ function initApi() {
 		locIds: [],
 		siteInfoDict: {},
 		transferKeys: {
-			"t": ["d_scr_temp", "Temperature", "°C"],
-			"f": ["d_feels_like", "Feels Like", "°C"],
+			"t": ["d_scr_temp", "Temperature", "\u00B0CC"],
+			"f": ["d_feels_like", "Feels Like", "\u00B0CC"],
 			"w": ["s_wt", "Weather Type", "%"],
 			"ws": ["d_wind_s", "Wind Speed", "km/h"],
-			"wd": ["d_wind_d", "Wind Direction", "°"],
+			"wd": ["d_wind_d", "Wind Direction", "\u00B0C"],
 			"wg": ["d_wind_g", "Wind Gust", "km/h"],
 			"pt": ["s_p_timing", "Precip Timing", "%"],
 			"pr": ["s_p_rate", "Precip Rate", "%"],

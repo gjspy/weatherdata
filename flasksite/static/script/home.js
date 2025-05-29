@@ -27,7 +27,7 @@
 		let title = document.querySelector("#homepage .pane-1 .footer > .main");
 		
 		if (bestOrg === "MO") {
-			title.textContent = title.textContent.replace("[org]", "The Met Office were");
+			title.textContent = title.textContent.replace("[org]", "The Met Office was");
 		} else if (bestOrg === "BBC") {
 			title.textContent = title.textContent.replace("[org]", "BBC Weather was");
 		} else {
@@ -105,9 +105,9 @@
 		let title = document.querySelector("#homepage .pane-3 .title-bar > .main");
 
 		if (veryBest === "MO") {
-			title.textContent = title.textContent.replace("[org]", "The Met Office were");
+			title.textContent = title.textContent.replace("[org]", "The Met Office was");
 		} else if (veryBest === "BBC") {
-			title.textContent = title.textContent.replace("[org]", "BBC Weather were");
+			title.textContent = title.textContent.replace("[org]", "BBC Weather was");
 		} else {
 			title.textContent = "Both organisations had the same accuracy"
 		};
@@ -197,14 +197,14 @@
 		let diffStr = (diff === 1) ? "1 more day" : String(diff) + " more days";
 
 		if ((counts.MO || 0) > (counts.BBC || 0)) {
-			title.textContent = title.textContent.replace("[org]", "The Met Office were");
+			title.textContent = title.textContent.replace("[org]", "The Met Office was");
 			subtitle.textContent = subtitle.textContent
 				.replace("[org1]", "The Met Office")
 				.replace("[time]", diffStr)
 				.replace("[org2]", "BBC Weather");
 
 		} else if ((counts.MO || 0) < (counts.BBC || 0)) {
-			title.textContent = title.textContent.replace("[org]", "BBC Weather were");
+			title.textContent = title.textContent.replace("[org]", "BBC Weather was");
 			subtitle.textContent = subtitle.textContent
 				.replace("[org1]", "BBC Weather")
 				.replace("[time]", diffStr)

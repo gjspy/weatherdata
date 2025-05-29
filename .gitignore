@@ -7,8 +7,11 @@ convertJSONtoMYSQL.py
 mergeDB2andMAINDB.py
 nice_queries/
 
+mapsinit.js
+
 # Ignore environment files
 .env
+.vscode
 
 # Ignore logs and temp files
 *.log
@@ -21,3 +24,4 @@ venv/
 .DS_Store
 Thumbs.db
 desktop.ini
+/flasksite/static/script/mapsinit.js
