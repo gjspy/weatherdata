@@ -102,7 +102,7 @@ def get_favicon():
 @app.get("/api/formatted/mapsinit.js")
 def get_mapsinit():
 	cached = global_cache_manager.scripts.get("mapsinit")
-	if (cached): return cached
+	if (cached): return Response(cached, media_type = "application/javascript")
 
 	f = open(MAPSINIT_LOC, "r")
 	data = f.read()
