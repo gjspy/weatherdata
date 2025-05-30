@@ -12,6 +12,7 @@ Base = declarative_base()
 
 class DirtyOBS(Base):
 	__tablename__ = 'DIRTYOBS'
+	__name__ = "DirtyOBS"
 
 	mid = Column("MID", Integer, nullable=False)
 	org = Column("ORG", CHAR(2), nullable=False)
@@ -39,6 +40,7 @@ class DirtyOBS(Base):
 
 class CleanOBS(Base): # MUST HAVE ROW WITH ID -1, FOR FCST WITHOUT OBS.
 	__tablename__ = 'CLEANOBS'
+	__name__ = "CleanOBS"
 
 	id = Column("ID", Integer, primary_key=True, autoincrement=True)
 	mid = Column("MID", Integer, nullable=False)
@@ -70,6 +72,7 @@ class CleanOBS(Base): # MUST HAVE ROW WITH ID -1, FOR FCST WITHOUT OBS.
 
 class FCST(Base):
 	__tablename__ = 'FCST'
+	__name__ = "FCST"
 
 	id = Column("ID", Integer, primary_key=True, autoincrement=True)
 	obs_id = Column("OBS_ID", Integer, ForeignKey('CLEANOBS.ID'), nullable=True) # KEEP THIS, allocate when comparing!!
@@ -111,6 +114,7 @@ class FCST(Base):
 
 class Result(Base):
 	__tablename__ = "RESULTS"
+	__name__ = "Result"
 
 	id = Column("ID", Integer, primary_key=True, autoincrement=True)
 	fcst_id = Column("FCST_ID", Integer, ForeignKey("FCST.ID"), nullable=False)
