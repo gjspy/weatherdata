@@ -228,7 +228,7 @@ def eval_precip_bbc1(fcst: FCST, obs: CleanOBS):
 		}
 	
 	return {
-		"s_p_conf": max(100, fprob * 1.25)
+		"s_p_conf": min(100, fprob * 1.25)
 	}
 
 
@@ -603,7 +603,11 @@ def eval_day_of_forecast_instances(obs: list[CleanOBS], forecasts: list[FCST], o
 	for day, results in results_per_condition.items():
 		day = datetime(day.year, day.month, day.day) # day -> date ugh
 
-		if (len(results["periods"]) <= 1): continue
+		amt_results = len(results["periods"])
+		# same as 24 / perid - 4 / period, allowing for 4 to be missed.
+		if (amt_results < (20 / instance_period)):
+			print(f"{instance_period} only {amt_results} results, skipping 24hr summary")
+			continue
 
 		min_dt = min(results["periods"])
 

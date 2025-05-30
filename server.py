@@ -14,7 +14,7 @@ import random
 import os
 
 from flasksite.apienums import Descriptions as describe, Interval, LocId, Org
-from flasksite.apihelpers import InterpretParam, get_json_graded_result, get_organised_json_results
+from flasksite.apihelpers import *
 from sqlalch_class_defs import Queries, Result
 from constants import *
 
@@ -50,6 +50,7 @@ class CacheManager():
 	current_wt = CacheValues()
 	scripts = CacheValues()
 	daily_summaries = CacheValues()
+	fcsts_of_day = CacheValues()
 
 
 def create_session_constructor(engine: Engine) -> Callable[[], Session]:
@@ -89,8 +90,11 @@ if (system() == "Windows"):
 
 
 	@app.get("/")
+	@app.get("/local")
 	def main():
 		return FileResponse("flasksite\\static\\doc\\main.html")
+	
+	
 
 
 
@@ -151,27 +155,36 @@ def current_photo(loc_id: str = "all", time_aware: bool = True):
 
 
 
-"""@app.get("/api/results/{interval}")
-def get_eval_result(
-	interval: Interval = Query(..., description = describe.interval),
-	loc_id: list[LocId] = Query(..., description = describe.loc_id),
-	org: list[Org] = Query(..., description = describe.org),
-	fcst_time: datetime | str = Query(..., description = describe.fcst_time),
-	future_time: datetime | str = Query(..., description = describe.future_time),
-	count_per_specific: int = Query(1, description = describe.count)
+
+@app.get("/api/weather/forecasts-of")
+def get_forecasts(
+	loc_id: int,
+	day_date: datetime | str = Query(..., description = describe.future_time),
+	days: int = 1
 ):
-	loc_id = InterpretParam.loc_id(loc_id)
-	fcst_time = InterpretParam.time(fcst_time)
-	future_time = InterpretParam.time(future_time)
+	if (loc_id == "all"): return HTTPException(400, "loc_id cannot be \'all\'.")
+
+	day_date = InterpretParam.time(day_date)
+
+	ref = str(loc_id) + str(day_date) + str(days)
+	cached = global_cache_manager.fcsts_of_day.get(ref)
+
+	if (cached): return cached
 
 	results = Queries.query(
-		Queries.get_results(interval, loc_id, org, fcst_time, future_time, count_per_specific),
+		Queries.get_fcsts_of_day(loc_id, day_date, days),
 		global_session_constructor
 	)
 
-	jsoned_graded_results = [ get_json_graded_result(r) for r in results ]
+	organised = get_organised_fcsts(results)
 
-	return jsoned_graded_results"""
+	global_cache_manager.fcsts_of_day.add(ref, organised)
+
+	return organised
+
+
+
+
 
 @app.get("/api/results/daily")
 def get_all_daily_results(
@@ -188,7 +201,7 @@ def get_all_daily_results(
 
 	results = Queries.query(
 		Queries.get_daily_summaries(
-			min_future_time_inc = day_date - timedelta(days = countback_days),
+			min_future_time_inc = day_date - timedelta(days = countback_days - 1),
 			max_future_time_exc = day_date + timedelta(days = 1),
 			fcst_time_buffer_days = fcst_time_buffer_days
 		),

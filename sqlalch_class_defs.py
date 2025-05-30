@@ -218,7 +218,7 @@ class Queries():
 		return (
 			lambda session:
 				session.query(Result) \
-					.options(selectinload(Result.fcst))
+					.options(selectinload(Result.fcst)) # join now, not lazy load, so can access Result.fcst immediately.
 					.filter(
 						FCST.id == Result.fcst_id, # join ON this
 						Result.period == 24,
@@ -234,7 +234,17 @@ class Queries():
 			)
 
 
-
+	def get_fcsts_of_day(mId: int, day_date: datetime, days: int = 1) -> Callable[[Session], list | None]:
+		return (
+			lambda session:
+				session.query(FCST)
+					.filter(
+						FCST.mid == mId,
+						FCST.future_time >= day_date,
+						FCST.future_time < day_date + timedelta(days = days)
+					)
+					.all()
+			)
 
 
 	# collection queries
@@ -256,28 +266,27 @@ class Queries():
 				)
 			) \
 			.filter(
-				DirtyOBS.dt < datetime.now() - timedelta(hours = DB_CLEANUP_BUFFER_HOURS),
+				DirtyOBS.dt < get_datetime_today(), #(datetime.now(**TIMEZONE**) - timedelta(hours = DB_CLEANUP_BUFFER_HOURS)),
 				DirtyOBS.has_cleaned.is_(None),
 				CleanOBS.id.is_(None),
-				#DirtyOBS.mid == 3002, # TESTING
 			) \
 			.order_by(DirtyOBS.dt.desc(), DirtyOBS.mid) \
-			.limit(1000) \
 			.all()
+			
 	
 
 	def get_fcsts_to_eval(session: Session) -> list:
 		return session.query(FCST) \
 			.filter(
-				FCST.fcst_time <= datetime.now() - timedelta(days = 1, hours = COMPARE_HOUR),
-				FCST.future_time < datetime.now() - timedelta(hours = COMPARE_HOUR), # NOT inclusive. 24 hours = midnight -> 11pm.
+				FCST.fcst_time <= get_datetime_today() - timedelta(days = 1), #datetime.now(**TIMEZONE**) - timedelta(days = 1, hours = COMPARE_HOUR),
+				FCST.future_time < get_datetime_today(), #datetime.now(**TIMEZONE**) - timedelta(hours = COMPARE_HOUR), # NOT inclusive. 24 hours = midnight -> 11pm.
 				FCST.obs_id.is_(None),
 				#FCST.org == "M3", # TESTING
 				#FCST.mid == 3002, # TESTING
 				#FCST.fcst_time == datetime(2025, 5, 5) # TESTING
 			) \
 			.order_by(FCST.fcst_time.asc(), FCST.mid, FCST.future_time.asc()) \
-			.all() # dont limit at all, eval is very quick.
+			.all() # dont limit at all, eval is very quick. X but still dont limit
 	
 
 	def get_obs_between_times(earliest_inc: datetime, latest_exc: datetime, mid: int) -> Callable[[Session], list]:

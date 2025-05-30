@@ -78,6 +78,7 @@ BBC_EXACT_DATE_FMT = "%Y-%m-%dT%H:%M:%S.%f%z"
 BBC1FCST_DATE_FMT = "%Y-%m-%d%H:%M"
 
 DAY_DATE_FMT = "%Y%m%d"
+EXACT_FMT_NO_TZ = "%Y-%m-%dT%H:%M:%S"
 
 
 MILE_TO_KM = 1.609344 # * by
@@ -142,7 +143,29 @@ JSONIFY_STORE_AS = {
 	"s_p_timing": "pt",
 	"s_p_rate": "pr",
 	"s_p_type": "pi", # for precip_intensity
-	"s_p_conf": "pc"
+	"s_p_conf": "pc",
+
+	"scr_temp": "t",
+	"temp_min": "tm",
+	"temp_max": "tx",
+	"feels_like": "f",
+	"precip_rt": "pr",
+	"precip_tot": "pt",
+	"precip_prob": "pp",
+	"wt": "w",
+	"wind_s": "ws",
+	"wind_d": "wd",
+	"wind_g": "wg",
+	"hum": None,
+	"prs": None,
+	"vis": None,
+	"snow_tot": None,
+	"snow_prob": None,
+	"hsnow_prob": None,
+	"rain_prob": None,
+	"hrain_prob": None,
+	"hail_prob": None,
+	"sferics_prob": None
 }
 
 REVERSE_JSONIFY_STORE_AS = {v: k for k,v in JSONIFY_STORE_AS.items()}

@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
+import copy
 import re
 
-from sqlalch_class_defs import Result
+from sqlalch_class_defs import Result, FCST
 from flasksite.grade_definitions import CONDITION_BOUNDARIES
 from constants import *
 
@@ -44,8 +45,8 @@ def get_json_graded_result(db_result: Result):
 		"i": db_result.fcst.mid,
 		"o": db_result.fcst.org,
 		"p": db_result.period,
-		"f": db_result.fcst.fcst_time,
-		"a": db_result.fcst.future_time,
+		"f": get_tzsafe_str_date(db_result.fcst.fcst_time),
+		"a": get_tzsafe_str_date(db_result.fcst.future_time),
 		"r": {}
 	}
 
@@ -72,7 +73,29 @@ def get_json_graded_result(db_result: Result):
 		data["r"]["g" + store_as] = get_grade(CONDITION_BOUNDARIES.get(k), db_value)
 	
 	return data
+
+
+def get_jsoned_obj(obj: FCST):
+	conditions = FCST_CONDITIONS if type(obj) == FCST else OBS_CONDITIONS
+
+	data = {}
+
+	for k in conditions: # NOT metadata (time, org, mid..).
+		store_as = JSONIFY_STORE_AS.get(k)
+		if (not store_as): continue
 		
+		v = None
+		try: v = getattr(obj, k)
+		except: pass
+
+		if (type(v) == float): v = round(v, 1)
+
+		data[store_as] = v
+	
+	return data
+
+
+
 
 def get_organised_json_results(results: list[Result]):
 	data = {}
@@ -117,6 +140,36 @@ def get_organised_json_results(results: list[Result]):
 
 
 
+def get_organised_fcsts(fcsts: list[FCST]):
+	data = {}
+
+	for r in fcsts:
+		if (not data.get(r.org)): data[r.org] = {}
+
+		fcst_time = get_tzsafe_str_date(r.fcst_time)
+		future_time = get_tzsafe_str_date(r.future_time)
+		if (not data[r.org].get(fcst_time)): data[r.org][fcst_time] = {}
+
+		data[r.org][fcst_time][future_time] = get_jsoned_obj(r)
+	
+
+	for org, v in copy.deepcopy(data).items():
+		period = 24 if (org == "BD") else 3 if (org == "M3") else 1
+
+		for fcst_time, vs in v.items():
+			if (len(vs.keys()) < 24/period): 
+				del data[org][fcst_time]
+
+
+
+
+	return data
+
+
+
+
+
+
 
 
 def get_hyperbolic_avg_grade(grades: list[str]):
@@ -147,5 +200,5 @@ def get_avg_grade(grades: list[str]):
 	return GRADES[avgI]
 
 
-
-#def filter_all_daily_results()
+def get_tzsafe_str_date(date: datetime):
+	return date.strftime(EXACT_FMT_NO_TZ) + "Z"

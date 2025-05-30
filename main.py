@@ -582,16 +582,20 @@ def daily_fcst_evaluate(detail: str = "COMPAREcompare"):
 		return
 	
 	for k, rows in grouped.items():
-		logger.debug(f"KEY DOING {k}")
 		future_times = [fcst.future_time for fcst in rows]
+
+		min_future = min(future_times)
+		max_future = max(future_times)
+
+		logger.debug(f"KEY DOING {k}, min: {min_future}, max: {max_future}")
 
 		mid, org, fcst_time = k
 		period = 3 if (org == "M3") else 24 if (org == "BD") else 1
 
 		obs = invoke_db(
 			query = Queries.get_obs_between_times(
-				min(future_times), 
-				max(future_times) + timedelta(hours = period), 
+				min_future, 
+				max_future + timedelta(hours = period), 
 				mid
 			),
 			wait = True
