@@ -17,11 +17,11 @@
 		api.dom.setElemGrade(bcGradeDOM, yesterdayBC.ga);
 
 		console.log(gradeByLocArr);
-		let colours = api.dom.getMapColours(gradeByLocArr, "hyp");
+		let mapGrades = api.dom.getMapGrades(gradeByLocArr, "hyp");
 		api.dom.initMap({
 			selector: ".pane-1 #hero-map",
 			popup: false,
-			colours: colours
+			grades: mapGrades
 		});
 
 		let title = document.querySelector("#homepage .pane-1 .footer > .main");
@@ -35,10 +35,12 @@
 		};
 	};
 
-	function pane2ChangeLoc(data, pinColour) {
+	function pane2ChangeLoc(data, pinElem) {
 		let locTitle = document.querySelector("#homepage .pane-2 .title-bar .right-items .main");
+		console.log(pinElem);
+		let grade = pinElem.getAttribute("grade");
 
-		api.dom.setElemGrade(locTitle, pinColour);
+		api.dom.setElemGrade(locTitle, grade);
 		locTitle.textContent = api.siteInfoDict[data.loc].clean_name;
 
 		let moTable = document.querySelector("#homepage .pane-2 #mo-summary table");
@@ -53,12 +55,12 @@
 
 
 	function pane2(gradeByLocArr) {
-		let colours = api.dom.getMapColours(gradeByLocArr, "hyp");
+		let grades = api.dom.getMapGrades(gradeByLocArr, "hyp");
 
 		api.dom.initMap({
 			selector: ".pane-2 #hero-map",
 			popup: false,
-			colours: colours,
+			grades: grades,
 			onPinSelect: pane2ChangeLoc,
 			data: gradeByLocArr
 		});
@@ -67,17 +69,16 @@
 
 	function pane3(weekDataForCalendar, veryBest) {
 		function dateOnHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade) {
-			let moData = api.calc.getOrgFromPeriod(period, "MO").data;
-			let bcData = api.calc.getOrgFromPeriod(period, "BBC").data;
-
+			let moData = api.calc.getOrgFromPeriod(period, "MO");
+			let bcData = api.calc.getOrgFromPeriod(period, "BBC");
 			//let dateMOGrades = period.data.map((v) => v.moGrade);
 			//let dateBBCGrades = period.data.map((v) => v.bbcGrade);
 		
 			let moTablesCont = document.querySelector("#homepage .pane-3 .detail #mo-summary");
-			api.dom.FillSummaryTableGrades(moTablesCont, moData);//dateMOGrades);
+			api.dom.FillSummaryTableGrades(moTablesCont, moData.data);//dateMOGrades);
 		
 			let bbcTablesCont = document.querySelector("#homepage .pane-3 .detail #bbc-summary");
-			api.dom.FillSummaryTableGrades(bbcTablesCont, bcData);//dateBBCGrades);
+			api.dom.FillSummaryTableGrades(bbcTablesCont, bcData.data);//dateBBCGrades);
 		
 			
 			let moGradeDOM = document.querySelector("#homepage .pane-3 .detail #mo-summary > label[grade]");
@@ -87,6 +88,10 @@
 			api.dom.setElemGrade(bbcGradeDOM, bcData.ga);
 		};
 
+		// need identifier, so we don't worry about hrs/min/sec ****
+		let today = new Date();
+		let yesterdayId = api.datetime.indentifierFromDate(new Date(today.getTime() - (1000 * 60 * 60 * 24))); 
+		console.log("Yesterdayid", yesterdayId)
 
 		let selector = "#homepage .pane-3 .calendar";
 		api.dom.FillCalendar(
@@ -94,7 +99,8 @@
 			weekDataForCalendar,
 			7,
 			"dynamicWeeksWithGaps",
-			dateOnHover
+			dateOnHover,
+			{ [yesterdayId]: "- <i>Yesterday</i>" }
 		)
 
 		api.dom.insertSVGByOrg(document.querySelector("#homepage .pane-3 .title-bar svg"), veryBest);
@@ -168,12 +174,15 @@
 
 		let selector = "#homepage .pane-4 .calendar";
 
+		let todayId = api.datetime.indentifierFromDate(new Date());
+
 		api.dom.FillCalendar(
 			selector,
 			dataForCalendar,
 			api.config.monthNDays,
 			"regularWeeks",
-			dateOnHover
+			dateOnHover,
+			{ [todayId]: "- <i>Today</i>" }
 		)
 
 		let elems = document.querySelectorAll(selector + " .calendar-cont > *");

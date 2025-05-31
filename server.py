@@ -51,6 +51,7 @@ class CacheManager():
 	scripts = CacheValues()
 	daily_summaries = CacheValues()
 	fcsts_of_day = CacheValues()
+	obs = CacheValues()
 
 
 def create_session_constructor(engine: Engine) -> Callable[[], Session]:
@@ -156,7 +157,7 @@ def current_photo(loc_id: str = "all", time_aware: bool = True):
 
 
 
-@app.get("/api/weather/forecasts-of")
+@app.get("/api/weather/forecasts")
 def get_forecasts(
 	loc_id: int,
 	day_date: datetime | str = Query(..., description = describe.future_time),
@@ -182,6 +183,47 @@ def get_forecasts(
 
 	return organised
 
+
+@app.get("/api/weather/obs")
+def get_obs(
+	loc_id: int,
+	startdt_inc: datetime | str = None,
+	enddt_exc: datetime | str = None,
+	day_date: datetime | str = None
+):
+	if (loc_id == "all"): return HTTPException(400, "loc_id cannot be \'all\'.")
+	
+	if (not (startdt_inc and enddt_exc) and not (day_date)):
+		return HTTPException(400, "You must provide dates, either day_date, or startdt_inc and enddt_exc.")
+	
+	if (day_date and (startdt_inc or enddt_exc)):
+		return HTTPException(400, "You must only provide day_date or startdt_inc and enddt_exc.")
+
+	if (startdt_inc): startdt_inc = InterpretParam.time(startdt_inc)
+	if (enddt_exc): enddt_exc = InterpretParam.time(enddt_exc)
+
+	if (day_date):
+		day_date = InterpretParam.time(day_date)
+
+		startdt_inc = day_date
+		enddt_exc = day_date + timedelta(days = 1)
+
+
+	ref = str(loc_id) + str(startdt_inc) + str(enddt_exc)
+	cached = global_cache_manager.obs.get(ref)
+
+	if (cached): return cached
+
+	results = Queries.query(
+		Queries.get_obs_between_times(startdt_inc, enddt_exc, loc_id),
+		global_session_constructor
+	)
+
+	organised = get_organised_obs(results)
+
+	global_cache_manager.obs.add(ref, organised)
+
+	return organised
 
 
 

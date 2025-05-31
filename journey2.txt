@@ -95,6 +95,7 @@ finished conversion code for mysql, started collection code for db
 checked compare of db2, swapped so db2 is used for service now.
 filled gap in db form while vm was testing. db2 now has all data from apr/may.
 ** services start on sys reboot!! **
+site homepage is functional.
 
 080325 AND 090325 WHEN COMPILING DB, FIX THESE. IS TIME WHEN FCST WANT RECORDING.
 

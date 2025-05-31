@@ -13,6 +13,7 @@
 	--grade-APlus: #FF41D8;
 	--grade-A: #2EC918;
 	--grade-B: #23C5D5;
+	--grade-B: #ffb600;
 	--grade-C: #FF5400;
 	--grade-D: #C40000;
 	--grade-F: #000000;
@@ -35,6 +36,7 @@ g#bbc-full .ln2 {
 
 [grade="A+"] {
 	color: var(--grade-APlus) !important;
+	fill: var(--grade-APlus) !important;
 }
 
 [grade="A+"]:has(sup) {
@@ -52,22 +54,27 @@ g#bbc-full .ln2 {
 
 [grade="A"] {
 	color: var(--grade-A) !important;
+	fill: var(--grade-A) !important;
 }
 
 [grade="B"] {
 	color: var(--grade-B) !important;
+	fill: var(--grade-B) !important;
 }
 
 [grade="C"] {
 	color: var(--grade-C) !important;
+	fill: var(--grade-C) !important;
 }
 
 [grade="D"] {
 	color: var(--grade-D) !important;
+	fill: var(--grade-D) !important;
 }
 
 [grade="F"] {
 	color: var(--grade-F) !important;
+	fill: var(--grade-F) !important;
 }
 
 div.underline.light {

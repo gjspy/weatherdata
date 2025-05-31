@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import copy
 import re
 
-from sqlalch_class_defs import Result, FCST
+from sqlalch_class_defs import Result, FCST, CleanOBS
 from flasksite.grade_definitions import CONDITION_BOUNDARIES
 from constants import *
 
@@ -75,7 +75,7 @@ def get_json_graded_result(db_result: Result):
 	return data
 
 
-def get_jsoned_obj(obj: FCST):
+def get_jsoned_obj(obj: FCST | CleanOBS):
 	conditions = FCST_CONDITIONS if type(obj) == FCST else OBS_CONDITIONS
 
 	data = {}
@@ -143,14 +143,14 @@ def get_organised_json_results(results: list[Result]):
 def get_organised_fcsts(fcsts: list[FCST]):
 	data = {}
 
-	for r in fcsts:
-		if (not data.get(r.org)): data[r.org] = {}
+	for f in fcsts:
+		if (not data.get(f.org)): data[f.org] = {}
 
-		fcst_time = get_tzsafe_str_date(r.fcst_time)
-		future_time = get_tzsafe_str_date(r.future_time)
-		if (not data[r.org].get(fcst_time)): data[r.org][fcst_time] = {}
+		fcst_time = get_tzsafe_str_date(f.fcst_time)
+		future_time = get_tzsafe_str_date(f.future_time)
+		if (not data[f.org].get(fcst_time)): data[f.org][fcst_time] = {}
 
-		data[r.org][fcst_time][future_time] = get_jsoned_obj(r)
+		data[f.org][fcst_time][future_time] = get_jsoned_obj(f)
 	
 
 	for org, v in copy.deepcopy(data).items():
@@ -160,13 +160,14 @@ def get_organised_fcsts(fcsts: list[FCST]):
 			if (len(vs.keys()) < 24/period): 
 				del data[org][fcst_time]
 
-
-
-
 	return data
 
 
+def get_organised_obs(obs: list[CleanOBS]):
+	data = {}
 
+	for o in obs:
+		data[o.dt] = get_jsoned_obj(o)
 
 
 

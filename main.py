@@ -369,7 +369,15 @@ def db_commit_loop(engine: Engine):
 		updates = next_item.get("updates")
 
 		if (query): task_detail.append(query.__name__)
-		if (objs): task_detail.append(f"add {len(objs)} objs: " + ",".join(o.__name__ for o in objs))
+		if (objs):
+			counts = {}
+			for o in objs:
+				if (not counts[o.__name__]): counts[o.__name__] = 0
+
+				counts[o.__name__] += 1
+
+			task_detail.append(f"add {len(objs)} objs: " + ", ".join(f"{c}x {o}" for c, o in counts.items()))
+
 		if (updates): task_detail.append(f"update {len(updates.keys())} items")
 
 		task_str = ""

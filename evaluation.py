@@ -222,7 +222,7 @@ def eval_precip_bbc1(fcst: FCST, obs: CleanOBS):
 	fprob = fcst.precip_prob
 	orate = obs.precip_rt
 
-	if (orate == 0):
+	if (orate == 0 or orate == None):
 		return {
 			"s_p_conf": 100 - (fprob * 0.5)
 		}
@@ -268,7 +268,7 @@ def eval_precip_day_of_obs(fcsts: list[FCST], obss: list[CleanOBS], org: str):
 
 	unmatched = sum([1 for hour in fhours if (not hour in ohours)]) + sum([1 for hour in ohours if (not hour in fhours)])
 	
-	timing_score = 0
+	timing_score = None
 	if (len(ohours) != 0): timing_score = max(0, 100 * (1 - (unmatched / len(ohours))))
 
 	# look at days difference in weather types (severity and duration, generally)
@@ -277,45 +277,19 @@ def eval_precip_day_of_obs(fcsts: list[FCST], obss: list[CleanOBS], org: str):
 	
 	rain_type_diff = f_rain_count - o_rain_count	
 
-	type_score = 0
+	type_score = None
 	if (o_rain_count != 0): type_score = max(0, 100 * (1 - (abs(rain_type_diff) / o_rain_count)))
 
 
 	# score based on confidence, earlier we scored on rate accuracy.
 	# do this no matter the timing (new method)
-	confidence_scores = []
 
 	confidences = [(
 		min( 100, fcsts[i].precip_prob * ( 1.25 if (obss[i] in observed_rain) else 1 ) )
 	) for i in range(len(fcsts))]
 	
-	confidence_score = 0
+	confidence_score = None
 	if (len(confidences) > 0): confidence_score = sum(confidences) / len(confidences)
-
-	"""for i in range(len(fcsts)):
-		f = fcsts[i]
-		try: o = obss[i]
-		except IndexError: break # not enough obss
-
-		frate = f.precip_rt
-		orate = o.precip_rt
-		confidence = f.precip_prob
-
-		if (orate == 0):
-			if (frate == 0): # didnt rain, not forecasted any, award low confidence
-				score = 100 - (confidence * 0.5) # * 0.5 to be nice
-			else: # didnt rain, forecasted some (properly, <15% conf usually = no precip_rate.), shame high confidence or high rate
-				# award lower confidence # frain will always be <= 1.
-				# dont do rate here, no need, did that before, just confidence.
-
-				score = max(0, 100 - (confidence * 1.5)) # *1.5 to be harsher
-
-		else: # did rain, award greater confidence
-			score = min(100, confidence * 1.5) # * 0.5 to be nice
-		
-		confidence_scores.append(score)
-	
-	confidence_score = sum(confidence_scores) / len(confidence_scores)"""
 
 
 	if (org == "M3" and len(observed_rain) > 0):
@@ -336,18 +310,18 @@ def eval_precip_day_of_obs(fcsts: list[FCST], obss: list[CleanOBS], org: str):
 		forecasted_rates = sum([
 			(o.precip_rt or 0)
 			for o in fcsts
-			if (o != None)
+			#if (o != None)
 		])
 
 		observed_rates = sum([
 			(o.precip_rt or 0)
 			for o in obss
-			if (o != None)
+			#if (o != None)
 		])
 
 		rate_diff = forecasted_rates - observed_rates
 		
-		rate_score = 0
+		rate_score = None
 		if (observed_rates != 0): rate_score = max(0, 100 * (1 - (abs(rate_diff) / observed_rates)))
 	
 

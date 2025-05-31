@@ -19,6 +19,18 @@ async function getApiMonthOfDailySummaries(fcstTimeBufferDays) {
 	return (await response.json());
 };
 
+async function getApiFcstsOfDay(locId) {
+	let response = await fetch(`/api/weather/forecasts?loc_id=${locId}&day_date=yesterday&days=1`);
+
+	return (await response.json());
+};
+
+async function getApiObsofDay(locId) {
+	let response = await fetch(`/api/weather/obs?loc_id=${locId}&day_date=yesterday`);
+
+	return (await response.json());
+};
+
 async function fetchSiteInfo(isDict) {
 	isDict = Boolean(isDict);
 
@@ -49,7 +61,7 @@ async function fetchSiteInfo(isDict) {
 
 
 
-async function initMap({selector, popup, colours, onPinSelect, data}={}) {
+async function initMap({selector, popup, grades, onPinSelect, data}={}) {
 	function setScale(pin, newScale) {
 		let currentTransform = pin.style.transform || "";
 		pin.style.transform = currentTransform.replace(/scale\([\d\.]+\)/g, "") + `scale(${newScale})`;
@@ -112,26 +124,34 @@ async function initMap({selector, popup, colours, onPinSelect, data}={}) {
 	let toHighlightRandom;
 	if (onPinSelect) toHighlightRandom = api.random.choice(pinsToMake);
 
+	let thisGrades = grades["default"];
+
 	let selected;
 
 	for (let loc of pinsToMake) {
-		let colour = colours[loc.mId] || api.map.defaultColour;
+		//let colour = colours[loc.mId] || api.map.defaultColour;
 		let thisData;
 
 		for (let v of data || []) {
 			if (loc.mId === v.loc) {thisData = v; break;}
 		};
 
+		let background = (thisGrades[loc.mId]) ? undefined : api.map.defaultColour;
+
 		let thisPin = new PinElement({
 			title: loc.name,
 			scale: 0.5,
 
-			background: colour,
+			background: "",
 			borderColor: "#464046",
 			glyphColor: "#464046"
 		});
 
 		let pinDOMElem = thisPin.element;
+
+		let pinColourBkg = pinDOMElem.querySelector(".RIFvHW-maps-pin-view-background")
+		api.dom.setElemGrade(pinColourBkg, thisGrades[loc.mId]);
+		
 
 		madePins.push(thisPin);
 
@@ -156,7 +176,7 @@ async function initMap({selector, popup, colours, onPinSelect, data}={}) {
 				selected = pinDOMElem;
 				setScale(selected, PIN_SCALE_SELECTED);
 
-				onPinSelect(thisData, colour);
+				onPinSelect(thisData, pinColourBkg);
 			};
 		});
 
@@ -197,7 +217,7 @@ async function initMap({selector, popup, colours, onPinSelect, data}={}) {
 				label.style.opacity = "1";
 			});
 
-			//if (pinDOMElem === selected) return;
+			if (pinDOMElem === selected) return;
 
 			setScale(pinDOMElem, PIN_SCALE_ON_HOVER);
 		});
@@ -213,8 +233,6 @@ async function initMap({selector, popup, colours, onPinSelect, data}={}) {
 			if (!label) return;
 
 			label.remove();
-
-			let currentTransform = pinDOMElem.style.transform || "";
 
 			if (pinDOMElem === selected) {
 				setScale(pinDOMElem, PIN_SCALE_SELECTED);
@@ -363,7 +381,7 @@ function chooseBestGrade(moGrade, bbcGrade, worst) {
 	};
 };
 
-function fillOneGradeDateElem(dateElem, period, dt, calendarCont, worst, onHover) {
+function fillOneGradeDateElem(dateElem, period, dt, calendarCont, worst, onHover, highlight) {
 	let gradeText = dateElem.querySelector("label[grade]");
 
 	let [bestOrg, bestGrade] = api.calc.chooseBestGrade(
@@ -382,7 +400,9 @@ function fillOneGradeDateElem(dateElem, period, dt, calendarCont, worst, onHover
 		dateStr = "1 " + api.datetime.months[dt.getUTCMonth()];
 	};
 
-	dateElem.querySelector(".datetxt").textContent = dateStr;
+	if (highlight) dateStr += " " + highlight;
+
+	dateElem.querySelector(".datetxt").innerHTML = dateStr;
 
 	calendarCont.append(dateElem);
 
@@ -393,19 +413,25 @@ function fillOneGradeDateElem(dateElem, period, dt, calendarCont, worst, onHover
 	});
 };
 
-function FillCalendar(selector, data, duration, calType, dateOnHover) {
+function FillCalendar(selector, data, duration, calType, dateOnHover, highlights) {
+	if (!highlights) highlights = {};
+
 	function pad(startDate, n, calendarCont) {
 		for (let i = 0; i < n; i++) {
 			let dateElem = api.assets.dateOneGradeTemplate.cloneNode(true);
+
+			let thisDt = new Date(startDate.getTime() + (i * 1000 * 60 * 60 * 24));
+			let dateStr = String(thisDt.getUTCDate()).padStart(2, "0");
+
+			let highlight = highlights[api.datetime.indentifierFromDate(thisDt)];
+
+			if (dateStr === "01") dateStr = "1 " + api.datetime.months[thisDt.getUTCMonth()];
+			if (highlight) dateStr += " " + highlight;
 	
 			for (let child of [...dateElem.children]) {
 				if (!child.matches(".datetxt")) { child.remove(); continue; };
 	
-				let thisDt = new Date(startDate.getTime() + (i * 1000 * 60 * 60 * 24));
-				let dateStr = String(thisDt.getUTCDate()).padStart(2, "0");
-	
-				if (dateStr === "01") dateStr = "1 " + api.datetime.months[thisDt.getUTCMonth()];
-				child.textContent = dateStr;
+				child.innerHTML = dateStr;
 			};
 	
 			calendarCont.append(dateElem);
@@ -423,10 +449,8 @@ function FillCalendar(selector, data, duration, calType, dateOnHover) {
 			if (!startDate) startDate = new Date((new Date()).getTime() - (duration * 1000 * 60 * 60 * 24));
 
 			let startWeekday = api.datetime.getWeekdayFromDateSunday0ToMonday0(startDate);
-			console.log("STARTWEEKDAY", startWeekday);
 
 			for (let i = 0; i < 7; i++) {
-				console.log(i, startWeekday + i, (startWeekday + i) % 7)
 				days.push(api.datetime.daysMon0[(startWeekday + i) % 7]);
 			};
 		} else if (calType === "dynamicWeeksNoGaps") {
@@ -446,15 +470,18 @@ function FillCalendar(selector, data, duration, calType, dateOnHover) {
 	function DefinedPeriods(periodByDate, calendarCont, startDate) {
 		if (!startDate) startDate = new Date((new Date()).getTime() - (duration * 1000 * 60 * 60 * 24));
 
-		console.log(startDate);
 		for (let i = 0; i < duration; i++) {
 			let dateNow = new Date(startDate.getTime() + (i * 1000 * 60 * 60 * 24));
-			let period = periodByDate[api.datetime.indentifierFromDate(dateNow)]; // do dict incase period doesnt exist
+			let id = api.datetime.indentifierFromDate(dateNow);
+			let period = periodByDate[id]; // do dict incase period doesnt exist
+			let highlight = highlights[id];
+			console.log(highlights, highlight);
 	
 			if (!period) { pad(dateNow, 1, calendarCont); continue; };
 	
 			let dateElem = api.assets.dateOneGradeTemplate.cloneNode(true);
-			api.dom.fillOneGradeDateElem(dateElem, period, dateNow, calendarCont, false, dateOnHover);
+			
+			api.dom.fillOneGradeDateElem(dateElem, period, dateNow, calendarCont, false, dateOnHover, highlight);
 		};
 	};
 
@@ -489,20 +516,16 @@ function FillCalendar(selector, data, duration, calType, dateOnHover) {
 	let paramData = data;
 	let startDate;
 
-	console.log("old paramdata", paramData);
-
 	if (calType === "regularWeeks" || calType === "dynamicWeeksWithGaps") {
 		paramData = {};
 		startDate = new Date(data[0].ft)
 
 		for (let period of data) {
 			let dt = new Date(period.ft);
-			console.log(period.ft, dt);
+			
 			paramData[api.datetime.indentifierFromDate(dt)] = period;
 		};
 	};
-
-	console.log("new paramdata", paramData);
 
 	FillDayHeader(startDate);
 
@@ -519,7 +542,7 @@ function setElemGrade(elem, grade) {
 	elem.setAttribute("grade", grade);
 
 	grade = grade.replace("+", "<sup>+</sup>");
-	elem.innerHTML = grade;
+	if (elem.tagName && api.textTags.includes(elem.tagName.toUpperCase())) elem.innerHTML = grade;
 };
 
 
@@ -610,11 +633,15 @@ function getBestOrgFromPeriods(periods) {
 };
 
 
-function getMapColours(data, mode) {
+function getMapGrades(data, mode) {
 	// mode = avg (simple)
 	// 		hyp (hyperbolic, most extreme away from middle of grades)
 
-	let colours = {};
+	let gradesByToggle = {
+		default: {},
+		mo: {},
+		bbc: {}
+	}
 
 	for (let loc of data) {
 		let grades = [];
@@ -625,14 +652,16 @@ function getMapColours(data, mode) {
 		let grade;
 
 		if (mode === "avg") grade = api.calc.averageOfGrades(grades);
-		else if (mode === "hyp") grade = api.calc.hyperbolicAvgGrades(grades)
+		else if (mode === "hyp") grade = api.calc.hyperbolicAvgGrades(grades);
 
-		colours[loc.loc] = GRADE_COLOURS[grade];
+		gradesByToggle.default[loc.loc] = grade;
+		if (loc.mo) gradesByToggle.mo[loc.loc] = loc.mo.ga;
+		if (loc.bbc) gradesByToggle.bbc[loc.loc] = loc.bbc.ga;
 	};
 
-	console.log(colours);
+	console.log(gradesByToggle);
 
-	return colours;
+	return gradesByToggle;
 };
 
 function randomInt(lowerInc, upperInc) {
@@ -692,6 +721,13 @@ function _setContentBody(innerHTML, historyDetail) {
 };
 
 function innerNavigateTo(relativeHref) {
+	//let queryParams = {};
+
+	if (typeof(relativeHref) === URL) {
+		//queryParams = relativeHref.searchParams;
+		relativeHref = relativeHref.pathname;
+	};
+
 	let cdnURI = api.navigation.cdnURI[relativeHref];
 
 	fetch(cdnURI).then(
@@ -711,7 +747,9 @@ function innerNavigateTo(relativeHref) {
 	);
 };
 
-
+function setLocCardName(locName) {
+	document.querySelector("#loc-card label").textContent = locName;
+};
 
 
 
@@ -727,15 +765,18 @@ function initApi() {
 			FillCalendar: FillCalendar,
 			fillOneGradeDateElem: fillOneGradeDateElem,
 			setElemGrade: setElemGrade,
-			getMapColours: getMapColours,
+			getMapGrades: getMapGrades,
 			initMap: initMap,
-			insertSVGByOrg: insertSVGByOrg
+			insertSVGByOrg: insertSVGByOrg,
+			setLocCardName: setLocCardName
 		},
 		api: {
 			getContentBody: null,
 			getApiWeekOfDailySummaries: getApiWeekOfDailySummaries,
 			getApiMonthOfDailySummaries: getApiMonthOfDailySummaries,
-			fetchSiteInfo: fetchSiteInfo
+			fetchSiteInfo: fetchSiteInfo,
+			getApiFcstsOfDay: getApiFcstsOfDay,
+			getApiObsofDay: getApiObsofDay
 		},
 		calc: {
 			averageOfGrades: averageOfGrades,
@@ -763,7 +804,8 @@ function initApi() {
 			bbcSVG: document.querySelector("template#bbc-svg").content.children[0],
 			equalsSVG: document.querySelector("template#equals-svg").content.children[0],
 			dateOneGradeTemplate: document.querySelector("template#calendar-date-onegrade-square").content.children[0],
-			calendarTemplate: document.querySelector("template#calendar").content.children[0]
+			calendarTemplate: document.querySelector("template#calendar").content.children[0],
+			fcstObsPeriodTemplate: document.querySelector("template#fcstvsobs").content.children[0]
 		},
 		map: {
 			id: "9e1930bb750ee894",
@@ -792,23 +834,38 @@ function initApi() {
 		siteInfo: [],
 		locIds: [],
 		siteInfoDict: {},
-		transferKeys: {
-			"t": ["d_scr_temp", "Temperature", "\u00B0C"],
-			"f": ["d_feels_like", "Feels Like", "\u00B0C"],
-			"w": ["s_wt", "Weather Type", "%"],
-			"ws": ["d_wind_s", "Wind Speed", "km/h"],
-			"wd": ["d_wind_d", "Wind Direction", "\u00B0"],
-			"wg": ["d_wind_g", "Wind Gust", "km/h"],
-			"pt": ["s_p_timing", "Precip Timing", "%"],
-			"pr": ["s_p_rate", "Precip Rate", "%"],
-			"pi": ["s_p_type", "Precip Intensity", "%"],
-			"pc": ["s_p_conf", "Precip Confidence", "%"],
-			"po": ["s_p_ovrl", "Precipitation", "%"]
+		textTags: [
+			'A', 'LABEL', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
+			'P', 'SPAN', 'B', 'I', 'U', 'STRONG', 'EM',
+			'SMALL', 'MARK', 'DEL', 'INS', 'SUB', 'SUP',
+			'Q', 'BLOCKQUOTE', 'CITE', 'TIME', 'CODE', 'PRE'
+		],
+		units: {
+			temp: "\u00B0C",
+			score: "%",
+			speed: "km/h",
+			direction: "\u00B0",
+			precip: "mm"
 		},
+		transferKeys: {},
 		summaryTableKeys: {}
 	};
 
 	window.api = api;
+
+	api.transferKeys = {
+		"t": ["d_scr_temp", "Temperature", api.units.temp],
+		"f": ["d_feels_like", "Feels Like", api.units.temp],
+		"w": ["s_wt", "Weather Type", api.units.score],
+		"ws": ["d_wind_s", "Wind Speed", api.units.speed],
+		"wd": ["d_wind_d", "Wind Direction", api.units.direction],
+		"wg": ["d_wind_g", "Wind Gust", api.units.speed],
+		"pt": ["s_p_timing", "Precip Timing", api.units.score],
+		"pr": ["s_p_rate", "Precip Rate", api.units.score],
+		"pi": ["s_p_type", "Precip Intensity", api.units.score],
+		"pc": ["s_p_conf", "Precip Confidence", api.units.score],
+		"po": ["s_p_ovrl", "Precipitation", api.units.score]
+	},
 
 	api.summaryTableKeys = {
 		"t": api.transferKeys.t,
@@ -865,6 +922,20 @@ function OnLoad() {
 			pushState: false
 		});
 
+	});
+
+	document.querySelector("#loc-card").addEventListener("click", function(e) {
+		api.dom.initMap({
+			selector: "#popup-map-cont",
+			popup: true,
+			onPinSelect: (data, pinElem) => {
+				let current = new URL(window.location.href);
+				current.searchParams.set("locId", data.loc);
+
+				innerNavigateTo(current);
+				setLocCardName(api.siteInfoDict[data.loc].clean_name);
+			}
+		});
 	});
 };
 
