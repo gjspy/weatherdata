@@ -7,14 +7,26 @@ const COLOUR_TO_GRADE = Object.fromEntries(
 );
 
 
-async function getApiWeekOfDailySummaries(fcstTimeBufferDays) {
-	let response = await fetch(`/api/results/daily?day_date=yesterday&countback_days=7&fcst_time_buffer_days=${fcstTimeBufferDays}`);
+async function getApiWeekOfDailySummaries(fcstTimeBufferDays, locId) {
+	let query = `/api/results/daily?day_date=yesterday&countback_days=7&fcst_time_buffer_days=${fcstTimeBufferDays}`;
+
+	if (locId) {
+		query +=`&loc_id=${locId}`;
+	};
+
+	let response = await fetch(query);
 
 	return (await response.json());
 };
 
-async function getApiMonthOfDailySummaries(fcstTimeBufferDays) {
-	let response = await fetch(`/api/results/daily?day_date=yesterday&countback_days=${api.config.monthNDays}&fcst_time_buffer_days=${fcstTimeBufferDays}`);
+async function getApiMonthOfDailySummaries(fcstTimeBufferDays, locId) {
+	let query = `/api/results/daily?day_date=yesterday&countback_days=${api.config.monthNDays}&fcst_time_buffer_days=${fcstTimeBufferDays}`;
+
+	if (locId) {
+		query +=`&loc_id=${locId}`;
+	};
+
+	let response = await fetch(query);
 
 	return (await response.json());
 };
@@ -70,6 +82,9 @@ async function initMap({selector, popup, grades, onPinSelect, data}={}) {
 	// selector: css selector to find map cont, str
 	// popup: whether to hide map once a pin is selected, bool
 	// colours: detail about colours {loc: grade}, or "#hex-value"
+	console.log("data", data);
+
+	if (!grades) grades = {"default": {}};
 
 	const {Map} = await google.maps.importLibrary("maps");
 	const {AdvancedMarkerElement, PinElement} = await google.maps.importLibrary("marker");
@@ -122,13 +137,14 @@ async function initMap({selector, popup, grades, onPinSelect, data}={}) {
 	pinsToMake.sort((a,b) => { return b.lat - a.lat; });
 
 	let toHighlightRandom;
-	if (onPinSelect) toHighlightRandom = api.random.choice(pinsToMake);
+	if (onPinSelect && !popup) toHighlightRandom = api.random.choice(pinsToMake);
 
 	let thisGrades = grades["default"];
 
 	let selected;
 
 	for (let loc of pinsToMake) {
+
 		//let colour = colours[loc.mId] || api.map.defaultColour;
 		let thisData;
 
@@ -136,7 +152,9 @@ async function initMap({selector, popup, grades, onPinSelect, data}={}) {
 			if (loc.mId === v.loc) {thisData = v; break;}
 		};
 
-		let background = (thisGrades[loc.mId]) ? undefined : api.map.defaultColour;
+		console.log(thisData,"thisData");
+
+		//let background = (thisGrades[loc.mId]) ? undefined : api.map.defaultColour;
 
 		let thisPin = new PinElement({
 			title: loc.name,
@@ -176,7 +194,7 @@ async function initMap({selector, popup, grades, onPinSelect, data}={}) {
 				selected = pinDOMElem;
 				setScale(selected, PIN_SCALE_SELECTED);
 
-				onPinSelect(thisData, pinColourBkg);
+				onPinSelect(thisData || loc, pinColourBkg);
 			};
 		});
 
@@ -325,6 +343,8 @@ function FillSummaryTableConditions(table, orgDetail) {
 		row.remove();
 	};
 
+	console.log(orgDetail);
+
 	let added = [];
 
 	for (let [k,v] of Object.entries(api.summaryTableKeys)) {
@@ -336,6 +356,7 @@ function FillSummaryTableConditions(table, orgDetail) {
 		if (value === undefined) continue;
 
 		let valObj = row.cloneNode(true);
+		console.log(valObj);
 
 		valObj.style.display = "";
 		
@@ -475,7 +496,6 @@ function FillCalendar(selector, data, duration, calType, dateOnHover, highlights
 			let id = api.datetime.indentifierFromDate(dateNow);
 			let period = periodByDate[id]; // do dict incase period doesnt exist
 			let highlight = highlights[id];
-			console.log(highlights, highlight);
 	
 			if (!period) { pad(dateNow, 1, calendarCont); continue; };
 	
@@ -685,14 +705,15 @@ function _setContentBody(innerHTML, historyDetail) {
 
 	let contentElem = tempElem.querySelector("div");
 
-	let currentContent = content.querySelector(".content-elem");
-	if (currentContent) currentContent.remove(); // removes current WITHOUT removing footer
-
 	content.scrollTo({
 		top: 0,
 		left: 0,
 		behavior: "instant"
 	});
+
+	let currentContent = content.querySelector(".content-elem");
+	if (currentContent) currentContent.remove(); // removes current WITHOUT removing footer
+
 
 	content.insertBefore(contentElem, content.firstElementChild);
 	tempElem.remove();
@@ -707,6 +728,7 @@ function _setContentBody(innerHTML, historyDetail) {
 	};
 
 	if (!historyDetail) return;
+	console.log(historyDetail);
 
 	let title = api.navigation.pageTitles[historyDetail.url];
 	document.title = title + " - " + api.navigation.masterTitle;
@@ -715,16 +737,19 @@ function _setContentBody(innerHTML, historyDetail) {
 	if (historyDetail.pushState === true) {
 		window.history.pushState({ 
 			"_contentInnerHTML": innerHTML,
-			"_relHref": historyDetail.url
-		}, "", historyDetail.url);
+			"_relHref": historyDetail.url + historyDetail.searchText
+		}, "", historyDetail.url + historyDetail.searchText);
 	};
 };
 
 function innerNavigateTo(relativeHref) {
-	//let queryParams = {};
+	let params;
+	let searchText = "";
 
-	if (typeof(relativeHref) === URL) {
-		//queryParams = relativeHref.searchParams;
+	if (typeof(relativeHref) === "object") {
+		params = relativeHref.searchParams;
+		searchText = relativeHref.search;
+
 		relativeHref = relativeHref.pathname;
 	};
 
@@ -735,7 +760,7 @@ function innerNavigateTo(relativeHref) {
 		async function(response) {
 			let innerHTML = await response.text();
 
-			api.dom._setContentBody(innerHTML, {url: relativeHref, pushState: true});
+			api.dom._setContentBody(innerHTML, {url: relativeHref, params: params, searchText: searchText, pushState: true});
 		}, 
 
 		function(err) {
@@ -901,7 +926,7 @@ function OnLoad() {
 
 	initApi();
 
-	innerNavigateTo(window.location.pathname);
+	innerNavigateTo(new URL(window.location.href));
 
 	for (let elem of document.querySelectorAll("#navbar > a[href]")) {
 
@@ -925,15 +950,19 @@ function OnLoad() {
 	});
 
 	document.querySelector("#loc-card").addEventListener("click", function(e) {
+		console.log("intting map");
+
 		api.dom.initMap({
+			data: api.siteInfo,
 			selector: "#popup-map-cont",
 			popup: true,
 			onPinSelect: (data, pinElem) => {
 				let current = new URL(window.location.href);
-				current.searchParams.set("locId", data.loc);
+				current.searchParams.set("locId", data.mId);
+				console.log(data, current);
 
 				innerNavigateTo(current);
-				setLocCardName(api.siteInfoDict[data.loc].clean_name);
+				setLocCardName(api.siteInfoDict[data.mId].clean_name);
 			}
 		});
 	});

@@ -9,6 +9,8 @@
 		let bcTablesCont = document.querySelector("#homepage .pane-1 .entry.bbc .table-cont");
 		api.dom.FillSummaryTableGrades(bcTablesCont, yesterdayBC.data);
 
+		console.log(yesterdayMO, yesterdayBC);
+
 
 		let moGradeDOM = document.querySelector("#homepage .pane-1 .entry.mo > a.grade");
 		api.dom.setElemGrade(moGradeDOM, yesterdayMO.ga);
@@ -37,7 +39,7 @@
 
 	function pane2ChangeLoc(data, pinElem) {
 		let locTitle = document.querySelector("#homepage .pane-2 .title-bar .right-items .main");
-		console.log(pinElem);
+
 		let grade = pinElem.getAttribute("grade");
 
 		api.dom.setElemGrade(locTitle, grade);
@@ -239,8 +241,10 @@
 		let datesInWeek = Array.from(Object.keys(weeklySummary)).map( v => Date.parse(v) );
 		let yesterday = datas[datesInWeek.indexOf(Math.max(...datesInWeek))];
 
-		let yesterdayMO = api.calc.getOrgFromPeriod(yesterday, "MO")
-		let yesterdayBC = api.calc.getOrgFromPeriod(yesterday, "BBC")
+		let yesterdayMO = api.calc.getOrgFromPeriod(yesterday, "MO");
+		let yesterdayBC = api.calc.getOrgFromPeriod(yesterday, "BBC");
+
+		console.log("yesterdayS", yesterdayMO, yesterdayBC);
 
 		let gradeByLocArr = api.calc.getGradeByLocArr(yesterdayMO.data, yesterdayBC.data);
 		

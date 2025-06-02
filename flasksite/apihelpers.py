@@ -167,7 +167,11 @@ def get_organised_obs(obs: list[CleanOBS]):
 	data = {}
 
 	for o in obs:
-		data[o.dt] = get_jsoned_obj(o)
+		dt = get_tzsafe_str_date(o.dt)
+
+		data[dt] = get_jsoned_obj(o)
+	
+	return data
 
 
 

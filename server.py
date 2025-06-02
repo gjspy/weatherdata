@@ -178,6 +178,7 @@ def get_forecasts(
 	)
 
 	organised = get_organised_fcsts(results)
+	organised["day_date"] = get_tzsafe_str_date(day_date)
 
 	global_cache_manager.fcsts_of_day.add(ref, organised)
 
@@ -220,7 +221,7 @@ def get_obs(
 	)
 
 	organised = get_organised_obs(results)
-
+	
 	global_cache_manager.obs.add(ref, organised)
 
 	return organised
@@ -232,11 +233,12 @@ def get_obs(
 def get_all_daily_results(
 	day_date: datetime | str = Query(..., description = describe.future_time),
 	countback_days: int = Query(0, description = describe.countback_days),
-	fcst_time_buffer_days: int = Query(2, description = describe.fcst_time_buffer_days)
+	fcst_time_buffer_days: int = Query(2, description = describe.fcst_time_buffer_days),
+	loc_id: str | int = "all"
 ):
 	day_date = InterpretParam.time(day_date)
 
-	ref = str(day_date) + str(countback_days) + str(fcst_time_buffer_days)
+	ref = str(day_date) + str(countback_days) + str(fcst_time_buffer_days) + str(loc_id)
 	cached = global_cache_manager.daily_summaries.get(ref)
 
 	if (cached): return cached
@@ -245,7 +247,8 @@ def get_all_daily_results(
 		Queries.get_daily_summaries(
 			min_future_time_inc = day_date - timedelta(days = countback_days - 1),
 			max_future_time_exc = day_date + timedelta(days = 1),
-			fcst_time_buffer_days = fcst_time_buffer_days
+			fcst_time_buffer_days = fcst_time_buffer_days,
+			loc_id = loc_id
 		),
 		global_session_constructor
 	)

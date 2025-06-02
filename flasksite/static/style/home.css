@@ -314,68 +314,6 @@
 	margin: 0 auto;
 }
 
-#homepage table.summary-table {
-	font-size: 3vmin;
-	font-family: "Roboto", sans-serif;
-
-	border-collapse: collapse;
-
-	flex: 1;
-}
-
-#homepage table.summary-table :first-child {
-	font-size: 3vh;
-}
-
-#homepage table.summary-table.conditions tr:first-child :nth-child(1) {
-	width: 30%;
-}
-
-#homepage table.summary-table.conditions tr:first-child :nth-child(2) {
-	width: 10%;
-}
-
-#homepage table.summary-table.conditions tr:first-child :nth-child(3) {
-	width: 60%;
-}
-
-#homepage table.summary-table.conditions tr :first-child {
-	padding-right: 5%;
-	text-align: right;
-}
-
-#homepage table.summary-table.conditions td {
-	padding: 0;
-}
-
-#homepage table.summary-table td[grade] {
-	font-family: "Luckiest Guy", serif;
-	font-size: 3.5vh;
-}
-
-
-#homepage table.summary-table.grades tr:first-child :nth-child(1) {
-	width: 40%;
-}
-
-#homepage .table.summary-table.grades tr:first-child :nth-child(2) {
-	width: 60%;
-}
-
-#homepage table.summary-table.grades tr :first-child {
-	padding-right: 9%;
-	text-align: right;
-}
-
-
-
-#homepage .pane-3 table.summary-table.grades table:first-of-type {
-	margin-left: 7%;
-}
-
-#homepage .pane-3 table.summary-table.grades table:last-of-type {
-	margin-right: 4%;
-}
 
 
 

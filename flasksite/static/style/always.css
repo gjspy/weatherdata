@@ -19,7 +19,12 @@
 	--grade-F: #000000;
 
 	--period-thin-border: 0.75px solid rgba(0, 0, 0, .2);
+	--theme: #8aabca;
 	
+}
+
+body {
+	background: var(--theme);
 }
 
 svg:not(.mono) [href="#mo-square"] {
@@ -126,8 +131,8 @@ body {
 	justify-content: space-between;
 	
 	/*background:rgb(0, 56, 10);*/
-	background: #80956d;
-	background: #8aabca;
+	/*background: #80956d;*/
+	background: var(--theme);
 
 	img#logo {
 		height: 90%;
@@ -191,7 +196,7 @@ body:has(#content > [location-selector="true"]) #loc-card {
 
 	position: absolute;
 	z-index: 100;
-	width: 10vw;
+	width: fit-content;/*10vw;*/
 
 	padding: 5px;
 	background:#8aabca;
@@ -488,4 +493,92 @@ a.map-pin-tooltip {
 
 #popup-map.invisible, #popup-map:has(.invisible) {
 	display: none;
+}
+
+
+
+
+
+
+
+
+
+
+table.summary-table {
+	font-size: 3vmin;
+	font-family: "Roboto", sans-serif;
+
+	border-collapse: collapse;
+
+	flex: 1;
+}
+
+table.summary-table :first-child {
+	font-size: 3vh;
+}
+
+table.summary-table.conditions tr:first-child :nth-child(1) {
+	width: 30%;
+}
+
+table.summary-table.conditions tr:first-child :nth-child(2) {
+	width: 10%;
+}
+
+table.summary-table.conditions tr:first-child :nth-child(3) {
+	width: 60%;
+}
+
+table.summary-table.conditions tr :first-child {
+	padding-right: 5%;
+	text-align: right;
+}
+
+table.summary-table.conditions td {
+	padding: 0;
+}
+
+table.summary-table td[grade] {
+	font-family: "Luckiest Guy", serif;
+	font-size: 3.5vh;
+}
+
+
+table.summary-table.grades tr:first-child :nth-child(1) {
+	width: 40%;
+}
+
+.table.summary-table.grades tr:first-child :nth-child(2) {
+	width: 60%;
+}
+
+table.summary-table.grades tr :first-child {
+	padding-right: 9%;
+	text-align: right;
+}
+
+
+
+table.summary-table.grades table:first-of-type {
+	margin-left: 7%;
+}
+
+table.summary-table.grades table:last-of-type {
+	margin-right: 4%;
+}
+
+#footer-bar {
+	height: fit-content;
+	
+	font-size: 2vmin;
+	
+	font-family: "Roboto";
+	background: var(--theme);
+	color: white;
+	
+	padding: 0 0 0.5vh 0.5vw
+}
+
+#footer-bar :visited {
+	color: white;
 }

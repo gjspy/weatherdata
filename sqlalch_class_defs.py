@@ -201,7 +201,7 @@ class Queries():
 			)
 
 
-	def get_daily_summaries(min_future_time_inc: datetime, max_future_time_exc: datetime, fcst_time_buffer_days: int) -> Callable[[Session], list | None]:
+	def get_daily_summaries(min_future_time_inc: datetime, max_future_time_exc: datetime, fcst_time_buffer_days: int, loc_id: int | None) -> Callable[[Session], list | None]:
 		"""
 		gets the daily summary for every location/org for every day between given dates.
 
@@ -214,6 +214,27 @@ class Queries():
 		and mid=11004
 		order by fcst.org, fcst.mid, fcst.FCST_TIME asc, fcst.future_time asc;
 		"""
+
+		if (loc_id and loc_id != "all"):
+			return (
+				lambda session:
+					session.query(Result) \
+						.options(selectinload(Result.fcst)) # join now, not lazy load, so can access Result.fcst immediately.
+						.filter(
+							FCST.id == Result.fcst_id, # join ON this
+							Result.period == 24,
+							FCST.fcst_time == func.DATE_SUB(
+								FCST.future_time,
+								text(f"INTERVAL {fcst_time_buffer_days} DAY") # timedelta(days = x)
+							),
+							FCST.future_time >= min_future_time_inc,
+							FCST.future_time < max_future_time_exc,
+							FCST.mid == loc_id
+						)
+						.order_by(FCST.org, FCST.mid, FCST.fcst_time.asc(), FCST.future_time.asc())
+						.all()
+				)
+
 
 		return (
 			lambda session:
