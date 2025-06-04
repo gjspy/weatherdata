@@ -372,11 +372,11 @@ def db_commit_loop(engine: Engine):
 		if (objs):
 			counts = {}
 			for o in objs:
-				if (not counts[o.__name__]): counts[o.__name__] = 0
+				if (not counts.get(o.__name__)): counts[o.__name__] = 0
 
 				counts[o.__name__] += 1
 
-			task_detail.append(f"add {len(objs)} objs: " + ", ".join(f"{c}x {o}" for c, o in counts.items()))
+			task_detail.append(f"add {len(objs)} objs: " + ", ".join(f"{c}x {o.__name__}" for o,c in counts.items()))
 
 		if (updates): task_detail.append(f"update {len(updates.keys())} items")
 
