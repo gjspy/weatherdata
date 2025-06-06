@@ -301,6 +301,44 @@ function insertSVGByOrg(elemToReplaceOuterHTML, org) {
 };
 
 
+function FillSummaryPieGrades(selector, weatherEntries) {
+	let pieCont = document.querySelector(selector);
+
+	let counts = {};
+	for (let entry of weatherEntries) {
+		let grade = entry.ga;
+
+		if (!counts[grade]) counts[grade] = 0;
+		
+		counts[grade] ++;
+	};
+
+	let orderedPieSegs = Object.entries(counts).sort( (a, b) => GRADES.indexOf(b[0]) > GRADES.indexOf(a[0]));
+	let pieData = [["Grade", "Number of locations"]].concat(orderedPieSegs);
+	let colours = orderedPieSegs.map( ([k,v]) => api.colours[k] );
+
+	let options = {
+		is3D: true,
+		colors: colours,
+		pieSliceText: "value",
+		legend: {position: "none"},
+		tooltip: {
+			isHtml: true,
+			ignoreBounds: true,
+			text: "percentage"
+		},
+		chartArea: {
+			width: "100%",
+			height: "100%"
+		},
+		backgroundColor: "transparent"
+	};
+
+	let gPieData = google.visualization.arrayToDataTable(pieData);
+	let chart = new google.visualization.PieChart(pieCont);
+	chart.draw(gPieData, options);
+};
+
 function FillSummaryTableGrades(table, weatherEntries) {
 	let counts = {};
 	for (let entry of weatherEntries) {
@@ -343,8 +381,6 @@ function FillSummaryTableConditions(table, orgDetail) {
 		row.remove();
 	};
 
-	console.log(orgDetail);
-
 	let added = [];
 
 	for (let [k,v] of Object.entries(api.summaryTableKeys)) {
@@ -356,7 +392,6 @@ function FillSummaryTableConditions(table, orgDetail) {
 		if (value === undefined) continue;
 
 		let valObj = row.cloneNode(true);
-		console.log(valObj);
 
 		valObj.style.display = "";
 		
@@ -381,7 +416,7 @@ function getWeekdayFromDateSunday0ToMonday0(dt) {
 };
 
 function indentifierFromDate(dt) {
-	return String(dt.getUTCDate()) + "/" + String(dt.getUTCMonth())
+	return String(dt.getUTCDate()) + "/" + String(dt.getUTCMonth() + 1); // month is zero based
 };
 
 function chooseBestGrade(moGrade, bbcGrade, worst) {
@@ -793,7 +828,8 @@ function initApi() {
 			getMapGrades: getMapGrades,
 			initMap: initMap,
 			insertSVGByOrg: insertSVGByOrg,
-			setLocCardName: setLocCardName
+			setLocCardName: setLocCardName,
+			FillSummaryPieGrades: FillSummaryPieGrades
 		},
 		api: {
 			getContentBody: null,
@@ -871,6 +907,14 @@ function initApi() {
 			speed: "km/h",
 			direction: "\u00B0",
 			precip: "mm"
+		},
+		colours: {
+			"A+": "#FF41D8",
+			"A": "#2EC918",
+			"B": "#ffb600",
+			"C": "#FF5400",
+			"D": "#C40000",
+			"F": "#000000"
 		},
 		transferKeys: {},
 		summaryTableKeys: {}

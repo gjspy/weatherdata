@@ -1,3 +1,19 @@
+.content-elem:has(.sticky-bkg img[src*="AS308506241"]) .hero .contents {
+	background: rgba(255, 255, 255, 0.75);
+}
+
+.content-elem:has(.sticky-bkg img[src*="AS183401940"]) .hero .contents {
+	background: rgba(255, 255, 255, 0.91);
+}
+
+.content-elem:has(.sticky-bkg img[src*="AS439173189"]) .hero .contents {
+	background: rgba(255, 255, 255, 0.83);
+}
+
+.content-elem:has(.sticky-bkg img[src*="AS291241545"]) .hero .contents {
+	background: rgba(255, 255, 255, 0.73);
+}
+
 :root {
 	/* COLOURS */
 	--met-office: #D6DF23;
@@ -156,15 +172,27 @@ body {
 #topbar #logocont img {
 	display: inline;
 	float: left;
-	filter: drop-shadow(#000000 1px 1px 1px);
+	filter: drop-shadow(#000000 0.1em 0.1em 0.1em);
 }
 
 #topbar #topleft {
-	font-size: 25px;
-	font-family: "Viga", serif;
-	text-align: right;
+	padding: 5px 5px 0 0;
+	height: 50%;
+	min-height: 40px;
+	max-height: 100px;
+}
+
+#topbar #topleft > * {
 	height: 100%;
-	flex: 20%; /* WIP*/
+}
+
+#topbar #topleft #hamburger {
+	fill: white;
+}
+
+#topbar #topleft #rainbow {
+	padding-right: 20px;
+	filter: drop-shadow(0.1em 0.1em 0px black);
 }
 
 #topbar #navbar {
@@ -198,7 +226,7 @@ body:has(#content > [location-selector="true"]) #loc-card {
 	z-index: 100;
 	width: fit-content;/*10vw;*/
 
-	padding: 5px;
+	padding: 5px 15px 5px 5px;
 	background:#8aabca;
 
 	/*filter: drop-shadow(0px 2px 2px black);*/
@@ -241,7 +269,7 @@ body:has(#content > [location-selector="true"]) #loc-card {
 	font-size: 1.6vw;
 	pointer-events: none;
 
-	filter: drop-shadow(1px 1px 0px black);
+	filter: drop-shadow(0.07em 0.07em 0 black);
 }
 
 .sticky-bkg {
@@ -266,7 +294,7 @@ body:has(#content > [location-selector="true"]) #loc-card {
 	object-position: center;
 }
 
-.sticky-bkg::after {
+/*.sticky-bkg::after {
 	content: var(--sticky-colour-gradient);
 
 	width: 100vw;
@@ -280,6 +308,22 @@ body:has(#content > [location-selector="true"]) #loc-card {
 	pointer-events: none;
 
 	background: var(--sticky-colour-gradient);
+}*/
+
+.sticky-bkg::after {
+	content: var(--sticky-colour-gradient);
+
+	width: 100vw;
+	height: 10px;
+
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	z-index: 1;
+
+	pointer-events: none;
+
+	background: var(--pane3-bkg);
 }
 
 
@@ -485,7 +529,7 @@ a.map-pin-tooltip {
 
 	padding: 10px 15px;
 	color: rgb(223, 52, 164);
-	filter: drop-shadow(2px 2px 0px black);
+	filter: drop-shadow(0.035em 0.035em 0 black);
 
 	position: absolute;
 	z-index: 102;

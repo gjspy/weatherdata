@@ -27,7 +27,7 @@
 #changes .title-bar .main {
 	--font-size: min(8vh,10vw);
 	color: #2992f3;
-	filter: drop-shadow(2px 2px 0px black);
+	filter: drop-shadow(0.035em 0.035em 0 black);
 	font-family: "Lilita One", "Serif";
 	font-size: var(--font-size);
 	line-height: var(--font-size);

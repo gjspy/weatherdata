@@ -51,7 +51,7 @@
 
 	};
 
-	function fillFullFcstObsPeriod(ft, data, elem) {
+	function fillFullFcstObsPeriod(ft, data, selectedSubOrg, elem) {
 		let ftime = new Date(ft);
 
 		let hr = ftime.getUTCHours();
@@ -62,6 +62,10 @@
 		else if (hr === 0) timeText.textContent = "12AM";
 		else if (hr < 12) timeText.textContent = `${hr}AM`;
 		else timeText.textContent = `${hr - 12}PM`;
+
+		if (selectedSubOrg === "3") elem.classList.add("three-hr");
+		else if (selectedSubOrg === "D") elem.classList.add("daily");
+		else elem.classList.add("hourly");
 
 		if (data.fcst) fillHalfFcstObsPeriod(data.fcst, elem.querySelector(".fcst"));
 		if (data.obs) fillHalfFcstObsPeriod(data.obs, elem.querySelector(".obs"));
@@ -77,7 +81,7 @@
 		};
 
 		// SET METADATA
-		let dateElem = contents.querySelector(".flex-grow > .date");
+		let dateElem = contents.querySelector(".option-row > .date");
 		dateElem.textContent = "Forecasts of " + new Date(data.fcst.day_date).toLocaleDateString();
 
 		periods.innerHTML = "";
@@ -156,7 +160,7 @@
 		for (let [ft, v] of Object.entries(chosenFcstData).sort( (a,b) => ( new Date(a[0]) - new Date(b[0]) ) )) {
 			let elem = api.assets.fcstObsPeriodTemplate.cloneNode(true);
 
-			fillFullFcstObsPeriod(ft, {fcst: v, obs: data.obs[ft]}, elem);
+			fillFullFcstObsPeriod(ft, {fcst: v, obs: data.obs[ft]}, selectedSubOrg, elem);
 
 			periods.append(elem);
 		};
@@ -169,8 +173,6 @@
 		function fillData(fcst, obs) {
 			let contents = document.querySelector(".pane-2 .contents");
 			let periods = document.querySelector(".pane-2 .periods");
-
-			console.log(fcst, obs);
 
 			fcstVsObsUpdate({fcst: fcst, obs: obs}, contents, periods);
 		};
@@ -189,6 +191,7 @@
 			if (fcst) fillData(fcst, obs);
 		});		
 	};
+
 
 	async function pane3(locId) {
 		function dateOnHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade) {
@@ -285,7 +288,9 @@
 		if (!locId) {
 			locId = api.random.choice(api.locIds);
 			api.dom.setLocCardName(api.siteInfoDict[locId].clean_name);
-		};		
+		};
+		
+		document.querySelector(".sticky-bkg .background").src = `api/weather/current-photo?loc=${locId}`;
 		
 		pane1(locId);
 		pane2(locId);

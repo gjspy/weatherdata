@@ -14,6 +14,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Viga&family=DynaPuff:wght@400..700&family=Luckiest+Guy&family=Titan+One&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 	<link href="static/favicon.ico" type="image/x-icon" rel="icon">
+	<script src="https://www.gstatic.com/charts/loader.js"></script>
 
 	<script src="api/formatted/mapsinit.js"></script>
 	<script src="static/script/main.js"></script>
@@ -99,7 +100,10 @@
 		</div>
 
 		<div id="topleft">
-			<a>[Information or menu.]</a>
+			<img id="rainbow" src="static/rainbow.png">
+			<svg id="hamburger" viewbox="0 0 12 12">
+				<use href="#menu"/>
+			</svg>
 		</div>
 	</div>
 
@@ -151,6 +155,11 @@
 		<g id="equals">
 			<rect y="3.78" width="22.354" height="5.132"/>
 			<rect y="13.441" width="22.354" height="5.133"/>
+		</g>
+		<g id="menu">
+			<rect height="1" width="11" x="0.5" y="5.5"/>
+			<rect height="1" width="11" x="0.5" y="2.5"/>
+			<rect height="1" width="11" x="0.5" y="8.5"/>
 		</g>
 	</defs>
 </svg>

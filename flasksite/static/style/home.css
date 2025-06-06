@@ -1,22 +1,3 @@
-#homepage:has(.sticky-bkg img[src*="AS308506241"]) .hero .contents {
-	background: rgba(255, 255, 255, 0.75);
-}
-
-#homepage:has(.sticky-bkg img[src*="AS183401940"]) .hero .contents {
-	background: rgba(255, 255, 255, 0.91);
-}
-
-#homepage:has(.sticky-bkg img[src*="AS439173189"]) .hero .contents {
-	background: rgba(255, 255, 255, 0.83);
-}
-
-#homepage:has(.sticky-bkg img[src*="AS291241545"]) .hero .contents {
-	background: rgba(255, 255, 255, 0.73);
-}
-
-
-
-
 #homepage {
 	--pane3-bkg: rgb(198, 255, 252);
 	--hero-map-width: 45vmin;
@@ -30,11 +11,13 @@
 }
 
 
-#homepage > :not(.sticky-bkg) { /* hero, pane-2, */
+#homepage > :not(.sticky-bkg) { /* hero, pane-2,... */
 	height: var(--content-height);
 	position: relative;
-	scroll-snap-align: start;
+	scroll-snap-align: end;
+	scroll-snap-stop: always;
 }
+
 
 #homepage .hero .contents {
 	margin: auto;
@@ -59,7 +42,7 @@
 #homepage .title-bar .main {
 	--font-size: min(8vh,10vw);
 	color: #2992f3;
-	filter: drop-shadow(2px 2px 0px black);
+	filter: drop-shadow(0.035em 0.035em 0 black);
 	font-family: "Lilita One", "Serif";
 	font-size: var(--font-size);
 	line-height: var(--font-size);
@@ -145,6 +128,7 @@
 }
 
 #homepage .pane-1 .entry-cont {
+	display: flex;
 	flex: 1;
 
 	margin-top: 4%;
@@ -153,12 +137,9 @@
 
 #homepage .pane-1 .entry {
 	width: var(--square);
-	height: var(--square);
+	height: calc(var(--square));
 
-	display: inline-flex;
-	align-items: center;
-	justify-content: flex-start;
-	flex-direction: column;
+	position: relative;
 }
 
 #homepage .pane-1 .entry:first-child {
@@ -170,20 +151,40 @@
 	padding: 0 0 0 var(--padding-each);
 }
 
-#homepage .pane-1 .entry .logo:has(use[href="#mo-square"]) {
+#homepage .pane-1 .entry .header {
+	width: 100%;
 	height: 45%;
+
+	display: flex;
+	justify-content: space-evenly;
+	flex-direction: row;
+	align-items: center;
+}
+
+#homepage .pane-1 .entry .logo {
+	max-height: 100%;
+	max-width: 70%;
 }
 
 #homepage .pane-1 .entry .logo:has(use[href="#bbc-full"]) {
-	/*height: min(calc(var(--square) - var(--padding-each)), 45%);*/
-	height: 45%;
-	padding: 5% 0;
+	padding-right: 10%;
 }
 
 #homepage .pane-1 .entry .grade {
-	padding-top: 1%;
 	font-family: Luckiest Guy;
-	font-size: min(5vw, 6vh);
+	font-size: 12vmin;
+
+	flex-shrink: 0;
+}
+
+#homepage .pane-1 .pie-cont {
+	width: 100%;
+	height: 50%;
+
+	position: absolute;
+	left: 50%;
+	transform: translate(-50%, 0);
+	bottom: 0;
 }
 
 #homepage .pane-1 .table-cont {
@@ -209,24 +210,6 @@
 	right: 0;
 
 	padding: 0 var(--padding-l) 2% calc(var(--padding-l) / 2);
-}
-
-#homepage .pane-1 .footer a.main {
-
-}
-
-#homepage .footer .main {
-	--font-size: min(5vh,6vw);
-	color: #1c980e;
-	filter: drop-shadow(2px 2px 0px black);
-	font-family: "Lilita One", "Serif";
-	font-size: var(--font-size);
-	line-height: var(--font-size);
-	display: block;
-
-	width: fit-content;
-
-	margin-bottom: 0.5%;
 }
 
 #homepage .footer .sub {
@@ -273,6 +256,9 @@
 
 	position: relative;
 }
+
+
+
 
 #homepage .pane-2 .summary-row {
 	width: 100%;
@@ -590,7 +576,7 @@
 
 	padding: var(--padding-tb) var(--padding-lr);
 
-	background: linear-gradient(var(--pane3-bkg) 20%, white 100%);
+	background: linear-gradient(var(--pane3-bkg) 20%, var(--theme) 100%);
 }
 
 #homepage .pane-4 .title-bar {

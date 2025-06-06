@@ -3,19 +3,19 @@
 
 
 	function pane1(yesterdayMO, yesterdayBC, gradeByLocArr, bestOrg) {
-		let moTablesCont = document.querySelector("#homepage .pane-1 .entry.mo .table-cont");
+		/*let moTablesCont = document.querySelector("#homepage .pane-1 .entry.mo .table-cont");
 		api.dom.FillSummaryTableGrades(moTablesCont, yesterdayMO.data);
 
 		let bcTablesCont = document.querySelector("#homepage .pane-1 .entry.bbc .table-cont");
-		api.dom.FillSummaryTableGrades(bcTablesCont, yesterdayBC.data);
+		api.dom.FillSummaryTableGrades(bcTablesCont, yesterdayBC.data);*/
 
 		console.log(yesterdayMO, yesterdayBC);
 
 
-		let moGradeDOM = document.querySelector("#homepage .pane-1 .entry.mo > a.grade");
+		let moGradeDOM = document.querySelector("#homepage .pane-1 .entry.mo > .header > a.grade");
 		api.dom.setElemGrade(moGradeDOM, yesterdayMO.ga);
 
-		let bcGradeDOM = document.querySelector("#homepage .pane-1 .entry.bbc > a.grade");
+		let bcGradeDOM = document.querySelector("#homepage .pane-1 .entry.bbc > .header > a.grade");
 		api.dom.setElemGrade(bcGradeDOM, yesterdayBC.ga);
 
 		console.log(gradeByLocArr);
@@ -26,7 +26,7 @@
 			grades: mapGrades
 		});
 
-		let title = document.querySelector("#homepage .pane-1 .footer > .main");
+		/*let title = document.querySelector("#homepage .pane-1 .footer > .main");
 		
 		if (bestOrg === "MO") {
 			title.textContent = title.textContent.replace("[org]", "The Met Office was");
@@ -34,7 +34,7 @@
 			title.textContent = title.textContent.replace("[org]", "BBC Weather was");
 		} else {
 			title.textContent = "Both organisations had the same accuracy"
-		};
+		};*/
 	};
 
 	function pane2ChangeLoc(data, pinElem) {
@@ -261,6 +261,20 @@
 		};
 
 		console.log("grade by loc arr", gradeByLocArr);
+
+
+
+		google.charts.load("current", {"packages": ["corechart"]});
+		google.charts.setOnLoadCallback(() => {
+			console.log("loaded")
+			api.dom.FillSummaryPieGrades("#homepage .pane-1 .entry.mo .pie-cont", yesterdayMO.data);
+			api.dom.FillSummaryPieGrades("#homepage .pane-1 .entry.bbc .pie-cont", yesterdayBC.data);
+		});
+
+
+
+
+
 		
 		pane1(yesterdayMO, yesterdayBC, gradeByLocArr, bestYesterday);
 		pane2(gradeByLocArr);
