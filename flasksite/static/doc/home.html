@@ -11,32 +11,35 @@
 			</div>
 			<div class="flex-grow">
 				<div id="hero-map"></div>
-				<div class="entry-cont">
-					<div class="entry mo">
-						<div class="header">
-							<svg class="logo" viewbox="0 0 200 200">
-								<use href="#mo-square"/>
-								<use href="#mo-text"/>
-							</svg>
-							<a class="grade" grade="A">A</a>
+				<div class="right-items">
+					<div class="entry-cont">
+						<div class="entry mo">
+							<div class="header">
+								<svg class="logo" viewbox="0 0 200 200">
+									<use href="#mo-square"/>
+									<use href="#mo-text"/>
+								</svg>
+								<a class="grade" grade="A">A</a>
+							</div>
+							
+							<div class="pie-cont"></div>
 						</div>
-						
-						<div class="pie-cont"></div>
+						<div class="entry bbc">
+							<div class="header">
+								<svg class="logo" viewbox="0 0 1000 400">
+									<use href="#bbc-full"/>
+								</svg>
+								<a class="grade" grade="B">B</a>
+							</div>
+							
+							<div class="pie-cont"></div>
+						</div>
 					</div>
-					<div class="entry bbc">
-						<div class="header">
-							<svg class="logo" viewbox="0 0 1000 400">
-								<use href="#bbc-full"/>
-							</svg>
-							<a class="grade" grade="B">B</a>
-						</div>
-						
-						<div class="pie-cont"></div>
+					<div class="footer">
+						<a class="sub">[PIE_CHART_GRADE_DESC]</a>
 					</div>
 				</div>
-				<div class="footer">
-					<a class="sub">The pie chart shows how many weather stations received each grade, per source.</a>
-				</div>
+				
 			</div>
 		</div>
 	</div>
@@ -45,7 +48,7 @@
 			<div class="title-bar">
 				
 				<a class="main">Locally...</a>
-				<a class="sub">Forecasts for today's weather, published 48 hours ago.</a>
+				<a class="sub">Forecasts for yesterday's weather, published [FCST_BUFFER_HOURS] hours prior.</a>
 				<div class="right-items">
 					<a class="sub">in </a>
 					<a class="main loc-name" grade="A+">Hawarden (A'pt)</a>
@@ -62,15 +65,7 @@
 							<use href="#mo-text"/>
 						</svg>
 						<label class="grade" grade="A+">A<sup>+</sup></label>
-
-						<table class="summary-table conditions">
-							<tr>
-								<td>Temp:</td>
-								<td grade=""></td>
-								<td></td>
-							</tr>
-						</table>
-
+						<table class="summary-table conditions"></table>
 						<div class="underline light thin moderate"></div>
 					</div>
 					<div id="bbc-summary" class="summary-row">
@@ -78,13 +73,7 @@
 							<use href="#bbc-full"/>
 						</svg>
 						<label class="grade" grade="C">C</label>
-						<table class="summary-table conditions">
-							<tr>
-								<td>Temp:</td>
-								<td grade=""></td>
-								<td></td>
-							</tr>
-						</table>
+						<table class="summary-table conditions"></table>
 					</div>
 				</div>
 				<div id="hero-map"></div>
@@ -93,92 +82,39 @@
 	</div>
 	<div class="pane-3">
 		<div class="contents">
-			<div class="title-bar">
-				<a class="sub">Last week...</a>
-				<a class="main">[org] more accurate</a>
-				<a class="sub">When forecasting 48 hours in advance.</a>
-				<svg></svg>
-			</div>
-			<div class="calendar">
-				
-			</div>
-			<div class="detail">
-				<div id="mo-summary" class="summary-row">
-					<svg class="logo" viewbox="0 0 200 200">
-						<use href="#mo-square"/>
-						<use href="#mo-text"/>
-					</svg>
-					<label class="grade" grade="A+">A<sup>+</sup></label>
-
-					<table class="summary-table grades">
-						<tr>
-							<td grade="A+">A<sup>+</sup></td>
-							<td></td>
-						</tr>
-						<tr>
-							<td grade="A">A</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td grade="B">B</td>
-							<td></td>
-						</tr>
-					</table>
-					<table class="summary-table grades">
-						<tr>
-							<td grade="C">C</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td grade="D">D</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td grade="F">F</td>
-							<td></td>
-						</tr>
-					</table>
-
-					<div class="underline light thin moderate"></div>
+			<div class="contents-cont">
+				<div class="title-bar">
+					<a class="sub">Last week...</a>
+					<a class="main">[org] more accurate</a>
+					<a class="sub">When forecasting [FCST_BUFFER_HOURS] hours in advance.</a>
+					<svg></svg>
 				</div>
-				<div id="bbc-summary" class="summary-row">
-					<svg class="logo" viewbox="0 0 1000 400">
-						<use href="#bbc-full"/>
-					</svg>
-					<label class="grade" grade="A+">A<sup>+</sup></label>
+				<div class="calendar"></div>
+				<div class="detail">
+					<div id="mo-summary" class="summary-row">
+						<svg class="logo" viewbox="0 0 200 200">
+							<use href="#mo-square"/>
+							<use href="#mo-text"/>
+						</svg>
+						<label class="grade" grade="A+">A<sup>+</sup></label>
 
-					<table class="summary-table grades">
-						<tr>
-							<td grade="A+">A<sup>+</sup></td>
-							<td></td>
-						</tr>
-						<tr>
-							<td grade="A">A</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td grade="B">B</td>
-							<td></td>
-						</tr>
-					</table>
-					<table class="summary-table grades">
-						<tr>
-							<td grade="C">C</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td grade="D">D</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td grade="F">F</td>
-							<td></td>
-						</tr>
-					</table>
+						<div class="pie-cont"></div>
 
-					<div class="underline light thin moderate"></div>
+						<div class="underline light thin moderate"></div>
+					</div>
+					<div id="bbc-summary" class="summary-row">
+						<svg class="logo" viewbox="0 0 1000 400">
+							<use href="#bbc-full"/>
+						</svg>
+						<label class="grade" grade="A+">A<sup>+</sup></label>
+
+						<div class="pie-cont"></div>
+
+						<div class="underline light thin moderate"></div>
+					</div>
+					<a class="info sub">[PIE_CHART_GRADE_DESC]</a>
 				</div>
-				<a class="info sub">Counts show the amount of locations which received each grade. The average of these gives the forecaster their daily score.</a>
+				<div class="placeholder"></div>
 			</div>
 		</div>
 	</div>
@@ -187,7 +123,7 @@
 			<div class="title-bar">
 				<a class="sub">Last month...</a>
 				<a class="main">[org] the most accurate.</a>
-				<a class="sub detail">[org1] had the highest accuracy for [time] than [org2].</a>
+				<a class="sub detail">[org1] had [time] than [org2].</a>
 			</div>
 			<div class="calendar"></div>
 		</div>

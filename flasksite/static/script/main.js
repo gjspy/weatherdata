@@ -301,7 +301,7 @@ function insertSVGByOrg(elemToReplaceOuterHTML, org) {
 };
 
 
-function FillSummaryPieGrades(selector, weatherEntries) {
+function FillSummaryPieGrades(selector, weatherEntries, showLegend) {
 	let pieCont = document.querySelector(selector);
 
 	let counts = {};
@@ -317,11 +317,15 @@ function FillSummaryPieGrades(selector, weatherEntries) {
 	let pieData = [["Grade", "Number of locations"]].concat(orderedPieSegs);
 	let colours = orderedPieSegs.map( ([k,v]) => api.colours[k] );
 
+	let width = pieCont.parentElement.getBoundingClientRect().width;
+
+	if (width < 300) showLegend = false;
+
 	let options = {
 		is3D: true,
 		colors: colours,
 		pieSliceText: "value",
-		legend: {position: "none"},
+		legend: {position: (!!showLegend) ? "right" : "none"},
 		tooltip: {
 			isHtml: true,
 			ignoreBounds: true,
@@ -372,14 +376,16 @@ function FillSummaryTableGrades(table, weatherEntries) {
 };
 
 function FillSummaryTableConditions(table, orgDetail) {
-	let row = table.querySelector(`tr`);
-	row.style.display = "";
+	function onRowClick(elem) {
+		let alreadyClicked = elem.classList.contains("clicked");
+		
+		if (alreadyClicked) elem.classList.remove("clicked");
+		else elem.classList.add("clicked");
+	};
 
 	orgDetail = orgDetail || {r: {}};
 
-	for (let row of table.querySelectorAll("tr")) {
-		row.remove();
-	};
+	table.innerHTML = "";
 
 	let added = [];
 
@@ -391,7 +397,7 @@ function FillSummaryTableConditions(table, orgDetail) {
 
 		if (value === undefined) continue;
 
-		let valObj = row.cloneNode(true);
+		let valObj = api.assets.conditionTr.cloneNode(true);
 
 		valObj.style.display = "";
 		
@@ -400,14 +406,11 @@ function FillSummaryTableConditions(table, orgDetail) {
 		api.dom.setElemGrade(valObj.children[1], grade);
 		valObj.children[2].innerHTML = String(value) + " " + unit;
 
+		valObj.setAttribute("cond", k);
+		valObj.onclick = () => onRowClick(valObj);
+
 		table.append(valObj);
 		added.push(valObj);
-	};
-
-	if (added.length == 0) {
-		row.style.display = "none";
-
-		table.append(row);
 	};
 };
 
@@ -464,9 +467,13 @@ function fillOneGradeDateElem(dateElem, period, dt, calendarCont, worst, onHover
 
 	if (!onHover) return;
 	dateElem.addEventListener("mouseover", () => {
-		console.log("HELLLLLO");
 		onHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade);
 	});
+	dateElem.addEventListener("click", () => {
+		onHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade, true);
+	});
+
+	//if (highlight) onHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade, true);
 };
 
 function FillCalendar(selector, data, duration, calType, dateOnHover, highlights) {
@@ -866,7 +873,9 @@ function initApi() {
 			equalsSVG: document.querySelector("template#equals-svg").content.children[0],
 			dateOneGradeTemplate: document.querySelector("template#calendar-date-onegrade-square").content.children[0],
 			calendarTemplate: document.querySelector("template#calendar").content.children[0],
-			fcstObsPeriodTemplate: document.querySelector("template#fcstvsobs").content.children[0]
+			conditionTr: document.querySelector("template#condition-tr").content.children[0],
+			fcstObsPeriodTemplate: document.querySelector("template#fcstvsobs").content.children[0],
+			fcstObsPeriodKey: document.querySelector("template#fcstvsobskey").content.children[0]
 		},
 		map: {
 			id: "9e1930bb750ee894",
@@ -916,6 +925,10 @@ function initApi() {
 			"D": "#C40000",
 			"F": "#000000"
 		},
+		descriptions: {
+			PIE_CHART_GRADES: "The pie charts show the the number of weather stations which received each grade, per forecaster."
+		},
+		nightWTsMap: {2: 0, 3: 1},
 		transferKeys: {},
 		summaryTableKeys: {}
 	};

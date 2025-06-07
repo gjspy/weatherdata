@@ -21,54 +21,107 @@
 
 		api.dom.setElemGrade(document.querySelector("#local .pane-1 #mo-summary > label.grade"), yesterdayMO.ga);
 		api.dom.setElemGrade(document.querySelector("#local .pane-1 #bbc-summary > label.grade"), yesterdayBC.ga);
+
+		let subtitle = document.querySelector("#local .pane-1 .title-bar .sub");
+		subtitle.textContent = subtitle.textContent.replaceAll("[FCST_BUFFER_HOURS]", String(FCST_TIME_BUFFER_DAYS * 24));
+	};
+
+	function conditionalFormat(condition, v) {
+		if (condition === "t") {
+			if (v <= 5) return "#70ebff";
+			else if (v <= 10) return "#a28800";
+			else if (v <= 15) return "#f2aa00";
+			else if (v < 20) return "#ec6f00";
+			else return "#ec0000";
+		};
+
+		if (condition === "pr") {
+			if (v > 0) return "#0025ec";
+			return "#b0b0b0";
+		};
+
+		if (condition === "pp") {
+			if (v >= 20) return "#0025ec";
+			return "#b0b0b0";
+		};
 	};
 
 
-
-	function fillHalfFcstObsPeriod(data, elem) {
+	function fillHalfFcstObsPeriod(data, elem, thisOrg) {
 		let wtElem = elem.querySelector(".wt");
 		let tempElem = elem.querySelector(".temp");
-		let windElem = elem.querySelector(".wind");
+		let windsElem = elem.querySelector(".wind .spd");
+		let winddElem = elem.querySelector(".wind .dir");
 		let rainElem = elem.querySelector(".rain");
 
-		if (data.w) {
-			wtElem.setAttribute("src", `/static/icon/100/${data.w}.png`);
+		let wt = data.w;
 
-		}// else {
-		//	wtElem.style.opacity = "0";
-		//};
+		if (wt !== undefined) {
+			if (thisOrg === "BD") {
+				// because is daily summary, swap night icons to day
+				let index = Object.values(api.nightWTsMap).indexOf(wt);
+				if (index) wt = Object.keys(api.nightWTsMap)[index];
 
-		if (data.t) tempElem.textContent = `${data.t}${api.units.temp}`;
-		else if (data.tm && data.tx) tempElem.textContent = `${data.tm} - ${data.tx}${api.units.temp}`;
-		//else tempElem.style.display = "none";
+			};
+			wtElem.setAttribute("src", `/static/icon/100/${wt}.png`);
 
-		if (data.ws) windElem.textContent = `${data.ws}${api.units.speed}`;
-		//else windElem.style.display = "none";
+		};
 
-		if (data.pp) rainElem.textContent = `${data.pp}${api.units.score}`;
-		else if (data.pr) rainElem.textContent = `${data.pr}${api.units.precip}`;
-		//else rainElem.style.display = "none";
+		let t = data.t;
+
+		if (!t && data.tm && data.tx) {
+			t = Math.round(((data.tm + data.tx) / 2) * 10) / 10;
+		};
+
+		if (t) {
+			tempElem.textContent = `${t}${api.units.temp}`;
+			tempElem.style.color = conditionalFormat("t", t);
+		};
+
+		if (data.ws) {
+			windsElem.textContent = `${data.ws} `; // ${api.units.speed}
+			//windElem.style.color = conditionalFormat("ws")
+		};
+
+		if (data.wd) {
+			winddElem.style.transform = `rotate(${data.wd}deg)`;
+		
+		} else {
+			winddElem.style.display = "none";
+		};
+		
+
+		if (data.pp || data.pp === 0) {
+			rainElem.textContent = `${data.pp}${api.units.score}`;
+			rainElem.style.color = conditionalFormat("pp", data.pp);
+
+		} else if (data.pr) {
+			rainElem.textContent = `${data.pr}${api.units.precip}`;
+			rainElem.style.color = conditionalFormat("pr", data.pr);
+		
+		};
 
 	};
 
-	function fillFullFcstObsPeriod(ft, data, selectedSubOrg, elem) {
+	function fillFullFcstObsPeriod(ft, data, thisOrg, elem) {
 		let ftime = new Date(ft);
 
 		let hr = ftime.getUTCHours();
 
 		let timeText = elem.querySelector(".time");
 
-		if (hr === 12) timeText.textContent = "12PM";
+		if (thisOrg === "BD") timeText.textContent = "Daily Summary";
+		else if (hr === 12) timeText.textContent = "12PM";
 		else if (hr === 0) timeText.textContent = "12AM";
 		else if (hr < 12) timeText.textContent = `${hr}AM`;
 		else timeText.textContent = `${hr - 12}PM`;
 
-		if (selectedSubOrg === "3") elem.classList.add("three-hr");
-		else if (selectedSubOrg === "D") elem.classList.add("daily");
+		if (thisOrg === "M3") elem.classList.add("three-hr");
+		else if (thisOrg === "BD") elem.classList.add("daily");
 		else elem.classList.add("hourly");
 
-		if (data.fcst) fillHalfFcstObsPeriod(data.fcst, elem.querySelector(".fcst"));
-		if (data.obs) fillHalfFcstObsPeriod(data.obs, elem.querySelector(".obs"));
+		if (data.fcst) fillHalfFcstObsPeriod(data.fcst, elem.querySelector(".fcst"), thisOrg);
+		if (data.obs) fillHalfFcstObsPeriod(data.obs, elem.querySelector(".obs"), thisOrg);
 
 	};
 
@@ -156,11 +209,13 @@
 
 		let chosenFcstData = data.fcst[thisOrg][selectedFcstTime];
 
+		//periods.append(api.assets.fcstObsPeriodKey.cloneNode(true));
+
 
 		for (let [ft, v] of Object.entries(chosenFcstData).sort( (a,b) => ( new Date(a[0]) - new Date(b[0]) ) )) {
 			let elem = api.assets.fcstObsPeriodTemplate.cloneNode(true);
 
-			fillFullFcstObsPeriod(ft, {fcst: v, obs: data.obs[ft]}, selectedSubOrg, elem);
+			fillFullFcstObsPeriod(ft, {fcst: v, obs: data.obs[ft]}, thisOrg, elem);
 
 			periods.append(elem);
 		};

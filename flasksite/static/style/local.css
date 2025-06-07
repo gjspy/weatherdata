@@ -340,39 +340,6 @@
 	position: relative;
 }
 
-#local .pane-2 .key-cont {
-	display: flex;
-	flex-direction: column;
-	/*justify-content: space-evenly;*/
-	align-items: center;
-
-	position: absolute;
-
-	width: 3%;
-	height: 80%;
-
-	top: 11%;
-}
-
-#local .pane-2 .key-cont .underline {
-	flex: none;
-}
-
-#local .pane-2 .key-cont label {
-	writing-mode: sideways-lr;
-	text-orientation: mixed;
-
-	height: 50%;
-	flex-grow: 0;
-	flex-shrink: 0;
-
-	text-align: center;
-
-	font-family: "Roboto";
-	font-weight: 300;
-	font-size: min(1em, 2.75vw)
-}
-
 #local .pane-2 .periods {
 	width: 94%;
 	height: 100%;
@@ -384,11 +351,19 @@
 
 	overflow: scroll hidden;
 	scrollbar-width: thin;
+
+	position: relative;
+}
+
+#local .pane-2 .periods:has(.period.daily) {
+	justify-content: center;
 }
 
 #local .pane-2 .periods .period {
 	--width: 80px;/*max(80px, calc(100vw / 24));*/
 	height: 100%;
+
+	width: var(--width);
 	
 	flex: none; /* was previously inheriting flex-grow from cont */
 }
@@ -401,16 +376,51 @@
 	width: calc(var(--width) * 2);
 }
 
+#local .pane-2 .periods .period.daily {
+	width: 100%;
+}
+
+
+#local .pane-2 .period.key {
+	width: 3%;
+	height: 90%;
+
+	overflow-x: scroll;
+	scrollbar-width: thin;
+
+	position: absolute;
+	bottom: 0;
+}
+
 #local .pane-2 .period .info {
 	--border: 0.75px solid rgba(0, 0, 0, .2);
 
 	width: inherit;
-	height: 80%;
+	height: 90%;
 	border-right: var(--border);
 
 	display: flex;
 	flex-direction: column;
 }
+
+#local .pane-2 .period.key label {
+	writing-mode: sideways-lr;
+	text-orientation: mixed;
+
+	height: 50%;
+	flex-grow: 0;
+	flex-shrink: 0;
+
+	text-align: center;
+
+	font-family: "Roboto";
+	font-weight: 300;
+	font-size: 1em;
+	line-height: 1em;
+	
+	margin-left: 50%;
+}
+	
 
 #local .pane-2 .period > * {
 	display: block;
@@ -421,8 +431,18 @@
 	
 	text-align: center;
 	font-family: "Lilita One";
+	width: 100%;
+	box-sizing: border-box;
+	transform: translateY(30%);
+}
 
-	padding: 5% 0;
+#local .pane-2 .period .fcst > :not(.wt),
+#local .pane-2 .period .obs > :not(.wt) {
+	height: 1em;
+}
+
+#local .pane-2 .period * > a {
+	filter: drop-shadow(0 0 1em rgba(0,0,0,1))
 }
 
 /*#local .pane-2 .periods .period:first-child .info {
@@ -451,21 +471,26 @@
 	font-family: "Viga";
 }
 
-#local .pane-2 .period .fcst img.wt {
-	padding-top: 5%;
-}
-
 #local .pane-2 .period img.wt {
 	width: min(90%, 6vh);
 	image-rendering: crisp-edges;
 }
 
-#local .pane-2 .period .temp {
 
+#local .pane-2 .period .wind .spd {
+	height: 1em;
+	line-height: 1em;
+
+	display: inline-block;
+	vertical-align: middle;
 }
 
-#local .pane-2 .period .wind_s {
+#local .pane-2 .period .wind .dir {
+	height: 1em;
+	
+	stroke: black;
 
+	vertical-align: middle;
 }
 
 #local .pane-2 .period .rain {

@@ -1,6 +1,6 @@
 #homepage {
 	--pane3-bkg: rgb(198, 255, 252);
-	--hero-map-width: 45vmin;
+	--hero-map-width: min(35vw, 300px);
 	--sticky-colour-gradient: linear-gradient(to bottom, transparent 99%, var(--pane3-bkg) 100%);
 }
 
@@ -40,7 +40,7 @@
 }
 
 #homepage .title-bar .main {
-	--font-size: min(8vh,10vw);
+	--font-size: 8vmin;
 	color: #2992f3;
 	filter: drop-shadow(0.035em 0.035em 0 black);
 	font-family: "Lilita One", "Serif";
@@ -116,7 +116,7 @@
 }
 
 #homepage .pane-1 .flex-grow {
-	--square: calc(var(--content-height) * 0.4);
+	--square: min(30vw, 50%);
 	--padding-each: calc(var(--content-height) * 0.05);
 
 	align-items: flex-start;
@@ -125,21 +125,39 @@
 
 #homepage .pane-1 #hero-map {
 	align-self: flex-start;
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+
+#homepage .pane-1 .right-items {
+	width: calc(100% - var(--hero-map-width));
+	height: 100%;
+
+	display: flex;
+	flex-direction: column;
 }
 
 #homepage .pane-1 .entry-cont {
 	display: flex;
-	flex: 1;
+	flex-grow: 1;
+	flex-shrink: 1;
+
+	justify-content: center;
+	align-items: center;
+	flex-direction: row;
 
 	margin-top: 4%;
-	padding-left: var(--padding-each);
 }
 
 #homepage .pane-1 .entry {
+	--padding-tb-each: 0;
+
 	width: var(--square);
-	height: calc(var(--square));
+	height: var(--square);
 
 	position: relative;
+
+	box-sizing: border-box;
 }
 
 #homepage .pane-1 .entry:first-child {
@@ -164,6 +182,8 @@
 #homepage .pane-1 .entry .logo {
 	max-height: 100%;
 	max-width: 70%;
+
+	flex-shrink: 0;
 }
 
 #homepage .pane-1 .entry .logo:has(use[href="#bbc-full"]) {
@@ -179,7 +199,7 @@
 
 #homepage .pane-1 .pie-cont {
 	width: 100%;
-	height: 50%;
+	height: 55%;
 
 	position: absolute;
 	left: 50%;
@@ -201,15 +221,15 @@
 }
 
 #homepage .pane-1 .footer {
-	width: calc(100% - var(--hero-map-width) - var(--padding-l));
+	width: 100%;
 	height: fit-content;
 	box-sizing: border-box;
-	
-	position: absolute;
-	bottom: 0;
-	right: 0;
 
-	padding: 0 var(--padding-l) 2% calc(var(--padding-l) / 2);
+	flex-shrink: 0;
+	
+	margin-top: auto;
+
+	padding: 0 var(--padding-l) 2% var(--padding-l);
 }
 
 #homepage .footer .sub {
@@ -300,6 +320,10 @@
 	margin: 0 auto;
 }
 
+#homepage .pane-2 table {
+	margin-right: 1vw;
+}
+
 
 
 
@@ -378,19 +402,24 @@
 	--padding-lr: 10vw;
 	--n-weeks: 1;
 	--content-width: calc(100vw - var(--padding-lr) - var(--padding-lr));
-	--date-square: calc(var(--content-width) / 7);
+	--date-square: min(calc(var(--content-width) / 7), 22vh);
 
 	width: inherit;
 	height: inherit;
 	box-sizing: border-box;
 
-	padding: 9vh var(--padding-lr);
+	position: relative;
 
-	/*background-image: 
-		linear-gradient(to right, rgba(14, 162, 206, 0.639) 30%, transparent 100%),
-		linear-gradient(to bottom, transparent 0%, white 10%, white 90%, transparent 0%);*/
+	padding: 0 var(--padding-lr);
 
 	background: var(--pane3-bkg);
+}
+
+#homepage .pane-3 .contents-cont {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	translate: -50% -50%;
 }
 
 #homepage .pane-3 .title-bar {
@@ -420,7 +449,7 @@
 
 #homepage .pane-3 .title-bar svg {
 	min-width: 15vw;
-	height: 110%;/*width: 15vw;*/
+	height: 100%;/*width: 15vw;*/
 
 	position: absolute;
 	right: 0;
@@ -444,10 +473,6 @@
 	box-shadow: -5px 5px black;
 }
 
-#homepage .pane-3 .calendar:has(.detail[opened]) {
-
-}
-
 #homepage .pane-3 .date {
 	/*width: var(--date-square);
 	height: var(--date-square);*/
@@ -459,12 +484,13 @@
 	border-bottom: none;
 }
 
-#homepage .pane-3 .date:not(:hover) {
+#homepage .pane-3 .date:not(:hover, .clicked) {
 	border-bottom: var(--period-thin-border);
 	transition-delay: 0.5s, 0.5s;
 }
 
-#homepage .pane-3 .date[best]:hover {
+#homepage .pane-3 .date[best]:hover,
+#homepage .pane-3 .date[best].clicked {
 	background: var(--detail-bkg);
 	border-bottom: 1px solid rgba(0,0,0,0) !important;
 	transition-delay: 0s, 0s;
@@ -482,8 +508,9 @@
 
 #homepage .pane-3 .detail {
 	--info-height: min(2vh, 3vw);
+	--padding-half: 5px;
 
-	width: var(--content-width);
+	width: calc(var(--date-square) * 7);
 	height: var(--date-square);
 
 	background: var(--detail-bkg);
@@ -505,18 +532,19 @@
 	
 }
 
-#homepage .pane-3 .calendar:has(.date[best]:hover) .date,
+#homepage .pane-3 .calendar:has(.date[best]:hover, .date[best].clicked) .date,
 #homepage .pane-3 .calendar:has(.detail:hover) .detail {
 	transition-delay: 0s, 0s;
 }
 
-#homepage .pane-3 .calendar:has(.date[best]:hover) .detail,
+#homepage .pane-3 .calendar:has(.date[best]:hover, .date[best].clicked) .detail,
 #homepage .pane-3 .calendar:has(.detail:hover) .detail {
 	top: var(--date-square);
 
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
 }
+
 
 #homepage .pane-3 .summary-row {
 	width: 50%;
@@ -530,6 +558,10 @@
 #homepage .pane-3 #bbc-summary.summary-row .logo {
 	margin-left: 0;
 	width: calc(var(--logo-width) + 5%);
+}
+
+#homepage .pane-3 .summary-row .logo {
+	flex-shrink: 0;
 }
 
 #homepage .pane-3 .summary-row > .grade {
@@ -553,11 +585,23 @@
 	font-size: var(--info-height);
 	line-height: var(--info-height);
 
-	padding: 0 0 5px 5px;
+	padding: 0 0 var(--padding-half) var(--padding-half);
 }
 
+#homepage .pane-3 .detail .pie-cont {
+	height: calc(95% - var(--info-height) - var(--padding-half) - var(--padding-half));
+	margin-top: 5%;
 
+	flex-grow: 1;
+	flex-shrink: 1;
 
+	max-width: 85%;
+}
+
+#homepage .pane-3 .placeholder {
+	width: 100%;
+	height: var(--date-square);
+}
 
 
 
@@ -598,7 +642,9 @@
 	box-shadow: 5px 5px black;
 }
 
-
+#footer-bar {
+	scroll-snap-align: end;
+}
 
 
 
@@ -612,9 +658,9 @@
 	#homepage .hero .summary-row > .grade[grade="A+"] {
 		--grade-size: 15vh;
 	}
-	#homepage .hero table tr :last-child {
+	/*#homepage .hero table tr :last-child {
 		display: none;
-	}
+	}*/
 }
 
 @media screen and (max-width: 1080px) {
@@ -623,6 +669,52 @@
 	}
 }
 
-#footer-bar {
-	scroll-snap-align: end;
+@media screen and (max-width: 900px) and (min-width: 501px) {
+	#homepage .pane-1 .entry-cont {
+		flex-direction: column;
+	}
+
+	#homepage .pane-1 .entry-cont > :first-child {
+		border-right: none;
+		border-bottom: var(--period-thin-border);
+
+		padding: 0 0 var(--padding-each) 0;
+	}
+
+	#homepage .pane-1 .entry-cont > :first-child .pie-cont {
+		bottom: var(--padding-tb-each);
+	}
+
+	#homepage .pane-1 .entry-cont > :last-child {
+		padding: var(--padding-each) 0 0 0;
+	}
+
+	#homepage .pane-1 .entry-cont .entry {
+		--padding-tb-each: var(--padding-each);
+		box-sizing: border-box;
+	}
+
+	#homepage .pane-1 .entry-cont .entry .pie-cont {
+		height: calc(55% - var(--padding-tb-each));
+	}
 }
+
+@media screen and (max-width: 500px) {
+	#homepage .pane-1 .flex-grow {
+		flex-direction: column;
+	}
+
+	#homepage .pane-1 #hero-map {
+		width: 100%;
+		height: 45%;
+	}
+
+	#homepage .pane-1 .right-items {
+		width: 100%;
+		height: 55%;
+	}
+}
+
+
+
+

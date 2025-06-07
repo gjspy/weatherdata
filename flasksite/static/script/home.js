@@ -1,24 +1,14 @@
 (function() {
-	const FCST_TIME_BUFFER_DAYS = 2;
+	const FCST_TIME_BUFFER_DAYS = 1;//2;
 
 
 	function pane1(yesterdayMO, yesterdayBC, gradeByLocArr, bestOrg) {
-		/*let moTablesCont = document.querySelector("#homepage .pane-1 .entry.mo .table-cont");
-		api.dom.FillSummaryTableGrades(moTablesCont, yesterdayMO.data);
-
-		let bcTablesCont = document.querySelector("#homepage .pane-1 .entry.bbc .table-cont");
-		api.dom.FillSummaryTableGrades(bcTablesCont, yesterdayBC.data);*/
-
-		console.log(yesterdayMO, yesterdayBC);
-
-
 		let moGradeDOM = document.querySelector("#homepage .pane-1 .entry.mo > .header > a.grade");
 		api.dom.setElemGrade(moGradeDOM, yesterdayMO.ga);
 
 		let bcGradeDOM = document.querySelector("#homepage .pane-1 .entry.bbc > .header > a.grade");
 		api.dom.setElemGrade(bcGradeDOM, yesterdayBC.ga);
 
-		console.log(gradeByLocArr);
 		let mapGrades = api.dom.getMapGrades(gradeByLocArr, "hyp");
 		api.dom.initMap({
 			selector: ".pane-1 #hero-map",
@@ -26,15 +16,8 @@
 			grades: mapGrades
 		});
 
-		/*let title = document.querySelector("#homepage .pane-1 .footer > .main");
-		
-		if (bestOrg === "MO") {
-			title.textContent = title.textContent.replace("[org]", "The Met Office was");
-		} else if (bestOrg === "BBC") {
-			title.textContent = title.textContent.replace("[org]", "BBC Weather was");
-		} else {
-			title.textContent = "Both organisations had the same accuracy"
-		};*/
+		let subtitle = document.querySelector("#homepage .pane-1 .footer .sub");
+		subtitle.textContent = subtitle.textContent.replaceAll("[PIE_CHART_GRADE_DESC]", api.descriptions.PIE_CHART_GRADES);
 	};
 
 	function pane2ChangeLoc(data, pinElem) {
@@ -59,6 +42,9 @@
 	function pane2(gradeByLocArr) {
 		let grades = api.dom.getMapGrades(gradeByLocArr, "hyp");
 
+		let subtitle = document.querySelector("#homepage .pane-2 .title-bar .sub");
+		subtitle.textContent = subtitle.textContent.replaceAll("[FCST_BUFFER_HOURS]", String(FCST_TIME_BUFFER_DAYS * 24));
+
 		api.dom.initMap({
 			selector: ".pane-2 #hero-map",
 			popup: false,
@@ -68,32 +54,35 @@
 		});
 	};
 
+	function pane3DateOnHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade, isClick) {
+		for (let e of calendarCont.querySelectorAll(".clicked")) e.classList.remove("clicked");
+
+		if (isClick) dateElem.classList.add("clicked");
+		
+
+		let moData = api.calc.getOrgFromPeriod(period, "MO");
+		let bcData = api.calc.getOrgFromPeriod(period, "BBC");
+	
+		//let moTablesCont = document.querySelector();
+		//api.dom.FillSummaryTableGrades(moTablesCont, moData.data);//dateMOGrades);
+		api.dom.FillSummaryPieGrades("#homepage .pane-3 .detail #mo-summary .pie-cont", moData.data, true);
+	
+		//let bbcTablesCont = document.querySelector("#homepage .pane-3 .detail #bbc-summary");
+		//api.dom.FillSummaryTableGrades(bbcTablesCont, bcData.data);//dateBBCGrades);
+		api.dom.FillSummaryPieGrades("#homepage .pane-3 .detail #bbc-summary .pie-cont", bcData.data, true);		
+		
+		let moGradeDOM = document.querySelector("#homepage .pane-3 .detail #mo-summary > label[grade]");
+		api.dom.setElemGrade(moGradeDOM, moData.ga);
+	
+		let bbcGradeDOM = document.querySelector("#homepage .pane-3 .detail #bbc-summary > label[grade]");
+		api.dom.setElemGrade(bbcGradeDOM, bcData.ga);
+	};
+
 
 	function pane3(weekDataForCalendar, veryBest) {
-		function dateOnHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade) {
-			let moData = api.calc.getOrgFromPeriod(period, "MO");
-			let bcData = api.calc.getOrgFromPeriod(period, "BBC");
-			//let dateMOGrades = period.data.map((v) => v.moGrade);
-			//let dateBBCGrades = period.data.map((v) => v.bbcGrade);
-		
-			let moTablesCont = document.querySelector("#homepage .pane-3 .detail #mo-summary");
-			api.dom.FillSummaryTableGrades(moTablesCont, moData.data);//dateMOGrades);
-		
-			let bbcTablesCont = document.querySelector("#homepage .pane-3 .detail #bbc-summary");
-			api.dom.FillSummaryTableGrades(bbcTablesCont, bcData.data);//dateBBCGrades);
-		
-			
-			let moGradeDOM = document.querySelector("#homepage .pane-3 .detail #mo-summary > label[grade]");
-			api.dom.setElemGrade(moGradeDOM, moData.ga);
-		
-			let bbcGradeDOM = document.querySelector("#homepage .pane-3 .detail #bbc-summary > label[grade]");
-			api.dom.setElemGrade(bbcGradeDOM, bcData.ga);
-		};
-
 		// need identifier, so we don't worry about hrs/min/sec ****
 		let today = new Date();
 		let yesterdayId = api.datetime.indentifierFromDate(new Date(today.getTime() - (1000 * 60 * 60 * 24))); 
-		console.log("Yesterdayid", yesterdayId)
 
 		let selector = "#homepage .pane-3 .calendar";
 		api.dom.FillCalendar(
@@ -101,7 +90,7 @@
 			weekDataForCalendar,
 			7,
 			"dynamicWeeksWithGaps",
-			dateOnHover,
+			pane3DateOnHover,
 			{ [yesterdayId]: "- <i>Yesterday</i>" }
 		)
 
@@ -119,18 +108,32 @@
 		} else {
 			title.textContent = "Both organisations had the same accuracy"
 		};
+
+		let subtitle = document.querySelector("#homepage .pane-3 .title-bar .sub:last-of-type");
+		subtitle.textContent = subtitle.textContent.replaceAll("[FCST_BUFFER_HOURS]", String(FCST_TIME_BUFFER_DAYS * 24));
+
+		let pieDesc = document.querySelector("#homepage .pane-3 .calendar .detail .info");
+		pieDesc.textContent = pieDesc.textContent.replaceAll("[PIE_CHART_GRADE_DESC]", api.descriptions.PIE_CHART_GRADES);
 	};
 
 
 
 
 	async function pane4() {
-		function dateOnHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade) {
+		function dateOnHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade, isClick) {
 			if (bestOrg === "EQUALS") return;
+
+			//for (let e of calendarCont.querySelectorAll(".clicked")) e.classList.remove("clicked");
+			//if (isClick) dateElem.classList.add("clicked");
 
 			let calendar = calendarCont.offsetParent;
 
-			if (calendar.querySelector(".date[floating=\"true\"]")) return;
+			let current = calendar.querySelector(".date[floating]");
+			if (current) {
+				if (current.__floatingOn === dateElem) return;
+
+				current.remove();
+			};
 
 			let floatElem = api.assets.dateOneGradeTemplate.cloneNode(true);
 			api.dom.fillOneGradeDateElem(floatElem, period, dt, calendarCont, true);
@@ -148,6 +151,7 @@
 			
 
 			floatElem.setAttribute("floating", "true");
+			floatElem.__floatingOn = dateElem;
 
 			calendarCont.append(floatElem);
 
@@ -205,7 +209,7 @@
 		let subtitle = document.querySelector("#homepage .pane-4 .title-bar > .sub.detail");
 
 		let diff = Math.abs((counts.MO || 0) - (counts.BBC || 0));
-		let diffStr = (diff === 1) ? "1 more day" : String(diff) + " more days";
+		let diffStr = (diff === 1) ? "1 more outperforming day" : String(diff) + " more outperforming days";
 
 		if ((counts.MO || 0) > (counts.BBC || 0)) {
 			title.textContent = title.textContent.replace("[org]", "The Met Office was");
@@ -225,11 +229,23 @@
 			let timeStr = ((counts.MO || 0) === 1) ? "1 day" : String((counts.MO || 0)) + " days";
 
 			title.textContent = "Both organisations had the same accuracy";
-			subtitle.textContent = `Each had ${timeStr} where they had greater accuracy than the other.`;
+			subtitle.textContent = `Each had ${timeStr} where they outperformed the other.`;
 		};
 
 		
 		
+	};
+
+	function onGoogleChartsLoad(yesterdayMO, yesterdayBC, weekDataForCalendar, bestOverWeek) {
+		console.log("googling");
+
+		api.dom.FillSummaryPieGrades("#homepage .pane-1 .entry.mo .pie-cont", yesterdayMO.data);
+		api.dom.FillSummaryPieGrades("#homepage .pane-1 .entry.bbc .pie-cont", yesterdayBC.data);
+		
+		let pane3Clicked = document.querySelector("#homepage .pane-3 .clicked");
+		if (!pane3Clicked) pane3Clicked = document.querySelector("#homepage .pane-3 .date:last-of-type");
+
+		pane3DateOnHover(pane3Clicked, weekDataForCalendar[weekDataForCalendar.length - 1], undefined, pane3Clicked.parentElement, undefined, undefined, true);
 	};
 
 
@@ -243,8 +259,6 @@
 
 		let yesterdayMO = api.calc.getOrgFromPeriod(yesterday, "MO");
 		let yesterdayBC = api.calc.getOrgFromPeriod(yesterday, "BBC");
-
-		console.log("yesterdayS", yesterdayMO, yesterdayBC);
 
 		let gradeByLocArr = api.calc.getGradeByLocArr(yesterdayMO.data, yesterdayBC.data);
 		
@@ -260,25 +274,13 @@
 			weekDataForCalendar.push(v);
 		};
 
-		console.log("grade by loc arr", gradeByLocArr);
-
-
-
-		google.charts.load("current", {"packages": ["corechart"]});
-		google.charts.setOnLoadCallback(() => {
-			console.log("loaded")
-			api.dom.FillSummaryPieGrades("#homepage .pane-1 .entry.mo .pie-cont", yesterdayMO.data);
-			api.dom.FillSummaryPieGrades("#homepage .pane-1 .entry.bbc .pie-cont", yesterdayBC.data);
-		});
-
-
-
-
-
-		
 		pane1(yesterdayMO, yesterdayBC, gradeByLocArr, bestYesterday);
 		pane2(gradeByLocArr);
 		pane3(weekDataForCalendar, bestOverWeek);
+
+		google.charts.load("current", {"packages": ["corechart"]});
+		google.charts.setOnLoadCallback(() => onGoogleChartsLoad(yesterdayMO, yesterdayBC, weekDataForCalendar, bestOverWeek));
+		window.onresize = () => onGoogleChartsLoad(yesterdayMO, yesterdayBC, weekDataForCalendar, bestOverWeek);
 
 		document.querySelector("#homepage").setAttribute("rendered", "true");
 

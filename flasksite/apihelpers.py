@@ -32,12 +32,13 @@ class InterpretParam():
 def get_grade(boundaries: dict[int, str], value: int):
 	if (boundaries == None): return None
 
+	value = abs(value)
+
 	for k,v in boundaries.items():
 		if (value <= v): return k
 	
 	if (list(boundaries.keys())[0] == "A+"): return "F"
 	else: return "A+"
-
 
 
 def get_json_graded_result(db_result: Result):
@@ -51,18 +52,18 @@ def get_json_graded_result(db_result: Result):
 	}
 
 	for k in RESULT_CONDITIONS:
+		store_as = JSONIFY_STORE_AS.get(k)
+		if (not store_as): continue
+
 		db_value = None
 
 		try: db_value = getattr(db_result, k)
 		except: pass
 
 		if (db_value != None):
-			if   (k.startswith("d_")): db_value = round(db_value, 1)
-			elif (k.startswith("s_")): db_value = round(db_value, 0)
+			if   (k.startswith("d_")): db_value = round(db_value, 1)# * sign
+			elif (k.startswith("s_")): db_value = round(db_value, 0)# * sign
 
-
-		store_as = JSONIFY_STORE_AS.get(k)
-		if (not store_as): continue
 
 		if (db_value == None):
 			data["r"][store_as] = db_value
@@ -76,7 +77,8 @@ def get_json_graded_result(db_result: Result):
 
 
 def get_jsoned_obj(obj: FCST | CleanOBS):
-	conditions = FCST_CONDITIONS if type(obj) == FCST else OBS_CONDITIONS
+	isfcst = type(obj) == FCST
+	conditions = FCST_CONDITIONS if isfcst else OBS_CONDITIONS
 
 	data = {}
 
@@ -89,6 +91,10 @@ def get_jsoned_obj(obj: FCST | CleanOBS):
 		except: pass
 
 		if (type(v) == float): v = round(v, 1)
+		if (store_as == "w"):
+			time = getattr(obj, "future_time") if isfcst else getattr(obj, "dt")
+
+			v = edit_wt_for_client(v, time)
 
 		data[store_as] = v
 	

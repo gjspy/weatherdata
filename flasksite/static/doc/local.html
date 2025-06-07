@@ -6,7 +6,7 @@
 		<div class="contents today">
 			<div class="title-bar">
 				<a class="main">Daily Summary</a>
-				<a class="sub">Results based on forecasts published 48 hours ago.</a>
+				<a class="sub">Results based on forecasts published [FCST_BUFFER_HOURS] hours ago.</a>
 			</div>
 			
 			<div class="underline light thin moderate"></div>
@@ -19,13 +19,7 @@
 					</svg>
 					<label class="grade" grade="A+">A<sup>+</sup></label>
 
-					<table class="summary-table conditions">
-						<tr>
-							<td>Temp:</td>
-							<td grade=""></td>
-							<td></td>
-						</tr>
-					</table>
+					<table class="summary-table conditions"></table>
 
 					<div class="underline light thin moderate"></div>
 				</div>
@@ -34,13 +28,7 @@
 						<use href="#bbc-full"/>
 					</svg>
 					<label class="grade" grade="C">C</label>
-					<table class="summary-table conditions">
-						<tr>
-							<td>Temp:</td>
-							<td grade=""></td>
-							<td></td>
-						</tr>
-					</table>
+					<table class="summary-table conditions"></table>
 				</div>
 			</div>
 		</div>
@@ -71,7 +59,7 @@
 			
 			<div class="underline light thin most"></div>
 			<div class="flex-grow">
-				<div class="key-cont">
+				<div class="period key">
 					<label>Forecast</label>
 					<div class="underline light thin moderate"></div>
 					<label>Actual</label>

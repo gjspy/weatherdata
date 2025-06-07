@@ -62,6 +62,18 @@
 			<use href="#equals"/>
 		</svg>
 	</template>
+	<template id="condition-tr">
+		<tr>
+			<td></td>
+			<td grade=""></td>
+			<td></td>
+			<td>
+				<svg class="arrow" viewBox="0 0 1024 1024">
+					<use href="#arrowhead"/>
+				</svg>
+			</td>
+		</tr>
+	</template>
 	<template id="fcstvsobs">
 		<div class="period">
 			<a class="time">1PM</a>
@@ -69,16 +81,35 @@
 				<div class="fcst">
 					<img class="wt" src="https://undefined">
 					<a class="temp"></a>
-					<a class="wind"></a>
+					<div class="wind">
+						<a class="spd"></a>
+						<svg class="dir" viewbox="0 0 24 24">
+							<use href="#arrow"></use>
+						</svg>
+					</div>
 					<a class="rain"></a>
 				</div>
 				<div class="underline light thin moderate"></div>
 				<div class="obs">
 					<img class="wt" src="https://undefined">
 					<a class="temp"></a>
-					<a class="wind"></a>
+					<div class="wind">
+						<a class="spd"></a>
+						<svg class="dir" viewbox="0 0 24 24">
+							<use href="#arrow"></use>
+						</svg>
+					</div>
 					<a class="rain"></a>
 				</div>
+			</div>
+		</div>
+	</template>
+	<template id="fcstvsobskey">
+		<div class="period key">
+			<div class="info">
+				<label>Forecast</label>
+				<div class="underline light thin moderate"></div>
+				<label>Actual</label>
 			</div>
 		</div>
 	</template>
@@ -101,7 +132,7 @@
 
 		<div id="topleft">
 			<img id="rainbow" src="static/rainbow.png">
-			<svg id="hamburger" viewbox="0 0 12 12">
+			<svg id="hamburger" viewbox="0 0 12 12" style="display: none;">
 				<use href="#menu"/>
 			</svg>
 		</div>
@@ -160,6 +191,12 @@
 			<rect height="1" width="11" x="0.5" y="5.5"/>
 			<rect height="1" width="11" x="0.5" y="2.5"/>
 			<rect height="1" width="11" x="0.5" y="8.5"/>
+		</g>
+		<g id="arrow">
+			<path d="M12 5V19M12 5L6 11M12 5L18 11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+		</g>
+		<g id="arrowhead">
+			<path xmlns="http://www.w3.org/2000/svg" d="M903.232 256l56.768 50.432L512 768 64 306.432 120.768 256 512 659.072z" fill="#000000"/>
 		</g>
 	</defs>
 </svg>

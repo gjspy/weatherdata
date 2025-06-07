@@ -36,7 +36,9 @@
 
 	--period-thin-border: 0.75px solid rgba(0, 0, 0, .2);
 	--theme: #8aabca;
-	
+
+	--topbar-border: 2px;
+	--light-border: rgba(0, 0, 0, .2);
 }
 
 body {
@@ -99,7 +101,7 @@ g#bbc-full .ln2 {
 }
 
 div.underline.light {
-	background-color: rgba(0, 0, 0, .2);
+	background-color: var(--light-border);
 }
 
 div.underline.thin {
@@ -138,7 +140,7 @@ body {
 #topbar {
 	width: 100vw;
 
-	z-index: 102;
+	z-index: 99;
 	height: var(--topbar-height);
 
 	position: relative;
@@ -149,6 +151,8 @@ body {
 	/*background:rgb(0, 56, 10);*/
 	/*background: #80956d;*/
 	background: var(--theme);
+
+	border-bottom: var(--topbar-border) solid white;
 
 	img#logo {
 		height: 90%;
@@ -191,7 +195,7 @@ body {
 }
 
 #topbar #topleft #rainbow {
-	padding-right: 20px;
+	/*padding-right: 20px;*/
 	filter: drop-shadow(0.1em 0.1em 0px black);
 }
 
@@ -236,7 +240,7 @@ body:has(#content > [location-selector="true"]) #loc-card {
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
 
-	margin-left: 10px;
+	margin: calc(var(--topbar-border) * -1) 0 0 10px;
 	color: white;
 
 	cursor: pointer;
@@ -310,7 +314,7 @@ body:has(#content > [location-selector="true"]) #loc-card {
 	background: var(--sticky-colour-gradient);
 }*/
 
-.sticky-bkg::after {
+/*.sticky-bkg::after {
 	content: var(--sticky-colour-gradient);
 
 	width: 100vw;
@@ -324,7 +328,7 @@ body:has(#content > [location-selector="true"]) #loc-card {
 	pointer-events: none;
 
 	background: var(--pane3-bkg);
-}
+}*/
 
 
 a.map-pin-tooltip {
@@ -367,6 +371,8 @@ a.map-pin-tooltip {
 	scrollbar-width: thin;
 
 	position: absolute;
+
+	margin-top: calc(var(--topbar-border) * -1);
 }
 
 /*#content:not(:has(.content-elem)),
@@ -558,29 +564,192 @@ table.summary-table {
 }
 
 table.summary-table :first-child {
+	height: 3vh;
 	font-size: 3vh;
 }
 
-table.summary-table.conditions tr:first-child :nth-child(1) {
-	width: 30%;
+table.summary-table.conditions tr > :nth-child(1) {
+	width: 50%;
+
+	padding-right: 5%;
+	text-align: right;
 }
 
-table.summary-table.conditions tr:first-child :nth-child(2) {
+table.summary-table.conditions tr :nth-child(2) {
 	width: 10%;
 }
 
-table.summary-table.conditions tr:first-child :nth-child(3) {
-	width: 60%;
+table.summary-table.conditions tr :nth-child(3) {
+	width: 30%;
 }
 
-table.summary-table.conditions tr :first-child {
-	padding-right: 5%;
-	text-align: right;
+table.summary-table.conditions tr :nth-child(4) {
+	width: 10%;
+	aspect-ratio: 1/1;
 }
 
 table.summary-table.conditions td {
 	padding: 0;
 }
+
+
+table.summary-table.conditions tr {
+	position: relative;
+}
+
+table.summary-table.conditions tr[cond="t"],
+table.summary-table.conditions tr[cond="f"],
+table.summary-table.conditions tr[cond="ws"],
+table.summary-table.conditions tr[cond="wg"],
+table.summary-table.conditions tr[cond="wd"] {
+	cursor: pointer;
+}
+
+table.summary-table.conditions tr[cond="f"] {
+	display: none;
+}
+
+
+table.summary-table.conditions:has(
+	tr[cond="t"]:hover,
+	tr[cond="f"]:hover,
+	tr[cond="t"].clicked,
+	tr[cond="f"].clicked
+) tr[cond="f"] {
+	display: table-row;
+}
+
+table.summary-table.conditions:has(
+	tr[cond="t"]:hover,
+	tr[cond="f"]:hover,
+	tr[cond="t"].clicked,
+	tr[cond="f"].clicked
+) tr[cond="t"]::after {
+	bottom: -100%;
+}
+
+table.summary-table.conditions:has(
+	tr[cond="t"]:hover,
+	tr[cond="f"]:hover,
+	tr[cond="t"].clicked,
+	tr[cond="f"].clicked
+) tr[cond="t"] svg {
+	rotate: 180deg;
+}
+
+
+
+table.summary-table.conditions tr[cond="wg"] {
+	display: none;
+}
+
+table.summary-table.conditions tr[cond="wd"] {
+	display: none;
+}
+
+
+table.summary-table.conditions:has(
+	tr[cond="ws"]:hover,
+	tr[cond="wg"]:hover,
+	tr[cond="wd"]:hover,
+	tr[cond="ws"].clicked,
+	tr[cond="wg"].clicked,
+	tr[cond="wd"].clicked
+) tr[cond="wg"],
+table.summary-table.conditions:has(
+	tr[cond="ws"]:hover,
+	tr[cond="wg"]:hover,
+	tr[cond="wd"]:hover,
+	tr[cond="ws"].clicked,
+	tr[cond="wg"].clicked,
+	tr[cond="wd"].clicked
+) tr[cond="wd"] {
+	display: table-row;
+}
+
+/*table.summary-table.conditions:has(
+	tr[cond="ws"]:hover,
+	tr[cond="wg"]:hover,
+	tr[cond="wd"]:hover,
+	tr[cond="ws"].clicked,
+	tr[cond="wg"].clicked,
+	tr[cond="wd"].clicked
+) tr[cond="ws"]::after {
+	bottom: -200%;
+}*/
+
+table.summary-table.conditions:has(
+	tr[cond="ws"]:hover,
+	tr[cond="wg"]:hover,
+	tr[cond="wd"]:hover,
+	tr[cond="ws"].clicked,
+	tr[cond="wg"].clicked,
+	tr[cond="wd"].clicked
+) tr[cond="ws"] svg {
+	rotate: 180deg;
+}
+
+table.summary-table.conditions tr[cond="f"] :first-child,
+table.summary-table.conditions tr[cond="wg"] :first-child,
+table.summary-table.conditions tr[cond="wd"] :first-child {
+	font-size: 0.7em;
+	font-weight: 700;
+}
+
+table.summary-table.conditions:not(:has(
+	tr[cond="t"]:hover,
+	tr[cond="f"]:hover,
+	tr[cond="t"].clicked,
+	tr[cond="f"].clicked
+)) tr[cond="t"]::after,
+
+table.summary-table.conditions:has(
+	tr[cond="t"]:hover,
+	tr[cond="f"]:hover,
+	tr[cond="t"].clicked,
+	tr[cond="f"].clicked
+) tr[cond="f"]::after,
+
+table.summary-table.conditions:not(:has(
+	tr[cond="ws"]:hover,
+	tr[cond="wg"]:hover,
+	tr[cond="wd"]:hover,
+	tr[cond="ws"].clicked,
+	tr[cond="wg"].clicked,
+	tr[cond="wd"].clicked
+)) tr[cond="ws"]::after,
+
+table.summary-table.conditions:has(
+	tr[cond="ws"]:hover,
+	tr[cond="wg"]:hover,
+	tr[cond="wd"]:hover,
+	tr[cond="ws"].clicked,
+	tr[cond="wg"].clicked,
+	tr[cond="wd"].clicked
+) tr[cond="wd"]::after {
+	content: "";
+
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	translate: -50%;
+	
+	width: 90%;
+	height: 1px;
+	background-color: var(--light-border);
+}
+
+
+
+table.summary-table.conditions tr[cond="f"] td:has(svg),
+table.summary-table.conditions tr[cond="wg"] td:has(svg),
+table.summary-table.conditions tr[cond="wd"] td:has(svg),
+table.summary-table.conditions tr[cond="w"] td:has(svg) {
+	display: none;
+}
+
+
+
 
 table.summary-table td[grade] {
 	font-family: "Luckiest Guy", serif;
