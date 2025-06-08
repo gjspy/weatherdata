@@ -97,6 +97,11 @@ filled gap in db form while vm was testing. db2 now has all data from apr/may.
 ** services start on sys reboot!! **
 site homepage is functional.
 
+
+
+
+MORE TELL DOn't SHOW! :)
+
 080325 AND 090325 WHEN COMPILING DB, FIX THESE. IS TIME WHEN FCST WANT RECORDING.
 
 put a crown on something, make it more visible, reputation, show if theyre normally good

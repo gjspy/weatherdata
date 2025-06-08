@@ -171,6 +171,8 @@ body {
 
 #topbar #logocont {
 	height: 100%;
+
+	position: relative;
 }
 
 #topbar #logocont img {
@@ -179,24 +181,31 @@ body {
 	filter: drop-shadow(#000000 0.1em 0.1em 0.1em);
 }
 
-#topbar #topleft {
+#topbar #logocont #wordlogo {
+	position: absolute;
+}
+
+#topbar #topright {
 	padding: 5px 5px 0 0;
 	height: 50%;
 	min-height: 40px;
 	max-height: 100px;
+
+	position: relative;
 }
 
-#topbar #topleft > * {
+#topbar #topright > * {
 	height: 100%;
 }
 
-#topbar #topleft #hamburger {
+#topbar #topright #hamburger {
 	fill: white;
 }
 
-#topbar #topleft #rainbow {
-	/*padding-right: 20px;*/
+#topbar #topright #rainbow {
 	filter: drop-shadow(0.1em 0.1em 0px black);
+	position: absolute;
+	right: 10px;
 }
 
 #topbar #navbar {
@@ -210,7 +219,7 @@ body {
 	width: fit-content;
 	padding-left: auto;
 
-	font-size: 30px;
+	font-size: clamp(3vh, 30px, 3vw);
 	font-family: "Viga", serif;
 	flex: 60%;/* WIP*/
 	
@@ -270,7 +279,7 @@ body:has(#content > [location-selector="true"]) #loc-card {
 	display: inline;
 
 	font-family: Lilita One;
-	font-size: 1.6vw;
+	font-size: clamp(3vh, 30px, 3vw);
 	pointer-events: none;
 
 	filter: drop-shadow(0.07em 0.07em 0 black);
@@ -357,10 +366,24 @@ a.map-pin-tooltip {
 	transition: transform 0.03s ease;
 }
 
-/*.sticky-bkg .stopper {
-	height: calc(var(--content-height) * 2);
-	background: transparent;
-}*/
+
+#content:has(.content-elem[scrollsnap="true"]) {
+	scroll-snap-type: y proximity;
+	scroll-padding: 0;
+	scroll-behavior: auto;
+}
+
+#content:has(.content-elem[scrollsnap="true"]) #footer-bar {
+	scroll-snap-align: end;
+}
+
+
+.content-elem[scrollsnap="true"] > :not(.sticky-bkg) {
+	height: var(--content-height);
+	position: relative;
+	scroll-snap-align: end;
+	scroll-snap-stop: always;
+}
 
 #content {
 	height: var(--content-height);
@@ -375,20 +398,54 @@ a.map-pin-tooltip {
 	margin-top: calc(var(--topbar-border) * -1);
 }
 
-/*#content:not(:has(.content-elem)),
-#content:has(.content-elem[rendered="false"]) {
-	/*display: none;
-}*/
 
 #content > * {
 	width: inherit;
 	height: fit-content;
 }
 
+#content > .content-elem > .hero > .contents {
+	margin: auto;
+
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+
+	display: flex;
+	flex-direction: column;
+
+	border-radius: 5px;
+	box-shadow: 4px 4px 0px black;
+	background: rgba(255, 255, 255, 0.91);
+}
+
+#content > .content-elem > .hero > .contents {
+	width: max(900px, 70vw);
+	height: calc(var(--content-height) * 0.9);
+
+	border: 1px solid rgb(0,6,81);
+}
+
+div[monthly-calendar] > .contents {
+	--content-width: calc(100vw - var(--padding-lr) - var(--padding-lr));
+	--date-square: min(calc(calc(var(--content-height) - var(--padding-tb) * 2) / var(--n-weeks)), calc(80vw / 7)); /* 6 rows used. */
+
+	width: inherit;
+	height: inherit;
+	box-sizing: border-box;
+	position: relative;
+
+	padding: var(--padding-tb) var(--padding-lr);
+
+	background: linear-gradient(var(--pane3-bkg) 20%, var(--theme) 100%);
+}
 
 
 .calendar {
 	--datetxt-size: calc(var(--date-square) * 0.08);
+	--datehead-size: var(--datetxt-size);
 
 	width: calc(var(--date-square) * 7);
 
@@ -489,12 +546,12 @@ a.map-pin-tooltip {
 }
 
 .calendar .date > svg:has(use[href="#equals"]) {
-	padding: 12.5% 0 0 0;
-	height: 20%;
+	padding: 10% 0 10% 0;
+	height: 25%;
 }
 
 .calendar .date:has(svg use[href="#equals"]) > label[grade] {
-	font-size: calc(var(--date-square) * 0.5);
+	font-size: calc(var(--date-square) * 0.4);
 }
 
 .calendar .date label.datetxt {
@@ -555,28 +612,31 @@ a.map-pin-tooltip {
 
 
 table.summary-table {
-	font-size: 3vmin;
+	font-size: 3vh;
 	font-family: "Roboto", sans-serif;
 
 	border-collapse: collapse;
-
-	flex: 1;
 }
 
-table.summary-table :first-child {
-	height: 3vh;
-	font-size: 3vh;
+table.summary-table.conditions {
+	--underline-len: 90%;
+	margin-right: 1vw;
+	margin-left: auto;
+
+	width: calc(60% - 1vw);
 }
+
 
 table.summary-table.conditions tr > :nth-child(1) {
 	width: 50%;
 
-	padding-right: 5%;
 	text-align: right;
 }
 
 table.summary-table.conditions tr :nth-child(2) {
 	width: 10%;
+
+	text-align: center;
 }
 
 table.summary-table.conditions tr :nth-child(3) {
@@ -588,6 +648,13 @@ table.summary-table.conditions tr :nth-child(4) {
 	aspect-ratio: 1/1;
 }
 
+table.summary-table.conditions tr :nth-child(4) svg {
+	width: 40%;
+
+	display: block;
+	margin: auto;
+}
+
 table.summary-table.conditions td {
 	padding: 0;
 }
@@ -595,6 +662,10 @@ table.summary-table.conditions td {
 
 table.summary-table.conditions tr {
 	position: relative;
+}
+
+table.summary-table.conditions td {
+	text-wrap: nowrap;
 }
 
 table.summary-table.conditions tr[cond="t"],
@@ -731,10 +802,9 @@ table.summary-table.conditions:has(
 
 	position: absolute;
 	bottom: 0;
-	left: 50%;
-	translate: -50%;
+	right: 0;
 	
-	width: 90%;
+	width: var(--underline-len);
 	height: 1px;
 	background-color: var(--light-border);
 }
@@ -745,7 +815,7 @@ table.summary-table.conditions tr[cond="f"] td:has(svg),
 table.summary-table.conditions tr[cond="wg"] td:has(svg),
 table.summary-table.conditions tr[cond="wd"] td:has(svg),
 table.summary-table.conditions tr[cond="w"] td:has(svg) {
-	display: none;
+	opacity: 0;
 }
 
 
@@ -753,7 +823,7 @@ table.summary-table.conditions tr[cond="w"] td:has(svg) {
 
 table.summary-table td[grade] {
 	font-family: "Luckiest Guy", serif;
-	font-size: 3.5vh;
+	font-size: 1.5em;
 }
 
 
@@ -783,7 +853,7 @@ table.summary-table.grades table:last-of-type {
 #footer-bar {
 	height: fit-content;
 	
-	font-size: 2vmin;
+	font-size: 2vh;
 	
 	font-family: "Roboto";
 	background: var(--theme);
@@ -794,4 +864,154 @@ table.summary-table.grades table:last-of-type {
 
 #footer-bar :visited {
 	color: white;
+}
+
+
+
+.summary-row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	position: relative;
+}
+
+.summary-row .left-items {
+	width: 40%;
+	height: 100%;
+
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.summary-row svg.logo {
+	width: 50%;
+	max-height: 80%;
+
+	flex-shrink: 0;
+}
+
+.summary-row .left-items .grade {
+	margin: 0 0 0 var(--grade-pad);
+
+	font-family: "Luckiest Guy";
+	font-size: var(--grade-size);
+	line-height: var(--grade-size);
+	text-align: left;
+
+	position: relative;
+}
+
+.summary-row .underline {
+	position: absolute;
+	margin: 0 auto;
+
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.hero .title-bar {
+	width: 94%;
+	/*height: 20%;*/
+	height: fit-content;
+	margin: 0 0 0.5% 6%;
+
+	position: relative;
+}
+
+.title-bar .main {
+	--font-size: 7vmin;
+	color: #2992f3;
+	filter: drop-shadow(0.035em 0.035em 0 black);
+	font-family: "Lilita One", "Serif";
+	font-size: var(--font-size);
+	line-height: var(--font-size);
+	display: block;
+
+	width: fit-content;
+
+	padding-top: 2vh;
+}
+
+.title-bar .sub {
+	--font-size: min(2vh,3vw);
+	font-family: "Viga";
+	font-size: var(--font-size);
+	line-height: var(--font-size);
+	display: block;
+	width: fit-content;
+
+	padding: 0.75% 0 0 1.5vw;
+}
+
+.hero .rows {
+	display: flex;
+	flex-direction: column;
+
+	flex-grow: 1;
+	flex-shrink: 1;
+
+	height: 100%;
+}
+
+
+
+@media screen and (max-width: 1500px) {
+	div[monthly-calendar] > .contents {
+		padding-top: calc(var(--padding-tb) / 2);
+	}
+
+	div[monthly-calendar] > .contents .title-bar {
+		position: static;
+		width: 100% !important;
+
+		padding-top: 2vh;
+		padding-right: 5vw;
+	}
+
+	div[monthly-calendar] > .contents .title-bar > * {
+		text-align: center;
+		width: 100%;
+	}
+
+	div[monthly-calendar] > .contents .calendar {
+		position: static;
+		display: block;
+
+		margin: 1vh auto 0 auto;
+	}
+}
+
+
+
+@media screen and (max-width: 1080px) {
+	#topbar #rainbow {
+		display: none;
+	}
+
+	body #content > .content-elem > .hero > .contents {
+		width: 90vw;
+	}
+}
+
+@media screen and (max-width: 900px) {
+	#topbar #logocont #wordlogo {
+		display: none;
+	}
+	
+	#topbar #navbar {
+		position: absolute;
+		left: 50%;
+		translate: -50% 0;
+	}
+}
+
+@media screen and (max-width: 460px) {
+	body #topbar #navbar {
+		left: auto;
+		right: 2vw;
+		translate: 0 0;
+	}
 }

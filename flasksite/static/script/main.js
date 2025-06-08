@@ -82,7 +82,6 @@ async function initMap({selector, popup, grades, onPinSelect, data}={}) {
 	// selector: css selector to find map cont, str
 	// popup: whether to hide map once a pin is selected, bool
 	// colours: detail about colours {loc: grade}, or "#hex-value"
-	console.log("data", data);
 
 	if (!grades) grades = {"default": {}};
 
@@ -144,17 +143,12 @@ async function initMap({selector, popup, grades, onPinSelect, data}={}) {
 	let selected;
 
 	for (let loc of pinsToMake) {
-
-		//let colour = colours[loc.mId] || api.map.defaultColour;
 		let thisData;
 
 		for (let v of data || []) {
 			if (loc.mId === v.loc) {thisData = v; break;}
 		};
 
-		console.log(thisData,"thisData");
-
-		//let background = (thisGrades[loc.mId]) ? undefined : api.map.defaultColour;
 
 		let thisPin = new PinElement({
 			title: loc.name,
@@ -319,7 +313,7 @@ function FillSummaryPieGrades(selector, weatherEntries, showLegend) {
 
 	let width = pieCont.parentElement.getBoundingClientRect().width;
 
-	if (width < 300) showLegend = false;
+	//if (width < 300) showLegend = false;
 
 	let options = {
 		is3D: true,
@@ -364,8 +358,6 @@ function FillSummaryTableGrades(table, weatherEntries) {
 	let percValues = Object.values(percs);
 	let maxPercGrade = Object.keys(percs)[percValues.indexOf(Math.max(...percValues))];
 	let rem = 100 - totalPercs;
-
-	console.log("REMO OF", rem, "GOING TO GRADE", maxPercGrade);
 	percs[maxPercGrade] += rem;
 
 
@@ -694,6 +686,38 @@ function getBestOrgFromPeriods(periods) {
 	else return "EQUALS"
 };
 
+function getAvgObs(obss) {
+	let sums = {};
+	for (let k of Object.keys(obss[0])) sums[k] = [];
+
+	for (let obs of Object.values(obss)) {
+		for (let [k,v] of Object.entries(obs)) {
+			if (typeof(v) !== "number") {
+				if (k !== "pr") continue;
+
+				v = 0;
+			};
+
+			sums[k].push(v);
+		};
+	};
+
+	let final = {};
+
+	for (let [k,v] of Object.entries(sums)) {
+		let decimals = 1;
+		if (k === "w") decimals = 0;
+
+		final[k] = Math.round(api.calc.sum(v) / v.length * (10**decimals)) / (10**decimals);
+	};
+
+	return final;
+};
+
+function sum(arr) {
+	return arr.reduce((acc, thisv) => acc + thisv, 0);
+};
+
 
 function getMapGrades(data, mode) {
 	// mode = avg (simple)
@@ -720,8 +744,6 @@ function getMapGrades(data, mode) {
 		if (loc.mo) gradesByToggle.mo[loc.loc] = loc.mo.ga;
 		if (loc.bbc) gradesByToggle.bbc[loc.loc] = loc.bbc.ga;
 	};
-
-	console.log(gradesByToggle);
 
 	return gradesByToggle;
 };
@@ -770,7 +792,6 @@ function _setContentBody(innerHTML, historyDetail) {
 	};
 
 	if (!historyDetail) return;
-	console.log(historyDetail);
 
 	let title = api.navigation.pageTitles[historyDetail.url];
 	document.title = title + " - " + api.navigation.masterTitle;
@@ -852,7 +873,9 @@ function initApi() {
 			chooseBestGrade: chooseBestGrade,
 			getGradeByLocArr: getGradeByLocArr,
 			getOrgFromPeriod: getOrgFromPeriod,
-			getBestOrgFromPeriods: getBestOrgFromPeriods
+			getBestOrgFromPeriods: getBestOrgFromPeriods,
+			getAvgObs: getAvgObs,
+			sum: sum
 		},
 		random: {
 			int: randomInt,
@@ -908,7 +931,7 @@ function initApi() {
 			'A', 'LABEL', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
 			'P', 'SPAN', 'B', 'I', 'U', 'STRONG', 'EM',
 			'SMALL', 'MARK', 'DEL', 'INS', 'SUB', 'SUP',
-			'Q', 'BLOCKQUOTE', 'CITE', 'TIME', 'CODE', 'PRE'
+			'Q', 'BLOCKQUOTE', 'CITE', 'TIME', 'CODE', 'PRE', "TD"
 		],
 		units: {
 			temp: "\u00B0C",
@@ -1007,8 +1030,6 @@ function OnLoad() {
 	});
 
 	document.querySelector("#loc-card").addEventListener("click", function(e) {
-		console.log("intting map");
-
 		api.dom.initMap({
 			data: api.siteInfo,
 			selector: "#popup-map-cont",

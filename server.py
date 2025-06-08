@@ -178,11 +178,15 @@ def get_forecasts(
 	)
 
 	organised = get_organised_fcsts(results)
-	organised["day_date"] = get_tzsafe_str_date(day_date)
 
-	global_cache_manager.fcsts_of_day.add(ref, organised)
+	to_send = {
+		"day_date": get_tzsafe_str_date(day_date),
+		"fcst": organised
+	}
 
-	return organised
+	global_cache_manager.fcsts_of_day.add(ref, to_send)
+
+	return to_send
 
 
 @app.get("/api/weather/obs")

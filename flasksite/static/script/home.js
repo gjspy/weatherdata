@@ -34,8 +34,8 @@
 		let bbcTable = document.querySelector("#homepage .pane-2 #bbc-summary table");
 		api.dom.FillSummaryTableConditions(bbcTable, data.bbc);
 
-		api.dom.setElemGrade(document.querySelector("#homepage .pane-2 #mo-summary > label.grade"), (data.mo || {}).ga);
-		api.dom.setElemGrade(document.querySelector("#homepage .pane-2 #bbc-summary > label.grade"), (data.bbc || {}).ga);
+		api.dom.setElemGrade(document.querySelector("#homepage .pane-2 #mo-summary .left-items label.grade"), (data.mo || {}).ga);
+		api.dom.setElemGrade(document.querySelector("#homepage .pane-2 #bbc-summary .left-items label.grade"), (data.bbc || {}).ga);
 	};
 
 
@@ -71,10 +71,10 @@
 		//api.dom.FillSummaryTableGrades(bbcTablesCont, bcData.data);//dateBBCGrades);
 		api.dom.FillSummaryPieGrades("#homepage .pane-3 .detail #bbc-summary .pie-cont", bcData.data, true);		
 		
-		let moGradeDOM = document.querySelector("#homepage .pane-3 .detail #mo-summary > label[grade]");
+		let moGradeDOM = document.querySelector("#homepage .pane-3 .detail #mo-summary .left-items label[grade]");
 		api.dom.setElemGrade(moGradeDOM, moData.ga);
 	
-		let bbcGradeDOM = document.querySelector("#homepage .pane-3 .detail #bbc-summary > label[grade]");
+		let bbcGradeDOM = document.querySelector("#homepage .pane-3 .detail #bbc-summary .left-items label[grade]");
 		api.dom.setElemGrade(bbcGradeDOM, bcData.ga);
 	};
 
@@ -237,8 +237,6 @@
 	};
 
 	function onGoogleChartsLoad(yesterdayMO, yesterdayBC, weekDataForCalendar, bestOverWeek) {
-		console.log("googling");
-
 		api.dom.FillSummaryPieGrades("#homepage .pane-1 .entry.mo .pie-cont", yesterdayMO.data);
 		api.dom.FillSummaryPieGrades("#homepage .pane-1 .entry.bbc .pie-cont", yesterdayBC.data);
 		

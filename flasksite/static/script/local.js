@@ -6,7 +6,7 @@
 		let datas = Object.values(data);
 
 		let datesInWeek = Array.from(Object.keys(data)).map( v => Date.parse(v) );
-		console.log(datesInWeek);
+
 		let yesterday = datas[datesInWeek.indexOf(Math.max(...datesInWeek))];
 
 		let yesterdayMO = api.calc.getOrgFromPeriod(yesterday, "MO");
@@ -19,8 +19,8 @@
 		let bbcTable = document.querySelector("#local .pane-1 #bbc-summary table");
 		api.dom.FillSummaryTableConditions(bbcTable, yesterdayBC.data[0]);
 
-		api.dom.setElemGrade(document.querySelector("#local .pane-1 #mo-summary > label.grade"), yesterdayMO.ga);
-		api.dom.setElemGrade(document.querySelector("#local .pane-1 #bbc-summary > label.grade"), yesterdayBC.ga);
+		api.dom.setElemGrade(document.querySelector("#local .pane-1 #mo-summary .left-items .grade"), yesterdayMO.ga);
+		api.dom.setElemGrade(document.querySelector("#local .pane-1 #bbc-summary .left-items .grade"), yesterdayBC.ga);
 
 		let subtitle = document.querySelector("#local .pane-1 .title-bar .sub");
 		subtitle.textContent = subtitle.textContent.replaceAll("[FCST_BUFFER_HOURS]", String(FCST_TIME_BUFFER_DAYS * 24));
@@ -59,9 +59,10 @@
 		if (wt !== undefined) {
 			if (thisOrg === "BD") {
 				// because is daily summary, swap night icons to day
+				
 				let index = Object.values(api.nightWTsMap).indexOf(wt);
-				if (index) wt = Object.keys(api.nightWTsMap)[index];
-
+				if (index !== -1) wt = Object.keys(api.nightWTsMap)[index];
+				
 			};
 			wtElem.setAttribute("src", `/static/icon/100/${wt}.png`);
 
@@ -128,7 +129,7 @@
 
 	function fcstVsObsUpdate(data, contents, periods, selectedOrg, selectedSubOrg, selectedFcstTime) {
 		if (!selectedOrg) {
-			let chosen = api.random.choice(Object.keys(data.fcst));
+			let chosen = api.random.choice(Object.keys(data.fcst.fcst));
 			selectedOrg = chosen[0];
 			selectedSubOrg = chosen[1];
 		};
@@ -157,7 +158,7 @@
 
 		let possibleSubOrgs = [];
 
-		for (let org of Object.keys(data.fcst)) {
+		for (let org of Object.keys(data.fcst.fcst)) {
 			if (org.startsWith(selectedOrg)) {
 				possibleSubOrgs.push(org.replace(selectedOrg, ""));
 			};
@@ -175,6 +176,7 @@
 			label.textContent = (org === "3") ? "3 Hourly" : (org === "D") ? "Daily" : "Hourly";
 
 			label.setAttribute("class", thisClass);
+			label.setAttribute("org", selectedOrg + org);
 			freqBar.append(label);
 
 			label.onclick = () => fcstVsObsUpdate(data, contents, periods, selectedOrg, org, selectedFcstTime);
@@ -187,7 +189,7 @@
 		let timeBar = contents.querySelector(".fcst-type-bar.fcst-time");
 		timeBar.innerHTML = "";
 
-		let possibleTimes = Object.keys(data.fcst[thisOrg]);
+		let possibleTimes = Object.keys(data.fcst.fcst[thisOrg]);
 
 		if ((!selectedFcstTime) || (!possibleTimes.includes(selectedFcstTime))) {
 			selectedFcstTime = possibleTimes[0];
@@ -207,20 +209,21 @@
 		};
 
 
-		let chosenFcstData = data.fcst[thisOrg][selectedFcstTime];
-
-		//periods.append(api.assets.fcstObsPeriodKey.cloneNode(true));
-
+		let chosenFcstData = data.fcst.fcst[thisOrg][selectedFcstTime];
 
 		for (let [ft, v] of Object.entries(chosenFcstData).sort( (a,b) => ( new Date(a[0]) - new Date(b[0]) ) )) {
 			let elem = api.assets.fcstObsPeriodTemplate.cloneNode(true);
 
-			fillFullFcstObsPeriod(ft, {fcst: v, obs: data.obs[ft]}, thisOrg, elem);
+			let obsToUse = data.obs[ft];
+
+			if (thisOrg === "BD") {
+				obsToUse = api.calc.getAvgObs(Object.values(data.obs));
+			};
+
+			fillFullFcstObsPeriod(ft, {fcst: v, obs: obsToUse}, thisOrg, elem);
 
 			periods.append(elem);
 		};
-
-		console.log("TODO: scroll to middle/nearest to now?")
 	};
 
 
@@ -232,19 +235,12 @@
 			fcstVsObsUpdate({fcst: fcst, obs: obs}, contents, periods);
 		};
 
-		let fcst, obs;
-
-		api.api.getApiFcstsOfDay(locId).then((v) => {
-			fcst = v;
-
-			if (obs) fillData(fcst, obs);
+		Promise.all([
+			api.api.getApiFcstsOfDay(locId),
+			api.api.getApiObsofDay(locId)
+		]).then((values) => {
+			fillData(values[0], values[1]);
 		});
-
-		api.api.getApiObsofDay(locId).then((v) => {
-			obs = v;
-
-			if (fcst) fillData(fcst, obs);
-		});		
 	};
 
 
@@ -350,6 +346,7 @@
 		pane1(locId);
 		pane2(locId);
 		pane3(locId);
+		window.onresize = undefined;
 
 		//document.querySelector("#homepage").setAttribute("rendered", "true");
 

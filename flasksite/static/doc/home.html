@@ -1,4 +1,4 @@
-<div id="homepage" class="content-elem" location-selector="false" scriptsrc="static/script/home.js" rendered="false">
+<div id="homepage" class="content-elem" location-selector="false" scrollsnap="true" scriptsrc="static/script/home.js" rendered="false">
 	<div class="sticky-bkg">
 		<img class="background" src="/api/weather/current-photo?loc_id=all">
 	</div>
@@ -46,7 +46,6 @@
 	<div class="hero pane-2">				
 		<div class="contents today">
 			<div class="title-bar">
-				
 				<a class="main">Locally...</a>
 				<a class="sub">Forecasts for yesterday's weather, published [FCST_BUFFER_HOURS] hours prior.</a>
 				<div class="right-items">
@@ -60,19 +59,23 @@
 			<div class="flex-grow">
 				<div class="rows">
 					<div id="mo-summary" class="summary-row">
-						<svg class="logo" viewbox="0 0 200 200">
-							<use href="#mo-square"/>
-							<use href="#mo-text"/>
-						</svg>
-						<label class="grade" grade="A+">A<sup>+</sup></label>
+						<div class="left-items">
+							<svg class="logo" viewbox="0 0 200 200">
+								<use href="#mo-square"/>
+								<use href="#mo-text"/>
+							</svg>
+							<label class="grade" grade=""></label>
+						</div>
 						<table class="summary-table conditions"></table>
 						<div class="underline light thin moderate"></div>
 					</div>
 					<div id="bbc-summary" class="summary-row">
-						<svg class="logo" viewbox="0 0 1000 400">
-							<use href="#bbc-full"/>
-						</svg>
-						<label class="grade" grade="C">C</label>
+						<div class="left-items">
+							<svg class="logo" viewbox="0 0 1000 400">
+								<use href="#bbc-full"/>
+							</svg>
+							<label class="grade" grade=""></label>
+						</div>
 						<table class="summary-table conditions"></table>
 					</div>
 				</div>
@@ -92,22 +95,24 @@
 				<div class="calendar"></div>
 				<div class="detail">
 					<div id="mo-summary" class="summary-row">
-						<svg class="logo" viewbox="0 0 200 200">
-							<use href="#mo-square"/>
-							<use href="#mo-text"/>
-						</svg>
-						<label class="grade" grade="A+">A<sup>+</sup></label>
-
+						<div class="left-items">
+							<svg class="logo" viewbox="0 0 200 200">
+								<use href="#mo-square"/>
+								<use href="#mo-text"/>
+							</svg>
+							<label class="grade" grade=""></label>
+						</div>
 						<div class="pie-cont"></div>
 
 						<div class="underline light thin moderate"></div>
 					</div>
 					<div id="bbc-summary" class="summary-row">
-						<svg class="logo" viewbox="0 0 1000 400">
-							<use href="#bbc-full"/>
-						</svg>
-						<label class="grade" grade="A+">A<sup>+</sup></label>
-
+						<div class="left-items">
+							<svg class="logo" viewbox="0 0 1000 400">
+								<use href="#bbc-full"/>
+							</svg>
+							<label class="grade" grade=""></label>
+						</div>
 						<div class="pie-cont"></div>
 
 						<div class="underline light thin moderate"></div>
@@ -118,7 +123,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="pane-4">
+	<div class="pane-4" monthly-calendar="">
 		<div class="contents">
 			<div class="title-bar">
 				<a class="sub">Last month...</a>
