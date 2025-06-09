@@ -1,0 +1,13 @@
+[Unit]
+Description=FastAPI Python Backend for the Weather site, ran through gunicorn.
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/user/weatherdata
+ExecStart=/home/user/weatherdata/.venv/bin/gunicorn -k uvicorn.workers.UvicornWorker --bind 127.0.0.1:8000 --workers 2 server:app
+Restart=always
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=default.target
