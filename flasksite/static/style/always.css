@@ -1,23 +1,5 @@
-.content-elem:has(.sticky-bkg img[src*="AS308506241"]) .hero .contents {
-	background: rgba(255, 255, 255, 0.75);
-}
-
-.content-elem:has(.sticky-bkg img[src*="AS183401940"]) .hero .contents {
-	background: rgba(255, 255, 255, 0.91);
-}
-
-.content-elem:has(.sticky-bkg img[src*="AS439173189"]) .hero .contents {
-	background: rgba(255, 255, 255, 0.83);
-}
-
-.content-elem:has(.sticky-bkg img[src*="AS291241545"]) .hero .contents {
-	background: rgba(255, 255, 255, 0.73);
-}
-
 :root {
 	/* COLOURS */
-	--met-office: #D6DF23;
-	--met-office: #b9d532; /* dark bkg*/
 	--met-office: #d7df00; /* light */
 	--met-office-mono: #231F20;
 
@@ -28,7 +10,6 @@
 
 	--grade-APlus: #FF41D8;
 	--grade-A: #2EC918;
-	--grade-B: #23C5D5;
 	--grade-B: #ffb600;
 	--grade-C: #FF5400;
 	--grade-D: #C40000;
@@ -125,8 +106,6 @@ div.underline.full {
 	margin: 0 auto;
 }
 
-
-
 body {
 	--topbar-height: max(70px, 9vh);
 	--content-height: calc(100vh - var(--topbar-height));
@@ -134,6 +113,16 @@ body {
 	margin: 0 !important;
 	overflow: hidden;
 }
+
+
+@supports (height: 100dvh) {
+	body {
+		--topbar-height: max(70px, 9dvh);
+		--content-height: calc(100dvh - var(--topbar-height));
+	}
+}
+
+
 
 
 
@@ -246,10 +235,11 @@ body:has(#content > [location-selector="true"]) #loc-card {
 	box-shadow: 1px 1px 0px black;
 	border: 1px solid black;
 	border-top: none;
+	border-left: none;
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
 
-	margin: calc(var(--topbar-border) * -1) 0 0 10px;
+	margin: calc(calc(var(--topbar-border) + 1px) * -1) 0 0 0;
 	color: white;
 
 	cursor: pointer;
@@ -682,28 +672,19 @@ table.summary-table.conditions tr[cond="f"] {
 
 
 table.summary-table.conditions:has(
-	tr[cond="t"]:hover,
-	tr[cond="f"]:hover,
-	tr[cond="t"].clicked,
-	tr[cond="f"].clicked
+	tr[cond="t"].clicked
 ) tr[cond="f"] {
 	display: table-row;
 }
 
 table.summary-table.conditions:has(
-	tr[cond="t"]:hover,
-	tr[cond="f"]:hover,
-	tr[cond="t"].clicked,
-	tr[cond="f"].clicked
+	tr[cond="t"].clicked
 ) tr[cond="t"]::after {
 	bottom: -100%;
 }
 
 table.summary-table.conditions:has(
-	tr[cond="t"]:hover,
-	tr[cond="f"]:hover,
-	tr[cond="t"].clicked,
-	tr[cond="f"].clicked
+	tr[cond="t"].clicked
 ) tr[cond="t"] svg {
 	rotate: 180deg;
 }
@@ -720,42 +701,16 @@ table.summary-table.conditions tr[cond="wd"] {
 
 
 table.summary-table.conditions:has(
-	tr[cond="ws"]:hover,
-	tr[cond="wg"]:hover,
-	tr[cond="wd"]:hover,
-	tr[cond="ws"].clicked,
-	tr[cond="wg"].clicked,
-	tr[cond="wd"].clicked
+	tr[cond="ws"].clicked
 ) tr[cond="wg"],
 table.summary-table.conditions:has(
-	tr[cond="ws"]:hover,
-	tr[cond="wg"]:hover,
-	tr[cond="wd"]:hover,
-	tr[cond="ws"].clicked,
-	tr[cond="wg"].clicked,
-	tr[cond="wd"].clicked
+	tr[cond="ws"].clicked
 ) tr[cond="wd"] {
 	display: table-row;
 }
 
-/*table.summary-table.conditions:has(
-	tr[cond="ws"]:hover,
-	tr[cond="wg"]:hover,
-	tr[cond="wd"]:hover,
-	tr[cond="ws"].clicked,
-	tr[cond="wg"].clicked,
-	tr[cond="wd"].clicked
-) tr[cond="ws"]::after {
-	bottom: -200%;
-}*/
-
 table.summary-table.conditions:has(
-	tr[cond="ws"]:hover,
-	tr[cond="wg"]:hover,
-	tr[cond="wd"]:hover,
-	tr[cond="ws"].clicked,
-	tr[cond="wg"].clicked,
-	tr[cond="wd"].clicked
+	tr[cond="ws"].clicked
 ) tr[cond="ws"] svg {
 	rotate: 180deg;
 }
@@ -768,35 +723,19 @@ table.summary-table.conditions tr[cond="wd"] :first-child {
 }
 
 table.summary-table.conditions:not(:has(
-	tr[cond="t"]:hover,
-	tr[cond="f"]:hover,
-	tr[cond="t"].clicked,
-	tr[cond="f"].clicked
+	tr[cond="t"].clicked
 )) tr[cond="t"]::after,
 
 table.summary-table.conditions:has(
-	tr[cond="t"]:hover,
-	tr[cond="f"]:hover,
-	tr[cond="t"].clicked,
-	tr[cond="f"].clicked
+	tr[cond="t"].clicked
 ) tr[cond="f"]::after,
 
 table.summary-table.conditions:not(:has(
-	tr[cond="ws"]:hover,
-	tr[cond="wg"]:hover,
-	tr[cond="wd"]:hover,
-	tr[cond="ws"].clicked,
-	tr[cond="wg"].clicked,
-	tr[cond="wd"].clicked
+	tr[cond="ws"].clicked
 )) tr[cond="ws"]::after,
 
 table.summary-table.conditions:has(
-	tr[cond="ws"]:hover,
-	tr[cond="wg"]:hover,
-	tr[cond="wd"]:hover,
-	tr[cond="ws"].clicked,
-	tr[cond="wg"].clicked,
-	tr[cond="wd"].clicked
+	tr[cond="ws"].clicked
 ) tr[cond="wd"]::after {
 	content: "";
 
@@ -964,7 +903,7 @@ table.summary-table.grades table:last-of-type {
 	}
 
 	div[monthly-calendar] > .contents .title-bar {
-		position: static;
+		position: static !important;
 		width: 100% !important;
 
 		padding-top: 2vh;

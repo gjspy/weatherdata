@@ -10,11 +10,16 @@
 		api.dom.setElemGrade(bcGradeDOM, yesterdayBC.ga);
 
 		let mapGrades = api.dom.getMapGrades(gradeByLocArr, "hyp");
-		api.dom.initMap({
-			selector: ".pane-1 #hero-map",
-			popup: false,
-			grades: mapGrades
-		});
+
+		try {
+			api.dom.initMap({
+				selector: ".pane-1 #hero-map",
+				popup: false,
+				grades: mapGrades
+			});
+		} catch(err) {
+			console.error("couldn't init map", err);
+		};		
 
 		let subtitle = document.querySelector("#homepage .pane-1 .footer .sub");
 		subtitle.textContent = subtitle.textContent.replaceAll("[PIE_CHART_GRADE_DESC]", api.descriptions.PIE_CHART_GRADES);
@@ -23,7 +28,7 @@
 	function pane2ChangeLoc(data, pinElem) {
 		let locTitle = document.querySelector("#homepage .pane-2 .title-bar .right-items .main");
 
-		let grade = pinElem.getAttribute("grade");
+		let grade = (pinElem) ? pinElem.getAttribute("grade") : "F";
 
 		api.dom.setElemGrade(locTitle, grade);
 		locTitle.textContent = api.siteInfoDict[data.loc].clean_name;
@@ -43,15 +48,23 @@
 		let grades = api.dom.getMapGrades(gradeByLocArr, "hyp");
 
 		let subtitle = document.querySelector("#homepage .pane-2 .title-bar .sub");
-		subtitle.textContent = subtitle.textContent.replaceAll("[FCST_BUFFER_HOURS]", String(FCST_TIME_BUFFER_DAYS * 24));
+		subtitle.textContent = subtitle.textContent
+			.replaceAll("[FCST_BUFFER_HOURS]", String(FCST_TIME_BUFFER_DAYS * 24))
+			.replaceAll("[SUMMARY_DESC]", api.descriptions.SUMMARY);
 
-		api.dom.initMap({
-			selector: ".pane-2 #hero-map",
-			popup: false,
-			grades: grades,
-			onPinSelect: pane2ChangeLoc,
-			data: gradeByLocArr
-		});
+		pane2ChangeLoc(gradeByLocArr[0], undefined);
+
+		try {
+			api.dom.initMap({
+				selector: ".pane-2 #hero-map",
+				popup: false,
+				grades: grades,
+				onPinSelect: pane2ChangeLoc,
+				data: gradeByLocArr
+			});
+		} catch(err) {
+			console.error("couldn't init map", err);
+		};		
 	};
 
 	function pane3DateOnHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade, isClick) {

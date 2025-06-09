@@ -1,7 +1,7 @@
 #homepage {
 	--pane3-bkg: rgb(198, 255, 252);
 	--hero-map-width: min(40vw, 400px);
-	--pane2-map-width: min(50vw, 450px);
+	--pane2-map-width: min(30vw, 300px);
 }
 
 
@@ -165,7 +165,7 @@
 
 
 #homepage #hero-map {
-	width: var(--pane2-map-width);
+	width: var(--hero-map-width);
 	height: 100%;
 	
 	align-self: center;
@@ -188,7 +188,8 @@
 
 
 #homepage .pane-2 #hero-map {
-	flex-shrink: 1;
+	width: var(--pane2-map-width);
+	flex-shrink: 0;
 }
 
 

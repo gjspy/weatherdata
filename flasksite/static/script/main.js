@@ -69,29 +69,18 @@ async function fetchSiteInfo(isDict) {
 
 
 
-
-
-
-
-async function initMap({selector, popup, grades, onPinSelect, data}={}) {
+function actualInitMap({MapConstruct, MarkerConstruct, PinConstruct, selector, popup, grades, onPinSelect, data}={}) {
 	function setScale(pin, newScale) {
 		let currentTransform = pin.style.transform || "";
 		pin.style.transform = currentTransform.replace(/scale\([\d\.]+\)/g, "") + `scale(${newScale})`;
 	};
 
-	// selector: css selector to find map cont, str
-	// popup: whether to hide map once a pin is selected, bool
-	// colours: detail about colours {loc: grade}, or "#hex-value"
-
 	if (!grades) grades = {"default": {}};
-
-	const {Map} = await google.maps.importLibrary("maps");
-	const {AdvancedMarkerElement, PinElement} = await google.maps.importLibrary("marker");
 
 	const mapCont = document.querySelector(selector);
 	mapCont.className = mapCont.className.replace("invisible","");
 
-	let mapElem = new Map(mapCont, {
+	let mapElem = new MapConstruct(mapCont, {
 		zoom: 5,
 		center: api.map.centre,
 		mapId: api.map.id,
@@ -118,9 +107,12 @@ async function initMap({selector, popup, grades, onPinSelect, data}={}) {
 		gestureHandling: "greedy"
 	});
 
-	google.maps.event.addListenerOnce(mapElem, "tilesloaded", () => {
-		mapElem.setZoom(5.4); // Forces a re-render to sharpen tiles
-	});
+	let MAP_BOUNDS = new google.maps.LatLngBounds();
+	MAP_BOUNDS.extend(new google.maps.LatLng(api.map.extendToNorth.lat, api.map.extendToNorth.lng))
+
+	//google.maps.event.addListenerOnce(mapElem, "tilesloaded", () => {
+	//	mapElem.setZoom(5.4); // Forces a re-render to sharpen tiles
+	//});
 
 	mapElem.setClickableIcons(false); // for default things (country name)
 
@@ -150,24 +142,25 @@ async function initMap({selector, popup, grades, onPinSelect, data}={}) {
 		};
 
 
-		let thisPin = new PinElement({
+		let thisPin = new PinConstruct({
 			title: loc.name,
 			scale: 0.5,
 
-			background: "",
 			borderColor: "#464046",
 			glyphColor: "#464046"
 		});
 
 		let pinDOMElem = thisPin.element;
 
-		let pinColourBkg = pinDOMElem.querySelector(".RIFvHW-maps-pin-view-background")
+		let pinColourBkg = pinDOMElem.querySelector(".RIFvHW-maps-pin-view-background");
 		api.dom.setElemGrade(pinColourBkg, thisGrades[loc.mId]);
-		
 
 		madePins.push(thisPin);
 
-		let marker = new AdvancedMarkerElement({
+		console.log(MAP_BOUNDS, loc);
+		if (loc.mId !== 3006) MAP_BOUNDS.extend(new google.maps.LatLng(loc.lat, loc.long));
+
+		let marker = new MarkerConstruct({
 			map: mapElem,
 			position: {lat: loc["lat"], lng: loc["long"]},
 			content: pinDOMElem,
@@ -254,6 +247,10 @@ async function initMap({selector, popup, grades, onPinSelect, data}={}) {
 		});
 	};
 
+
+	mapElem.fitBounds(MAP_BOUNDS, api.map.boundsPadding);
+
+
 	google.maps.event.addListener(mapElem, "zoom_changed", () => {
 		let zoom = mapElem.getZoom();
 		let scale = zoom / (5.4/0.5);
@@ -268,8 +265,29 @@ async function initMap({selector, popup, grades, onPinSelect, data}={}) {
 			label.remove();
 		};
 	});
+}
 
 
+
+function initMap(opts) {
+	// selector: css selector to find map cont, str
+	// popup: whether to hide map once a pin is selected, bool
+	// colours: detail about colours {loc: grade}, or "#hex-value"
+
+	Promise.all([
+		google.maps.importLibrary("maps"),
+		google.maps.importLibrary("marker")
+	]).then((values) => {
+		let MapConstruct = values[0].Map;
+		let MarkerConstruct = values[1].AdvancedMarkerElement;
+		let PinConstruct = values[1].PinElement;
+
+		opts["MapConstruct"] = MapConstruct;
+		opts["MarkerConstruct"] = MarkerConstruct;
+		opts["PinConstruct"] = PinConstruct;
+
+		actualInitMap(opts);
+	});
 };
 
 
@@ -369,6 +387,15 @@ function FillSummaryTableGrades(table, weatherEntries) {
 
 function FillSummaryTableConditions(table, orgDetail) {
 	function onRowClick(elem) {
+		let thisCond = elem.getAttribute("cond");
+
+		if (thisCond === "f") {
+			elem = elem.parentElement.querySelector("[cond=\"t\"]");
+
+		} else if (thisCond === "wg" || thisCond === "wd") {
+			elem = elem.parentElement.querySelector("[cond=\"ws\"]");
+		};
+
 		let alreadyClicked = elem.classList.contains("clicked");
 		
 		if (alreadyClicked) elem.classList.remove("clicked");
@@ -791,6 +818,12 @@ function _setContentBody(innerHTML, historyDetail) {
 		contentElem.removeAttribute("scriptsrc");
 	};
 
+	let popupMap = document.querySelector("#popup-map-cont");
+	popupMap.className = "invisible";
+	popupMap.innerHTML = "";
+
+
+
 	if (!historyDetail) return;
 
 	let title = api.navigation.pageTitles[historyDetail.url];
@@ -904,7 +937,9 @@ function initApi() {
 			id: "9e1930bb750ee894",
 			defaultColour: "#0ab6ff", //"#02006b",
 			borderColour: "#464046",
-			centre: {lat: 55.81511846508342, lng: -3.7059529463830354}
+			centre: {lat: 55.81511846508342, lng: -3.7059529463830354},
+			extendToNorth: {lat: 58.637216164602556, lng: -3.0689814701912654},
+			boundsPadding: {top: 15, bottom: 5, left: 30, right: 30}
 		},
 		navigation: {
 			masterTitle: "Cloudy?",
@@ -949,7 +984,8 @@ function initApi() {
 			"F": "#000000"
 		},
 		descriptions: {
-			PIE_CHART_GRADES: "The pie charts show the the number of weather stations which received each grade, per forecaster."
+			PIE_CHART_GRADES: "The pie charts show the the number of weather stations which received each grade, per forecaster.",
+			SUMMARY: "Difference between forecast and actual for yesterday's weather"
 		},
 		nightWTsMap: {2: 0, 3: 1},
 		transferKeys: {},
@@ -1030,19 +1066,23 @@ function OnLoad() {
 	});
 
 	document.querySelector("#loc-card").addEventListener("click", function(e) {
-		api.dom.initMap({
-			data: api.siteInfo,
-			selector: "#popup-map-cont",
-			popup: true,
-			onPinSelect: (data, pinElem) => {
-				let current = new URL(window.location.href);
-				current.searchParams.set("locId", data.mId);
-				console.log(data, current);
+		try {
+			api.dom.initMap({
+				data: api.siteInfo,
+				selector: "#popup-map-cont",
+				popup: true,
+				onPinSelect: (data, pinElem) => {
+					let current = new URL(window.location.href);
+					current.searchParams.set("locId", data.mId);
+					console.log(data, current);
 
-				innerNavigateTo(current);
-				setLocCardName(api.siteInfoDict[data.mId].clean_name);
-			}
-		});
+					innerNavigateTo(current);
+					setLocCardName(api.siteInfoDict[data.mId].clean_name);
+				}
+			});
+		} catch(err) {
+			console.error("couldn't init map", err);
+		};		
 	});
 };
 

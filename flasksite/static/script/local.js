@@ -23,7 +23,9 @@
 		api.dom.setElemGrade(document.querySelector("#local .pane-1 #bbc-summary .left-items .grade"), yesterdayBC.ga);
 
 		let subtitle = document.querySelector("#local .pane-1 .title-bar .sub");
-		subtitle.textContent = subtitle.textContent.replaceAll("[FCST_BUFFER_HOURS]", String(FCST_TIME_BUFFER_DAYS * 24));
+		subtitle.textContent = subtitle.textContent
+			.replaceAll("[FCST_BUFFER_HOURS]", String(FCST_TIME_BUFFER_DAYS * 24))
+			.replaceAll("[SUMMARY_DESC]", api.descriptions.SUMMARY);
 	};
 
 	function conditionalFormat(condition, v) {
@@ -124,15 +126,43 @@
 		if (data.fcst) fillHalfFcstObsPeriod(data.fcst, elem.querySelector(".fcst"), thisOrg);
 		if (data.obs) fillHalfFcstObsPeriod(data.obs, elem.querySelector(".obs"), thisOrg);
 
+
+	};
+
+
+
+	function selectOrgsAndTime(fcsts, selectedOrg, selectedSubOrg, selectedFcstTime) {
+		if (!selectedOrg) {
+			let possibleOrgs = Array.from(Object.keys(fcsts));
+			let bdIndex = possibleOrgs.indexOf("BD"); // REMOVE BD FROM AUTOSELECT
+
+			if (possibleOrgs.length > 1 && bdIndex !== -1) possibleOrgs.splice(bdIndex);
+			
+			let chosen = api.random.choice(possibleOrgs);
+			selectedOrg = chosen[0];
+			selectedSubOrg = chosen[1];
+		};
+		
+		let possibleSubOrgs = [];
+
+		for (let org of Object.keys(fcsts)) {
+			if (!org.startsWith(selectedOrg)) continue;
+			
+			possibleSubOrgs.push(org.replace(selectedOrg, ""));
+		};
+
+
+		if ((!selectedSubOrg) || (!possibleSubOrgs.includes(selectedSubOrg))) {
+			selectedSubOrg = possibleSubOrgs[0];
+		};
+
+		return [selectedOrg, selectedSubOrg, selectedFcstTime, possibleSubOrgs];
 	};
 
 
 	function fcstVsObsUpdate(data, contents, periods, selectedOrg, selectedSubOrg, selectedFcstTime) {
-		if (!selectedOrg) {
-			let chosen = api.random.choice(Object.keys(data.fcst.fcst));
-			selectedOrg = chosen[0];
-			selectedSubOrg = chosen[1];
-		};
+		let possibleSubOrgs;
+		[selectedOrg, selectedSubOrg, selectedFcstTime, possibleSubOrgs] = selectOrgsAndTime(data.fcst.fcst, selectedOrg, selectedSubOrg, selectedFcstTime);
 
 		// SET METADATA
 		let dateElem = contents.querySelector(".option-row > .date");
@@ -156,18 +186,6 @@
 		let freqBar = contents.querySelector(".fcst-type-bar.fcst-freq");
 		freqBar.innerHTML = "";
 
-		let possibleSubOrgs = [];
-
-		for (let org of Object.keys(data.fcst.fcst)) {
-			if (org.startsWith(selectedOrg)) {
-				possibleSubOrgs.push(org.replace(selectedOrg, ""));
-			};
-		};
-
-		if ((!selectedSubOrg) || (!possibleSubOrgs.includes(selectedSubOrg))) {
-			selectedSubOrg = api.random.choice(possibleSubOrgs);
-		};
-
 		for (let org of possibleSubOrgs) {
 			let label = document.createElement("label");
 			let thisClass = "fcst-option";
@@ -181,6 +199,7 @@
 
 			label.onclick = () => fcstVsObsUpdate(data, contents, periods, selectedOrg, org, selectedFcstTime);
 		};
+
 
 		let thisOrg = selectedOrg + selectedSubOrg;
 
@@ -224,6 +243,15 @@
 
 			periods.append(elem);
 		};
+
+		setTimeout(() => {
+			let bounds = periods.getBoundingClientRect();
+
+			periods.scroll(
+				(periods.scrollWidth / 2) - (bounds.width / 2),
+				0
+			);
+		}, 100);
 	};
 
 
