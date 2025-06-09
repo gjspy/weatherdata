@@ -87,13 +87,13 @@ global_session_constructor = create_session_constructor(global_engine)
 	def get_file(path: str):
 		print(path)
 
-		return FileResponse("flasksite\\static\\" + path.replace("/","\\"))
+		return FileResponse("flasksite{SLASH}static{SLASH}" + path.replace("/",f"{SLASH}"))
 
 
 	@app.get("/")
 	@app.get("/local")
 	def main():
-		return FileResponse("flasksite\\static\\doc\\main.html")"""
+		return FileResponse("flasksite{SLASH}static{SLASH}doc{SLASH}main.html")"""
 	
 	
 
@@ -288,4 +288,4 @@ def get_logs(key: str):
 
 @app.get("/{fullpath:path}")
 def main(full_path: str = None):
-	return FileResponse("flasksite\\static\\doc\\main.html")
+	return FileResponse(f"flasksite{SLASH}static{SLASH}doc{SLASH}main.html")
