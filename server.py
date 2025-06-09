@@ -287,5 +287,5 @@ def get_logs(key: str):
 # KEEP THIS LAST.
 
 @app.get("/{fullpath:path}")
-def main(full_path: str):
+def main(full_path: str = None):
 	return FileResponse("flasksite\\static\\doc\\main.html")
