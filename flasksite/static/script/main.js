@@ -949,9 +949,9 @@ function initApi() {
 				"/changes": "Changes"
 			},
 			cdnURI: {
-				"/": "weatherstatic.gtweb.dev/doc/home.html",
-				"/local": "weatherstatic.gtweb.dev/doc/local.html",
-				"/changes": "weatherstatic.gtweb.dev/doc/changes.html"
+				"/": "https://weatherstatic.gtweb.dev/doc/home.html",
+				"/local": "https://weatherstatic.gtweb.dev/doc/local.html",
+				"/changes": "https://weatherstatic.gtweb.dev/doc/changes.html"
 			}
 		},
 		config: {

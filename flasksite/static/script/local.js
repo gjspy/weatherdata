@@ -66,7 +66,7 @@
 				if (index !== -1) wt = Object.keys(api.nightWTsMap)[index];
 				
 			};
-			wtElem.setAttribute("src", `/weatherstatic.gtweb.dev/icon/100/${wt}.png`);
+			wtElem.setAttribute("src", `/https://weatherstatic.gtweb.dev/icon/100/${wt}.png`);
 
 		};
 
