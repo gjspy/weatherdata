@@ -81,7 +81,7 @@ global_cache_manager = CacheManager()
 global_engine = connect_to_db()
 global_session_constructor = create_session_constructor(global_engine)
 
-if (system() == "Windows"):
+"""if (system() == "Windows"):
 	
 	@app.get("/static/{path:path}")
 	def get_file(path: str):
@@ -93,7 +93,7 @@ if (system() == "Windows"):
 	@app.get("/")
 	@app.get("/local")
 	def main():
-		return FileResponse("flasksite\\static\\doc\\main.html")
+		return FileResponse("flasksite\\static\\doc\\main.html")"""
 	
 	
 
@@ -277,3 +277,15 @@ def get_logs(key: str):
 		raise HTTPException(403)
 	
 	return FileResponse("collection.log")
+
+
+
+
+
+
+
+# KEEP THIS LAST.
+
+@app.get("/{fullpath:path}")
+def main(full_path: str):
+	return FileResponse("flasksite\\static\\doc\\main.html")
