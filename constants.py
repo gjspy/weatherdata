@@ -173,7 +173,7 @@ REVERSE_JSONIFY_STORE_AS = {v: k for k,v in JSONIFY_STORE_AS.items()}
 PRECIP_PROB_THRESH_TO_COUNT_AS_FCSTED = 20
 
 
-WEATHER_BKGS_DIR = "/static/backgrounds/"
+WEATHER_BKGS_DIR = "https://weatherstatic.gtweb.dev/backgrounds/"
 
 WEATHER_PHOTO_TO_WTS = {
 	"DAY": {

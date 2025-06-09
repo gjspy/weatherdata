@@ -66,7 +66,7 @@
 				if (index !== -1) wt = Object.keys(api.nightWTsMap)[index];
 				
 			};
-			wtElem.setAttribute("src", `/https://weatherstatic.gtweb.dev/icon/100/${wt}.png`);
+			wtElem.setAttribute("src", `https://weatherstatic.gtweb.dev/icon/100/${wt}.png`);
 
 		};
 
@@ -369,7 +369,7 @@
 			api.dom.setLocCardName(api.siteInfoDict[locId].clean_name);
 		};
 		
-		document.querySelector(".sticky-bkg .background").src = `api/weather/current-photo?loc=${locId}`;
+		document.querySelector(".sticky-bkg .background").src = `/api/weather/current-photo?loc=${locId}`;
 		
 		pane1(locId);
 		pane2(locId);
