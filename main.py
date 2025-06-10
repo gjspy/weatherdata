@@ -38,7 +38,7 @@ JOB_DEFAULT_WORKLOADS = {
 }
 
 JOB_SCHEDULE = {
-	"??:00": ["MOBS", "BOBS", "OOBS"],
+	"??:00": ["BOBS", "OOBS"], # "MOBS" removed.
 	"00:00": ["B1FCST"],
 	"01:00": ["M1FCST", "M3FCST", "DOBS"],  # MUST DPOBS BEFORE clean.
 	"02:00": ["CLEAN"],						# MUST clean before compare. clean includes dpobs, which WILL be useful for compare.

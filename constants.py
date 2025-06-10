@@ -13,8 +13,8 @@ DB_U = os.getenv("DB_U")
 DB_P = os.getenv("DB_P")
 DB_H = os.getenv("DB_H")
 
-if ("maindb" in DB_H):
-	for i in range(100): print("USING MAINDB, NOT DB2. DB2 IS *NOW* THE DB USED BY COLLECTION.SERVICE")
+#if ("maindb" in DB_H):
+#	for i in range(100): print("USING MAINDB, NOT DB2. DB2 IS *NOW* THE DB USED BY COLLECTION.SERVICE")
 
 CONNECION_URL = f"mysql+mysqlconnector://{DB_U}:{DB_P}@{DB_H}"
 CONNECTION_KWARGS = {
