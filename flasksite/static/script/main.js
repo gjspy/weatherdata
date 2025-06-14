@@ -8,7 +8,7 @@ const COLOUR_TO_GRADE = Object.fromEntries(
 
 
 async function getApiWeekOfDailySummaries(fcstTimeBufferDays, locId) {
-	let query = `/api/results/daily?day_date=yesterday&countback_days=7&fcst_time_buffer_days=${fcstTimeBufferDays}`;
+	let query = `weather.gtweb.dev/api/results/daily?day_date=yesterday&countback_days=7&fcst_time_buffer_days=${fcstTimeBufferDays}`;
 
 	if (locId) {
 		query +=`&loc_id=${locId}`;
@@ -20,7 +20,7 @@ async function getApiWeekOfDailySummaries(fcstTimeBufferDays, locId) {
 };
 
 async function getApiMonthOfDailySummaries(fcstTimeBufferDays, locId) {
-	let query = `/api/results/daily?day_date=yesterday&countback_days=${api.config.monthNDays}&fcst_time_buffer_days=${fcstTimeBufferDays}`;
+	let query = `weather.gtweb.dev/api/results/daily?day_date=yesterday&countback_days=${api.config.monthNDays}&fcst_time_buffer_days=${fcstTimeBufferDays}`;
 
 	if (locId) {
 		query +=`&loc_id=${locId}`;
@@ -31,14 +31,22 @@ async function getApiMonthOfDailySummaries(fcstTimeBufferDays, locId) {
 	return (await response.json());
 };
 
+async function getApiWeekOfDailyResultsOfFuture(futureTime, locId) {
+	let query = `weather.gtweb.dev/api/results/daily?future_time=${futureTime}&countback_days=7${locId}`;
+
+	let response = await fetch(query);
+
+	return (await response.json());
+};
+
 async function getApiFcstsOfDay(locId) {
-	let response = await fetch(`/api/weather/forecasts?loc_id=${locId}&day_date=yesterday&days=1`);
+	let response = await fetch(`weather.gtweb.dev/api/weather/forecasts?loc_id=${locId}&day_date=yesterday&days=1`);
 
 	return (await response.json());
 };
 
 async function getApiObsofDay(locId) {
-	let response = await fetch(`/api/weather/obs?loc_id=${locId}&day_date=yesterday`);
+	let response = await fetch(`weather.gtweb.dev/api/weather/obs?loc_id=${locId}&day_date=yesterday`);
 
 	return (await response.json());
 };
@@ -46,7 +54,7 @@ async function getApiObsofDay(locId) {
 async function fetchSiteInfo(isDict) {
 	isDict = Boolean(isDict);
 
-	let response = await fetch(`/api/info/sites?dict=${isDict}`);
+	let response = await fetch(`weather.gtweb.dev/api/info/sites?dict=${isDict}`);
 
 	let json = await response.json();
 
@@ -459,7 +467,8 @@ function chooseBestGrade(moGrade, bbcGrade, worst) {
 	};
 };
 
-function fillOneGradeDateElem(dateElem, period, dt, calendarCont, worst, onHover, highlight) {
+function fillOneGradeDateElem(period, dt, calendarCont, worst, onHover, highlight) {
+	let dateElem = api.assets.dateOneGradeTemplate.cloneNode(true);
 	let gradeText = dateElem.querySelector("label[grade]");
 
 	let [bestOrg, bestGrade] = api.calc.chooseBestGrade(
@@ -495,7 +504,38 @@ function fillOneGradeDateElem(dateElem, period, dt, calendarCont, worst, onHover
 	//if (highlight) onHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade, true);
 };
 
-function FillCalendar(selector, data, duration, calType, dateOnHover, highlights) {
+
+function fillTwoGradeDateElem(period, dt, calendarCont, highlight) {
+	let mo = api.calc.getOrgFromPeriod(period, "MO").ga;
+	let bc = api.calc.getOrgFromPeriod(period, "BBC").ga;
+
+	if (mo) {
+		api.dom.setElemGrade(dateElem.querySelector(".mo label[grade]"), mo);
+	
+	} else {
+		dateElem.querySelector(".mo").style.display = "none";
+	};
+
+	if (bc) {
+		api.dom.setElemGrade(dateElem.querySelector(".bbc label[grade]"), mo);
+	
+	} else {
+		dateElem.querySelector(".bbc").style.display = "none";
+	};
+
+	let dateStr = String(dt.getUTCDate()).padStart(2, "0");
+	if (dateStr === "01") {
+		dateStr = "1 " + api.datetime.months[dt.getUTCMonth()];
+	};
+
+	if (highlight) dateStr += " " + highlight;
+
+	dateElem.querySelector(".datetxt").innerHTML = dateStr;
+
+	calendarCont.append(dateElem);
+};
+
+function FillCalendar(selector, data, duration, calType, dateOnHover, highlights, twoGradeElem) {
 	if (!highlights) highlights = {};
 
 	function pad(startDate, n, calendarCont) {
@@ -560,9 +600,9 @@ function FillCalendar(selector, data, duration, calType, dateOnHover, highlights
 	
 			if (!period) { pad(dateNow, 1, calendarCont); continue; };
 	
-			let dateElem = api.assets.dateOneGradeTemplate.cloneNode(true);
 			
-			api.dom.fillOneGradeDateElem(dateElem, period, dateNow, calendarCont, false, dateOnHover, highlight);
+			if (twoGradeElem) { api.dom.fillTwoGradeDateElem(period,dateNow, calendarCont, false); return; };
+			api.dom.fillOneGradeDateElem(period, dateNow, calendarCont, false, dateOnHover, highlight);
 		};
 	};
 
@@ -885,6 +925,7 @@ function initApi() {
 			FillSummaryTableConditions: FillSummaryTableConditions,
 			FillCalendar: FillCalendar,
 			fillOneGradeDateElem: fillOneGradeDateElem,
+			fillTwoGradeDateElem: fillTwoGradeDateElem,
 			setElemGrade: setElemGrade,
 			getMapGrades: getMapGrades,
 			initMap: initMap,
@@ -958,7 +999,6 @@ function initApi() {
 			monthNDays: 30
 		},
 		grades: GRADES,
-		
 		siteInfo: [],
 		locIds: [],
 		siteInfoDict: {},

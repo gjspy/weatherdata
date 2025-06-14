@@ -332,7 +332,7 @@
 			"regularWeeks",
 			dateOnHover,
 			{ [todayId]: "- <i>Today</i>" }
-		)
+		);
 
 		let elems = document.querySelectorAll(selector + " .calendar-cont > *");
 		let counts = {};
@@ -341,7 +341,7 @@
 			let v = elem.getAttribute("best");
 			if (!v || v === "EQUALS") continue;
 
-			if (!counts[v]) counts[v] = 0
+			if (!counts[v]) counts[v] = 0;
 			counts[v] ++;
 		};
 
@@ -376,9 +376,7 @@
 		pane3(locId);
 		window.onresize = undefined;
 
-		//document.querySelector("#homepage").setAttribute("rendered", "true");
-
-		//pane4();
+		document.querySelector("#local").setAttribute("rendered", "true");
 	};
 
 	Main();

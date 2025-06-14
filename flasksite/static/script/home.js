@@ -105,7 +105,7 @@
 			"dynamicWeeksWithGaps",
 			pane3DateOnHover,
 			{ [yesterdayId]: "- <i>Yesterday</i>" }
-		)
+		);
 
 		api.dom.insertSVGByOrg(document.querySelector("#homepage .pane-3 .title-bar svg"), veryBest);
 
@@ -119,7 +119,7 @@
 		} else if (veryBest === "BBC") {
 			title.textContent = title.textContent.replace("[org]", "BBC Weather was");
 		} else {
-			title.textContent = "Both organisations had the same accuracy"
+			title.textContent = "Both organisations had the same accuracy";
 		};
 
 		let subtitle = document.querySelector("#homepage .pane-3 .title-bar .sub:last-of-type");
