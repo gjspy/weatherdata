@@ -8,7 +8,7 @@ const COLOUR_TO_GRADE = Object.fromEntries(
 
 
 async function getApiWeekOfDailySummaries(fcstTimeBufferDays, locId) {
-	let query = `https://https://weather.gtweb.dev/api/results/daily?day_date=yesterday&countback_days=7&fcst_time_buffer_days=${fcstTimeBufferDays}`;
+	let query = `https://weather.gtweb.dev/api/results/daily?day_date=yesterday&countback_days=7&fcst_time_buffer_days=${fcstTimeBufferDays}`;
 
 	if (locId) {
 		query +=`&loc_id=${locId}`;
