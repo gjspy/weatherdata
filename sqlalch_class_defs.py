@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKeyConstraint, UniqueConstraint, PrimaryKeyConstraint, ForeignKey, and_, Engine, func, text
+from sqlalchemy import Column, Integer, ForeignKeyConstraint, UniqueConstraint, PrimaryKeyConstraint, ForeignKey, and_, Engine, func, text, or_
 from sqlalchemy.dialects.mysql import DATETIME, FLOAT, TINYINT, SMALLINT, CHAR, INTEGER, BOOLEAN
 from sqlalchemy.orm import Session, declarative_base, relationship, Mapped, selectinload
 
@@ -275,13 +275,12 @@ class Queries():
 						.filter(
 							FCST.id == Result.fcst_id, # join ON this
 							Result.period == 24,
-							FCST.future_time == future_time,
+							or_(FCST.future_time == future_time, FCST.future_time == future_time + timedelta(hours=1)), # stupid bbc1fcst, starts 1am
 							FCST.mid == loc_id
 						)
 						.order_by(FCST.org, FCST.fcst_time.asc(), FCST.future_time.asc())
 						.all()
 				)
-
 
 		return (
 			lambda session:
@@ -290,7 +289,7 @@ class Queries():
 					.filter(
 						FCST.id == Result.fcst_id, # join ON this
 						Result.period == 24,
-						FCST.future_time == future_time
+						or_(FCST.future_time == future_time, FCST.future_time == future_time + timedelta(hours=1)), # stupid bbc1fcst, starts 1am
 					)
 					.order_by(FCST.org, FCST.mid, FCST.fcst_time.asc(), FCST.future_time.asc())
 					.all()
