@@ -18,6 +18,7 @@
 	position: relative;
 
 	margin-bottom: 1%;
+	margin-top: var(--loc-card-h);
 }
 
 
@@ -64,6 +65,7 @@
 	width: 100%;
 	display: flex;
 	justify-content: space-between;
+	flex-wrap: wrap;
 
 	padding: 2% calc(var(--padding-lr)/2) 0 calc(var(--padding-lr)/2);
 	box-sizing: border-box;
@@ -142,4 +144,30 @@
 	width: inherit;
 	height: inherit;
 	padding: 0 var(--padding-lr) 2vh var(--padding-lr);
+}
+
+@media screen and (max-width: 1000px) {
+	#changes .sect-1 .title-bar .right-items {
+		position: static;
+		width: 100%;
+		text-align: right;
+	}
+}
+
+@media screen and (max-width: 750px) {
+	#changes .info-tables .entry {
+		width: 100%;
+	}
+	
+	#changes .info-tables .entry:nth-child(2n) {
+		margin-top: 2vh;
+	}
+	
+	#changes .info-tables .entry td {
+		font-size: 0.75em !important;
+	}
+
+	#changes table svg {
+		height: 4vh;
+	}
 }

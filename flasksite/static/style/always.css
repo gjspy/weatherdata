@@ -20,6 +20,7 @@
 
 	--topbar-border: 2px;
 	--light-border: rgba(0, 0, 0, .2);
+	--loc-card-h: 35px;
 }
 
 body {
@@ -262,7 +263,7 @@ body:has(#content > [location-selector="true"]) #loc-card {
 
 #loc-card svg {
 	display: inline;
-	width: 35px;
+	width: var(--loc-card-h);
 }
 
 #loc-card label {
