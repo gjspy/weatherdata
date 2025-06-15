@@ -8,13 +8,14 @@ from constants import *
 
 class InterpretParam():
 
+	@staticmethod
 	def loc_id(param: list[str]):
 		if (param == ["all"]):
 			return ALL_LOCIDS.copy()
 
 		return param
 	
-
+	@staticmethod
 	def time(param: datetime | str):
 		if (type(param) == datetime): return param
 

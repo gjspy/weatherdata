@@ -235,29 +235,46 @@ def get_obs(
 
 @app.get("/api/results/daily")
 def get_all_daily_results(
-	day_date: datetime | str = Query(..., description = describe.future_time),
 	countback_days: int = Query(0, description = describe.countback_days),
+	day_date: datetime | None = Query(None, description = describe.future_time),
+	future_time: datetime | str | None = Query(None, description = describe.future_time),
 	fcst_time_buffer_days: int = Query(2, description = describe.fcst_time_buffer_days),
 	loc_id: str | int = "all"
 ):
-	day_date = InterpretParam.time(day_date)
+	if (day_date): 	  day_date = InterpretParam.time(day_date)
+	if (future_time): future_time = InterpretParam.time(future_time)
 
-	ref = str(day_date) + str(countback_days) + str(fcst_time_buffer_days) + str(loc_id)
+	if (not ((day_date or future_time) and (day_date and future_time))):
+		return HTTPException(400, "Exactly one of day_date or future_time must be provided.")
+
+	ref = str(day_date) + str(future_time) + str(countback_days) + str(fcst_time_buffer_days) + str(loc_id)
 	cached = global_cache_manager.daily_summaries.get(ref)
 
 	if (cached): return cached
 
-	results = Queries.query(
-		Queries.get_daily_summaries(
-			min_future_time_inc = day_date - timedelta(days = countback_days - 1),
-			max_future_time_exc = day_date + timedelta(days = 1),
-			fcst_time_buffer_days = fcst_time_buffer_days,
-			loc_id = loc_id
-		),
-		global_session_constructor
-	)
 
-	#jsoned_graded_results = [ get_json_graded_result(r) for r in results ]#[ r.jsonify() for r in results]#
+	if (day_date):
+		# do daily summaries of each day, counting back from day_date,
+		# fcst is buffer behind counted day_date
+
+		results = Queries.query(
+			Queries.get_daily_summaries(
+				min_future_time_inc = day_date - timedelta(days = countback_days - 1),
+				max_future_time_exc = day_date + timedelta(days = 1),
+				fcst_time_buffer_days = fcst_time_buffer_days,
+				loc_id = loc_id
+			),
+			global_session_constructor
+		)
+	
+	elif (future_time):
+		results = Queries.query(
+			Queries.get_daily_summaries_of_future(
+				future_time,
+				loc_id
+			),
+			global_session_constructor
+		)
 	
 	orgainsed = get_organised_json_results(results)
 

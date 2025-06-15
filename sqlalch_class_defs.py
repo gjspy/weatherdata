@@ -34,7 +34,7 @@ class DirtyOBS(Base):
 	has_cleaned = Column("HAS_CLEANED", BOOLEAN) # NULL = not attempted, TRUE = is included, FALSE = cleanobs created before this existed, not included
 
 	__table_args__ = (
-        PrimaryKeyConstraint("MID", "ORG", "DT"),
+        PrimaryKeyConstraint("MID", "ORG", "DT"), # INDEXES ARE INCORECT, CHECK IN MSQL WB
     )
 
 
@@ -60,7 +60,7 @@ class CleanOBS(Base): # MUST HAVE ROW WITH ID -1, FOR FCST WITHOUT OBS.
 	# if changing, change OBS_CONDITIONS constant.
 
 	__table_args__ = (
-		UniqueConstraint('MID', 'DT'),
+		UniqueConstraint('MID', 'DT'), # INDEXES ARE INCORECT, CHECK IN MSQL WB
 	)
 
 	_real_obs_hr = None
@@ -108,7 +108,7 @@ class FCST(Base):
 	obs = relationship("CleanOBS")
 
 	__table_args__ = (
-		UniqueConstraint('MID', 'ORG', 'FCST_TIME', 'FUTURE_TIME'),
+		UniqueConstraint('MID', 'ORG', 'FCST_TIME', 'FUTURE_TIME'), # INDEXES ARE INCORECT, CHECK IN MSQL WB
 	)
 
 
@@ -137,7 +137,7 @@ class Result(Base):
 	fcst: Mapped[FCST] = relationship("FCST")
 
 	__table_args__ = (
-		UniqueConstraint('FCST_ID', 'PERIOD'),
+		UniqueConstraint('FCST_ID', 'PERIOD'), # INDEXES ARE INCORECT, CHECK IN MSQL WB
 	)
 
 	def jsonify(self): 
@@ -231,7 +231,7 @@ class Queries():
 							FCST.future_time < max_future_time_exc,
 							FCST.mid == loc_id
 						)
-						.order_by(FCST.org, FCST.mid, FCST.fcst_time.asc(), FCST.future_time.asc())
+						.order_by(FCST.org, FCST.fcst_time.asc(), FCST.future_time.asc())
 						.all()
 				)
 
@@ -249,6 +249,48 @@ class Queries():
 						),
 						FCST.future_time >= min_future_time_inc,
 						FCST.future_time < max_future_time_exc
+					)
+					.order_by(FCST.org, FCST.mid, FCST.fcst_time.asc(), FCST.future_time.asc())
+					.all()
+			)
+	
+
+	def get_daily_summaries_of_future(future_time: datetime, loc_id: int | None) -> Callable[[Session], list | None]:
+		"""
+		gets all summaries of accuracy for a future time.
+
+		select * from results
+		join fcst on fcst.ID=results.FCST_ID
+		where results.period = 24
+		and fcst.future_time=future_time
+		and mid=11004
+		order by fcst.org, fcst.mid, fcst.FCST_TIME asc, fcst.future_time asc;
+		"""
+
+		if (loc_id and loc_id != "all"):
+			return (
+				lambda session:
+					session.query(Result) \
+						.options(selectinload(Result.fcst)) # join now, not lazy load, so can access Result.fcst immediately.
+						.filter(
+							FCST.id == Result.fcst_id, # join ON this
+							Result.period == 24,
+							FCST.future_time == future_time,
+							FCST.mid == loc_id
+						)
+						.order_by(FCST.org, FCST.fcst_time.asc(), FCST.future_time.asc())
+						.all()
+				)
+
+
+		return (
+			lambda session:
+				session.query(Result) \
+					.options(selectinload(Result.fcst)) # join now, not lazy load, so can access Result.fcst immediately.
+					.filter(
+						FCST.id == Result.fcst_id, # join ON this
+						Result.period == 24,
+						FCST.future_time == future_time
 					)
 					.order_by(FCST.org, FCST.mid, FCST.fcst_time.asc(), FCST.future_time.asc())
 					.all()
