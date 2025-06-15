@@ -565,7 +565,7 @@ div[monthly-calendar] > .contents {
 	width: 100%;	
 }
 
-.calendar .date.twograde > svg {
+.calendar .date.twograde svg {
 	width: 50%;
 	max-height: 80%;
 }
@@ -598,12 +598,17 @@ div[monthly-calendar] > .contents {
 	margin: 3px 0 0 5px;
 }
 
-.calendar .date > label[grade] {
+.calendar .date.onegrade > label[grade],
+.calendar .date.twograde label[grade] {
 	font-family: Luckiest Guy;
 	font-size: calc(var(--date-square) * 0.4);
 	width: 100%;
 	text-align: center;
 	display: block;
+}
+
+.calendar .date.twograde label[grade] {
+	max-width: 40%;
 }
 
 .calendar .date.twograde > label[grade] {

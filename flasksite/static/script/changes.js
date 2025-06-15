@@ -3,9 +3,9 @@
 	function sect1(dataForCalendar, locId) {
 		dataForCalendar = dataForCalendar.slice(-7);
 
-		let selector = "#changes .pane-1 .calendar";
+		let selector = "#changes .sect-1 .calendar";
 
-		document.querySelector("#changes .pane-1 .title-bar .right-items .main").textContent = api.siteInfoDict[locId].clean_name;
+		document.querySelector("#changes .sect-1 .title-bar .right-items .main").textContent = api.siteInfoDict[locId].clean_name;
 
 		let today = new Date();
 		let yesterdayId = api.datetime.indentifierFromDate(new Date(today.getTime() - (1000 * 60 * 60 * 24))); 
@@ -40,7 +40,7 @@
 	};
 
 	function sect2(dataForCalendar) {
-		let selector = "#changes .pane-2 .info-tables .entry";
+		let selector = "#changes .sect-2 .info-tables .entry";
 
 		dataForCalendar = dataForCalendar.slice(-5);
 

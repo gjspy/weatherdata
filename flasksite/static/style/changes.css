@@ -5,7 +5,8 @@
 
 	--padding-lr: 6vw;
 
-	background: var(--bkg)
+	background: var(--bkg);
+	padding-bottom: 100px;
 }
 
 
@@ -112,8 +113,6 @@
 #changes table.summary-table td[grade] {
 	font-family: "Luckiest Guy", serif;
 	font-size: 3.5vh;
-
-	
 }
 
 #changes table.summary-table.change tr :nth-child(n + 2) {
