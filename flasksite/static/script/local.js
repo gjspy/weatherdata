@@ -162,7 +162,7 @@
 
 	function fcstVsObsUpdate(data, contents, periods, selectedOrg, selectedSubOrg, selectedFcstTime) {
 		let possibleSubOrgs;
-		[selectedOrg, selectedSubOrg, selectedFcstTime, possibleSubOrgs] = selectOrgsAndTime(data.data.fcst, selectedOrg, selectedSubOrg, selectedFcstTime);
+		[selectedOrg, selectedSubOrg, selectedFcstTime, possibleSubOrgs] = selectOrgsAndTime(data.fcst, selectedOrg, selectedSubOrg, selectedFcstTime);
 
 		// SET METADATA
 		let dateElem = contents.querySelector(".option-row > .date");
@@ -208,7 +208,7 @@
 		let timeBar = contents.querySelector(".fcst-type-bar.fcst-time");
 		timeBar.innerHTML = "";
 
-		let possibleTimes = Object.keys(data.data.fcst[thisOrg]);
+		let possibleTimes = Object.keys(data.fcst.data[thisOrg]);
 
 		if ((!selectedFcstTime) || (!possibleTimes.includes(selectedFcstTime))) {
 			selectedFcstTime = possibleTimes[0];
@@ -228,7 +228,7 @@
 		};
 
 
-		let chosenFcstData = data.data.fcst[thisOrg][selectedFcstTime];
+		let chosenFcstData = data.fcst.data[thisOrg][selectedFcstTime];
 
 		for (let [ft, v] of Object.entries(chosenFcstData).sort( (a,b) => ( new Date(a[0]) - new Date(b[0]) ) )) {
 			let elem = api.assets.fcstObsPeriodTemplate.cloneNode(true);
@@ -371,13 +371,15 @@
 		
 		document.querySelector(".sticky-bkg .background").src = `/api/weather/current-photo?loc=${locId}`;
 		
-		pane1(locId);
+		pane1(locId).then((v) => {
+			document.querySelector("#local").setAttribute("rendered", "true");
+		});
+
 		pane2(locId);
 		pane3(locId);
-		window.onresize = undefined;
 
-		document.querySelector("#local").setAttribute("rendered", "true");
+		window.onresize = undefined;
 	};
 
 	Main();
-})()
+})();
