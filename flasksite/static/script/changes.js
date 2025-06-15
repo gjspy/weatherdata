@@ -27,7 +27,7 @@
 		let selector2 = ` td:nth-of-type(${count + 2})`; // +1 bcs of cond name col
 
 		let tdDate = document.querySelector(selector + "d" + selector2);
-		tdDate.textContent = String(fcstDate.getUTCDate()).padStart(2, "0");
+		tdDate.textContent = String(fcstDate.getUTCDate()).padStart(2, "0") + " " + api.datetime.months[fcstDate.getUTCMonth()];
 
 		for (let cond of CHANGES_TABLE_CONDITIONS) {
 			let data = orgData.data[0].r["g"+cond];

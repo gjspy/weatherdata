@@ -560,21 +560,26 @@ div[monthly-calendar] > .contents {
 	background: #e3e3e3;
 }
 
-.calendar .date > svg {
+.calendar .date.onegrade > svg {
 	display: block;
 	width: 100%;	
 }
 
-.calendar .date > svg:has(use[href="#mo-square"]) {
+.calendar .date.twograde > svg {
+	width: 50%;
+	max-height: 80%;
+}
+
+.calendar .date.onegrade > svg:has(use[href="#mo-square"]) {
 	height: 45%;
 }
 
-.calendar .date > svg:has(use[href="#bbc-full"]) {
+.calendar .date.onegrade > svg:has(use[href="#bbc-full"]) {
 	padding: 7% 0 3% 0;
 	height: 35%;
 }
 
-.calendar .date > svg:has(use[href="#equals"]) {
+.calendar .date.onegrade > svg:has(use[href="#equals"]) {
 	padding: 10% 0 10% 0;
 	height: 25%;
 }
@@ -599,6 +604,26 @@ div[monthly-calendar] > .contents {
 	width: 100%;
 	text-align: center;
 	display: block;
+}
+
+.calendar .date.twograde > label[grade] {
+	font-family: Luckiest Guy;
+	font-size: calc(var(--date-square) * 0.3);
+	width: 100%;
+	text-align: center;
+	display: block;
+}
+
+.calendar .date.twograde > div:not(.underline) {
+	height: calc(50% - var(--datetxt-size));
+
+	display: flex;
+	align-items: center;
+	justify-content: space-evenly;
+}
+
+.calendar .date.highlight {
+	background: #ffffd5;
 }
 
 
@@ -828,6 +853,18 @@ table.summary-table.grades table:last-of-type {
 	margin-right: 4%;
 }
 
+
+table.summary-table.change {
+	width: 100%;
+
+	font-size: 2vh;
+	font-family: "Roboto", sans-serif;
+	font-weight: 500;
+
+	border-collapse: collapse;
+}
+
+
 #footer-bar {
 	height: fit-content;
 	
@@ -922,6 +959,24 @@ table.summary-table.grades table:last-of-type {
 	width: fit-content;
 
 	padding: 0.75% 0 0 1.5vw;
+}
+
+.title-bar .right-items {
+	position: absolute;
+	right: 5%;
+	bottom: 0;
+}
+
+.title-bar .right-items .sub {
+	--font-size: min(2.5vh,3.5vw);
+	padding: 0 5px 0 0 ;
+
+	display: inline;
+}
+
+.title-bar .right-items .loc-name {
+	--font-size: min(6vh, 8vw);
+	display: inline;
 }
 
 .hero .rows {

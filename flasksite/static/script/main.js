@@ -32,7 +32,7 @@ async function getApiMonthOfDailySummaries(fcstTimeBufferDays, locId) {
 };
 
 async function getApiWeekOfDailyResultsOfFuture(futureTime, locId) {
-	let query = `https://weather.gtweb.dev/api/results/daily?future_time=${futureTime}&loc_id${locId}`;
+	let query = `https://weather.gtweb.dev/api/results/daily?future_time=${futureTime}&loc_id=${locId}`;
 
 	let response = await fetch(query);
 
