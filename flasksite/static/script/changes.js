@@ -5,7 +5,7 @@
 
 		let selector = "#changes .pane-1 .calendar";
 
-		document.querySelector("#changes .pane-1 .title-bar .main").textContent = api.siteInfoDict[locId].clean_name;
+		document.querySelector("#changes .pane-1 .title-bar .right-items .main").textContent = api.siteInfoDict[locId].clean_name;
 
 		let today = new Date();
 		let yesterdayId = api.datetime.indentifierFromDate(new Date(today.getTime() - (1000 * 60 * 60 * 24))); 
