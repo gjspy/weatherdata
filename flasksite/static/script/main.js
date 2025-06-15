@@ -32,7 +32,7 @@ async function getApiMonthOfDailySummaries(fcstTimeBufferDays, locId) {
 };
 
 async function getApiWeekOfDailyResultsOfFuture(futureTime, locId) {
-	let query = `https://weather.gtweb.dev/api/results/daily?future_time=${futureTime}&countback_days=7${locId}`;
+	let query = `https://weather.gtweb.dev/api/results/daily?future_time=${futureTime}&loc_id${locId}`;
 
 	let response = await fetch(query);
 
@@ -506,6 +506,8 @@ function fillOneGradeDateElem(period, dt, calendarCont, worst, onHover, highligh
 
 
 function fillTwoGradeDateElem(period, dt, calendarCont, highlight) {
+	let dateElem = api.assets.dateTwoGradeTemplate.cloneNode(true);
+
 	let mo = api.calc.getOrgFromPeriod(period, "MO").ga;
 	let bc = api.calc.getOrgFromPeriod(period, "BBC").ga;
 
@@ -601,7 +603,7 @@ function FillCalendar(selector, data, duration, calType, dateOnHover, highlights
 			if (!period) { pad(dateNow, 1, calendarCont); continue; };
 	
 			
-			if (twoGradeElem) { api.dom.fillTwoGradeDateElem(period,dateNow, calendarCont, false); return; };
+			if (twoGradeElem) { api.dom.fillTwoGradeDateElem(period,dateNow, calendarCont, false); continue; };
 			api.dom.fillOneGradeDateElem(period, dateNow, calendarCont, false, dateOnHover, highlight);
 		};
 	};
@@ -639,7 +641,7 @@ function FillCalendar(selector, data, duration, calType, dateOnHover, highlights
 
 	if (calType === "regularWeeks" || calType === "dynamicWeeksWithGaps") {
 		paramData = {};
-		startDate = new Date(data[0].ft)
+		startDate = new Date(data[0].ft);
 
 		for (let period of data) {
 			let dt = new Date(period.ft);
@@ -937,6 +939,7 @@ function initApi() {
 			getContentBody: null,
 			getApiWeekOfDailySummaries: getApiWeekOfDailySummaries,
 			getApiMonthOfDailySummaries: getApiMonthOfDailySummaries,
+			getApiWeekOfDailyResultsOfFuture: getApiWeekOfDailyResultsOfFuture,
 			fetchSiteInfo: fetchSiteInfo,
 			getApiFcstsOfDay: getApiFcstsOfDay,
 			getApiObsofDay: getApiObsofDay
@@ -969,6 +972,7 @@ function initApi() {
 			bbcSVG: document.querySelector("template#bbc-svg").content.children[0],
 			equalsSVG: document.querySelector("template#equals-svg").content.children[0],
 			dateOneGradeTemplate: document.querySelector("template#calendar-date-onegrade-square").content.children[0],
+			dateTwoGradeTemplate: document.querySelector("template#calendar-date-twograde-square").content.children[0],
 			calendarTemplate: document.querySelector("template#calendar").content.children[0],
 			conditionTr: document.querySelector("template#condition-tr").content.children[0],
 			fcstObsPeriodTemplate: document.querySelector("template#fcstvsobs").content.children[0],

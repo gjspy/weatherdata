@@ -1,13 +1,11 @@
 (function() {
-	const CHANGES_TABLE_CONDITIONS = ["t", "f", "ws", "wt"]
-	function sect1(weekData) {
-		let dataForCalendar = [];
-		for (let [k,v] of Object.entries(weekData)) {
-			v.fcstTime = k;
-			dataForCalendar.push(v);
-		};
+	const CHANGES_TABLE_CONDITIONS = ["t", "f", "ws", "w"]
+	function sect1(dataForCalendar, locId) {
+		dataForCalendar = dataForCalendar.slice(-7);
 
 		let selector = "#changes .pane-1 .calendar";
+
+		document.querySelector("#changes .pane-1 .title-bar .main").textContent = api.siteInfoDict[locId].clean_name;
 
 		let today = new Date();
 		let yesterdayId = api.datetime.indentifierFromDate(new Date(today.getTime() - (1000 * 60 * 60 * 24))); 
@@ -15,9 +13,9 @@
 		api.dom.FillCalendar(
 			selector,
 			dataForCalendar,
-			api.config.monthNDays,
-			"regularWeeks",
-			dateOnHover,
+			7,
+			"dynamicWeeksWithGaps",
+			undefined,
 			{ [yesterdayId]: "- <i>Yesterday</i>" },
 			true
 		);
@@ -26,7 +24,7 @@
 
 	function sect2FillOrgCol(selector, orgData, fcstDate, count) {
 		selector = selector + " table tr.";
-		let selector2 = ` td:nth-of-type(${count + 1})`; // +1 bcs of cond name col
+		let selector2 = ` td:nth-of-type(${count + 2})`; // +1 bcs of cond name col
 
 		let tdDate = document.querySelector(selector + "d" + selector2);
 		tdDate.textContent = String(fcstDate.getUTCDate()).padStart(2, "0");
@@ -41,13 +39,15 @@
 		};
 	};
 
-	function sect2(weekData) {
+	function sect2(dataForCalendar) {
 		let selector = "#changes .pane-2 .info-tables .entry";
+
+		dataForCalendar = dataForCalendar.slice(-5);
 
 		let count = 0;
 
-		for (let [fcstT, data] of Object.entries(weekData)) {
-			let fcstDate = new Date(fcstT);
+		for (let data of dataForCalendar) {
+			let fcstDate = new Date(data.ft);
 
 			let bcData = api.calc.getOrgFromPeriod(data, "BBC");
 			let moData = api.calc.getOrgFromPeriod(data, "MO");
@@ -69,13 +69,19 @@
 			locId = api.random.choice(api.locIds);
 			api.dom.setLocCardName(api.siteInfoDict[locId].clean_name);
 		};
-		
-		document.querySelector(".sticky-bkg .background").src = `/api/weather/current-photo?loc=${locId}`;
 
-		let weekData = await api.api.getApiWeekOfDailyResultsOfFuture("yesterday", locId);
+		let weekData = (await api.api.getApiWeekOfDailyResultsOfFuture("yesterday", locId)).data;
+
+		let dataForCalendar = [];
+		for (let [k,v] of Object.entries(weekData)) {
+			v.ft = k;
+			dataForCalendar.push(v);
+		};
+
+		dataForCalendar = dataForCalendar.sort((a, b) => (new Date(a.ft) - new Date(b.ft)));
 		
-		sect1(weekData);
-		sect2(weekData);
+		sect1(dataForCalendar, locId);
+		sect2(dataForCalendar);
 		window.onresize = undefined;
 		document.querySelector("#changes").setAttribute("rendered", "true");
 	};
