@@ -183,7 +183,7 @@
 		};
 
 
-		let monthly = await api.api.getApiMonthOfDailySummaries(FCST_TIME_BUFFER_DAYS);
+		let monthly = (await api.api.getApiMonthOfDailySummaries(FCST_TIME_BUFFER_DAYS)).data;
 
 		let dataForCalendar = [];
 		for (let [k,v] of Object.entries(monthly)) {
@@ -262,7 +262,7 @@
 
 
 	async function Main() {
-		let weeklySummary = await api.api.getApiWeekOfDailySummaries(FCST_TIME_BUFFER_DAYS);
+		let weeklySummary = (await api.api.getApiWeekOfDailySummaries(FCST_TIME_BUFFER_DAYS)).data;
 		let datas = Object.values(weeklySummary);
 
 		let datesInWeek = Array.from(Object.keys(weeklySummary)).map( v => Date.parse(v) );

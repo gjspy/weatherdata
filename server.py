@@ -181,7 +181,7 @@ def get_forecasts(
 
 	to_send = {
 		"day_date": get_tzsafe_str_date(day_date),
-		"fcst": organised
+		"data": organised
 	}
 
 	global_cache_manager.fcsts_of_day.add(ref, to_send)
@@ -235,7 +235,7 @@ def get_obs(
 
 @app.get("/api/results/daily")
 def get_all_daily_results(
-	countback_days: int = Query(0, description = describe.countback_days),
+	countback_days: int = Query(1, description = describe.countback_days), # must be >0
 	day_date: datetime | str | None = Query(None, description = describe.future_time),
 	future_time: datetime | str | None = Query(None, description = describe.future_time),
 	fcst_time_buffer_days: int = Query(2, description = describe.fcst_time_buffer_days),
@@ -276,11 +276,16 @@ def get_all_daily_results(
 			global_session_constructor
 		)
 	
-	orgainsed = get_organised_json_results(results)
+	key_mode = "future_time" if day_date else "fcst_time"
+	organised = get_organised_json_results(results, key_mode)
+	to_send = {
+		"key": key_mode,
+		"data": organised
+	}
 
-	global_cache_manager.daily_summaries.add(ref, orgainsed)
+	global_cache_manager.daily_summaries.add(ref, to_send)
 
-	return orgainsed
+	return to_send
 
 
 
