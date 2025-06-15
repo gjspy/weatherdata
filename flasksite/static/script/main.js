@@ -8,7 +8,7 @@ const COLOUR_TO_GRADE = Object.fromEntries(
 
 
 async function getApiWeekOfDailySummaries(fcstTimeBufferDays, locId) {
-	let query = `weather.gtweb.dev/api/results/daily?day_date=yesterday&countback_days=7&fcst_time_buffer_days=${fcstTimeBufferDays}`;
+	let query = `https://https://weather.gtweb.dev/api/results/daily?day_date=yesterday&countback_days=7&fcst_time_buffer_days=${fcstTimeBufferDays}`;
 
 	if (locId) {
 		query +=`&loc_id=${locId}`;
@@ -20,7 +20,7 @@ async function getApiWeekOfDailySummaries(fcstTimeBufferDays, locId) {
 };
 
 async function getApiMonthOfDailySummaries(fcstTimeBufferDays, locId) {
-	let query = `weather.gtweb.dev/api/results/daily?day_date=yesterday&countback_days=${api.config.monthNDays}&fcst_time_buffer_days=${fcstTimeBufferDays}`;
+	let query = `https://weather.gtweb.dev/api/results/daily?day_date=yesterday&countback_days=${api.config.monthNDays}&fcst_time_buffer_days=${fcstTimeBufferDays}`;
 
 	if (locId) {
 		query +=`&loc_id=${locId}`;
@@ -32,7 +32,7 @@ async function getApiMonthOfDailySummaries(fcstTimeBufferDays, locId) {
 };
 
 async function getApiWeekOfDailyResultsOfFuture(futureTime, locId) {
-	let query = `weather.gtweb.dev/api/results/daily?future_time=${futureTime}&countback_days=7${locId}`;
+	let query = `https://weather.gtweb.dev/api/results/daily?future_time=${futureTime}&countback_days=7${locId}`;
 
 	let response = await fetch(query);
 
@@ -40,13 +40,13 @@ async function getApiWeekOfDailyResultsOfFuture(futureTime, locId) {
 };
 
 async function getApiFcstsOfDay(locId) {
-	let response = await fetch(`weather.gtweb.dev/api/weather/forecasts?loc_id=${locId}&day_date=yesterday&days=1`);
+	let response = await fetch(`https://weather.gtweb.dev/api/weather/forecasts?loc_id=${locId}&day_date=yesterday&days=1`);
 
 	return (await response.json());
 };
 
 async function getApiObsofDay(locId) {
-	let response = await fetch(`weather.gtweb.dev/api/weather/obs?loc_id=${locId}&day_date=yesterday`);
+	let response = await fetch(`https://weather.gtweb.dev/api/weather/obs?loc_id=${locId}&day_date=yesterday`);
 
 	return (await response.json());
 };
@@ -54,7 +54,7 @@ async function getApiObsofDay(locId) {
 async function fetchSiteInfo(isDict) {
 	isDict = Boolean(isDict);
 
-	let response = await fetch(`weather.gtweb.dev/api/info/sites?dict=${isDict}`);
+	let response = await fetch(`https://weather.gtweb.dev/api/info/sites?dict=${isDict}`);
 
 	let json = await response.json();
 
