@@ -418,6 +418,45 @@ a.map-pin-tooltip {
 	border: 1px solid rgb(0,6,81);
 }
 
+
+
+
+.content-elem[rendered="false"] > div.hero > .contents > * {
+	display: none !important;
+}
+
+.content-elem[rendered="false"] > div.hero > .contents::after {
+	content: "Loading, please wait!";
+	
+	font-size: 3vmin;
+	font-family: Roboto;
+	text-align: center;
+	
+	margin-top: 10%;
+}
+
+#content:not(:has(.content-elem)) .footer-bar {
+	position: absolute;
+	bottom: 0;
+}
+
+#content:not(:has(.content-elem))::after {
+	content: "Loading! Please wait. If this is taking too long, please ensure you have JavaScript enabled, then refresh the page. Thanks!";
+	height: var(--content-height);
+	
+	font-size: 3vmin;
+	font-family: Roboto;
+	color: white;
+	text-align: center;
+	padding-top: 10%;
+	width: 100%;
+	display: block;
+}
+
+
+
+
+
 div[monthly-calendar] > .contents {
 	--content-width: calc(100vw - var(--padding-lr) - var(--padding-lr));
 	--date-square: min(calc(calc(var(--content-height) - var(--padding-tb) * 2) / var(--n-weeks)), calc(80vw / 7)); /* 6 rows used. */

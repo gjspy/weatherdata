@@ -105,7 +105,7 @@
 			"dynamicWeeksWithGaps",
 			pane3DateOnHover,
 			{ [yesterdayId]: "- <i>Yesterday</i>" }
-		)
+		);
 
 		api.dom.insertSVGByOrg(document.querySelector("#homepage .pane-3 .title-bar svg"), veryBest);
 
@@ -119,7 +119,7 @@
 		} else if (veryBest === "BBC") {
 			title.textContent = title.textContent.replace("[org]", "BBC Weather was");
 		} else {
-			title.textContent = "Both organisations had the same accuracy"
+			title.textContent = "Both organisations had the same accuracy";
 		};
 
 		let subtitle = document.querySelector("#homepage .pane-3 .title-bar .sub:last-of-type");
@@ -183,7 +183,7 @@
 		};
 
 
-		let monthly = await api.api.getApiMonthOfDailySummaries(FCST_TIME_BUFFER_DAYS);
+		let monthly = (await api.api.getApiMonthOfDailySummaries(FCST_TIME_BUFFER_DAYS)).data;
 
 		let dataForCalendar = [];
 		for (let [k,v] of Object.entries(monthly)) {
@@ -262,7 +262,7 @@
 
 
 	async function Main() {
-		let weeklySummary = await api.api.getApiWeekOfDailySummaries(FCST_TIME_BUFFER_DAYS);
+		let weeklySummary = (await api.api.getApiWeekOfDailySummaries(FCST_TIME_BUFFER_DAYS)).data;
 		let datas = Object.values(weeklySummary);
 
 		let datesInWeek = Array.from(Object.keys(weeklySummary)).map( v => Date.parse(v) );

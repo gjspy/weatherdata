@@ -8,13 +8,14 @@ from constants import *
 
 class InterpretParam():
 
+	@staticmethod
 	def loc_id(param: list[str]):
 		if (param == ["all"]):
 			return ALL_LOCIDS.copy()
 
 		return param
 	
-
+	@staticmethod
 	def time(param: datetime | str):
 		if (type(param) == datetime): return param
 
@@ -103,27 +104,27 @@ def get_jsoned_obj(obj: FCST | CleanOBS):
 
 
 
-def get_organised_json_results(results: list[Result]):
+def get_organised_json_results(results: list[Result], key_mode: str = "future_time"):
+	key_is_future = key_mode == "future_time"
 	data = {}
 
 	for r in results:
 		jsoned = get_json_graded_result(r)
-		future_time = jsoned["a"]
+		key = jsoned["a"] if key_is_future else jsoned["f"]
 		org = jsoned["o"]
 
-		if (not data.get(future_time)):
-			data[future_time] = {}
+		if (not data.get(key)):
+			data[key] = {}
 		
-		if (not data[future_time].get(org)):
-			data[future_time][org] = {"data": []}
+		if (not data[key].get(org)):
+			data[key][org] = {"data": []}
 		
-		data[future_time][org]["data"].append(jsoned)
+		data[key][org]["data"].append(jsoned)
 
 
 
 	# CALCULATE AVERAGE GRADE AT EACH LAYER
-	for future_time, orgs in data.items():
-		#grades = []
+	for orgs in data.values():
 
 		for org, org_data in orgs.items():
 			org_grades = []
@@ -135,11 +136,9 @@ def get_organised_json_results(results: list[Result]):
 					if (k.startswith("g")):
 						entry_grades.append(v)
 				
-				#entry["gha"] = get_hyperbolic_avg_grade(entry_grades)
 				entry["ga"] = get_avg_grade(entry_grades)
 				org_grades.append(entry["ga"])
 			
-			#org_data["gha"] = get_hyperbolic_avg_grade(org_grades)
 			org_data["ga"] = get_avg_grade(entry_grades)
 
 	return data

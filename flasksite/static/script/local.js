@@ -2,7 +2,7 @@
 	const FCST_TIME_BUFFER_DAYS = 2;
 
 	async function pane1(locId) {
-		let data = await api.api.getApiWeekOfDailySummaries(FCST_TIME_BUFFER_DAYS, locId);
+		let data = (await api.api.getApiWeekOfDailySummaries(FCST_TIME_BUFFER_DAYS, locId)).data;
 		let datas = Object.values(data);
 
 		let datesInWeek = Array.from(Object.keys(data)).map( v => Date.parse(v) );
@@ -162,11 +162,11 @@
 
 	function fcstVsObsUpdate(data, contents, periods, selectedOrg, selectedSubOrg, selectedFcstTime) {
 		let possibleSubOrgs;
-		[selectedOrg, selectedSubOrg, selectedFcstTime, possibleSubOrgs] = selectOrgsAndTime(data.fcst.fcst, selectedOrg, selectedSubOrg, selectedFcstTime);
+		[selectedOrg, selectedSubOrg, selectedFcstTime, possibleSubOrgs] = selectOrgsAndTime(data.data.fcst, selectedOrg, selectedSubOrg, selectedFcstTime);
 
 		// SET METADATA
 		let dateElem = contents.querySelector(".option-row > .date");
-		dateElem.textContent = "Forecasts of " + new Date(data.fcst.day_date).toLocaleDateString();
+		dateElem.textContent = "Forecasts of " + new Date(data.data.day_date).toLocaleDateString();
 
 		periods.innerHTML = "";
 		
@@ -208,7 +208,7 @@
 		let timeBar = contents.querySelector(".fcst-type-bar.fcst-time");
 		timeBar.innerHTML = "";
 
-		let possibleTimes = Object.keys(data.fcst.fcst[thisOrg]);
+		let possibleTimes = Object.keys(data.data.fcst[thisOrg]);
 
 		if ((!selectedFcstTime) || (!possibleTimes.includes(selectedFcstTime))) {
 			selectedFcstTime = possibleTimes[0];
@@ -228,7 +228,7 @@
 		};
 
 
-		let chosenFcstData = data.fcst.fcst[thisOrg][selectedFcstTime];
+		let chosenFcstData = data.data.fcst[thisOrg][selectedFcstTime];
 
 		for (let [ft, v] of Object.entries(chosenFcstData).sort( (a,b) => ( new Date(a[0]) - new Date(b[0]) ) )) {
 			let elem = api.assets.fcstObsPeriodTemplate.cloneNode(true);
@@ -313,7 +313,7 @@
 			});
 		};
 
-		let monthly = await api.api.getApiMonthOfDailySummaries(FCST_TIME_BUFFER_DAYS, locId);
+		let monthly = (await api.api.getApiMonthOfDailySummaries(FCST_TIME_BUFFER_DAYS, locId)).data;
 
 		let dataForCalendar = [];
 		for (let [k,v] of Object.entries(monthly)) {
@@ -332,7 +332,7 @@
 			"regularWeeks",
 			dateOnHover,
 			{ [todayId]: "- <i>Today</i>" }
-		)
+		);
 
 		let elems = document.querySelectorAll(selector + " .calendar-cont > *");
 		let counts = {};
@@ -341,7 +341,7 @@
 			let v = elem.getAttribute("best");
 			if (!v || v === "EQUALS") continue;
 
-			if (!counts[v]) counts[v] = 0
+			if (!counts[v]) counts[v] = 0;
 			counts[v] ++;
 		};
 
@@ -376,9 +376,7 @@
 		pane3(locId);
 		window.onresize = undefined;
 
-		//document.querySelector("#homepage").setAttribute("rendered", "true");
-
-		//pane4();
+		document.querySelector("#local").setAttribute("rendered", "true");
 	};
 
 	Main();
