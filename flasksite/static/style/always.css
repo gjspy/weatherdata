@@ -954,6 +954,13 @@ table.summary-table.change {
 	width: fit-content;
 
 	padding-top: 2vh;
+
+	margin: unset;
+}
+
+.title-bar .main.mid {
+	--font-size: 5vmin;
+	color: #5b9d36;
 }
 
 .title-bar .sub {
@@ -965,6 +972,8 @@ table.summary-table.change {
 	width: fit-content;
 
 	padding: 0.75% 0 0 1.5vw;
+
+	margin: unset;
 }
 
 .title-bar .right-items {

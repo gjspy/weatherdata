@@ -1098,6 +1098,8 @@ function OnLoad() {
 	let thisURL = new URL(window.location.href)
 	if (thisURL.pathname !== "/") innerNavigateTo();
 
+	document.querySelector("#logocont").onclick = () => window.location.href = "/";
+
 	for (let elem of document.querySelectorAll("#navbar > a[href]")) {
 		let href = elem.getAttribute("href");
 
