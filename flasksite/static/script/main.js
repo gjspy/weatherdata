@@ -996,12 +996,14 @@ function initApi() {
 		navigation: {
 			masterTitle: "Cloudy?",
 			pageTitles: {
-				"/": "Home",
+				"/": "Cloudy With a Chance of Errors",
+				"/national": "Nationally",
 				"/local": "Local",
 				"/changes": "Changes"
 			},
 			cdnURI: {
-				"/": "https://weatherstatic.gtweb.dev/doc/home.html",
+			//	"/": "",
+				"/national": "https://weatherstatic.gtweb.dev/doc/home.html",
 				"/local": "https://weatherstatic.gtweb.dev/doc/local.html",
 				"/changes": "https://weatherstatic.gtweb.dev/doc/changes.html"
 			}
@@ -1093,15 +1095,22 @@ function OnLoad() {
 
 	initApi();
 
-	innerNavigateTo(new URL(window.location.href));
+	let thisURL = new URL(window.location.href)
+	if (thisURL.pathname !== "/") innerNavigateTo();
 
 	for (let elem of document.querySelectorAll("#navbar > a[href]")) {
+		let href = elem.getAttribute("href");
 
 		elem.addEventListener("click", function(e) {
 			e.preventDefault();
 			e.stopImmediatePropagation();
 
-			innerNavigateTo(elem.getAttribute("href"));
+			if (href === "/") {
+				window.location.reload();
+				return;
+			};
+
+			innerNavigateTo(href);
 		});
 
 	};

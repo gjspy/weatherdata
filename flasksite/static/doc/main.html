@@ -121,13 +121,13 @@
 
 <body>
 	<div id="topbar">
-		<div id="logocont">
+		<div id="logocont" href="/">
 			<img id="logo" src="https://weatherstatic.gtweb.dev/logo-square.png" draggable="false">
 			<img id="wordlogo" src="https://weatherstatic.gtweb.dev/logo-title.png" draggable="false">
 		</div>
 
 		<div id="navbar">
-			<a href="/">Home</a>
+			<a href="/national">National</a>
 			<label>|</label>
 			<a href="/local">Local</a>
 			<label>|</label>
@@ -150,6 +150,30 @@
 	</div>
 
 	<div id="content">
+		<div id="default" class="content-elem" location-selector="false" scrollsnap="false">
+			<div class="sticky-bkg">
+				<img class="background" src="https://weatherstatic.gtweb.dev/backgrounds/AS183401940.jpeg">
+			</div>
+			<div class="hero pane-1">
+				<div class="contents">
+					<div class="title-bar">
+						<div class="hero-logo">
+							<img class="logo" src="https://weatherstatic.gtweb.dev/logo-square.png" draggable="false">
+							<img class="wordlogo" src="https://weatherstatic.gtweb.dev/logo-title.png" draggable="false">
+						</div>
+						<h1 class="main">Welcome!</h1>
+						<h2 class="main mid">Here, you can compare different weather forecasts, to deciper if they are truly accurate or not!</h2>
+						<p class="sub">See various results, from national averages to fine-tuned daily accuracies per weather station.<br>Over the past month, the Met Office has performed best. Why? See for yourself! Start browsing now!</p>
+						<div class="nav-buttons">
+							<a href="/national">National Averages</a>
+							<a href="/local">Local Specifics</a>
+							<a href="/changes">How Forecasts Change</a>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
 		<div id="footer-bar">
 			<p>Data sourced from <a href="https://www.metoffice.gov.uk/" target="_blank">Met Office</a>, <a href="https://www.bbc.co.uk/weather" target="_blank">BBC Weather</a> and <a href="https://openweathermap.org/" target="_blank">OpenWeather</a>.<br/>This project is non-commercial, and has not been endorsed nor produced by any organisation mentioned.</p>
 			<noscript>
