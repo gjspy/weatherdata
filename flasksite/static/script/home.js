@@ -148,8 +148,7 @@
 				current.remove();
 			};
 
-			let floatElem = api.assets.dateOneGradeTemplate.cloneNode(true);
-			api.dom.fillOneGradeDateElem(floatElem, period, dt, calendarCont, true);
+			let floatElem = api.dom.fillOneGradeDateElem(period, dt, calendarCont, true);
 
 			floatElem.querySelector(".datetxt").remove();
 
