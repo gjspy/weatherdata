@@ -7,8 +7,8 @@
 
 		document.querySelector("#changes .sect-1 .title-bar .right-items .main").textContent = api.siteInfoDict[locId].clean_name;
 
-		let today = new Date();
-		let yesterdayId = api.datetime.indentifierFromDate(new Date(today.getTime() - (1000 * 60 * 60 * 24))); 
+		let yesterday = new Date((new Date()).getTime() - (1000 * 60 * 60 * 24));
+		//let yesterdayId = api.datetime.indentifierFromDate(yesterday); 
 
 		api.dom.FillCalendar(
 			selector,
@@ -16,9 +16,18 @@
 			7,
 			"dynamicWeeksWithGaps",
 			undefined,
-			{ [yesterdayId]: "- <i>Yesterday</i>" },
+			{},//{ [yesterdayId]: "- <i>Yesterday</i>" },
 			true
 		);
+
+		for (let elem of document.querySelectorAll(selector + " .calendar-cont .date")) {
+			let dateDiff = yesterday - elem.__data.dt;
+
+			let days = (new Date(dateDiff)).getUTCDate();
+
+			let dateTxt = (days === 1) ? "On the day" : String(days) + " days prior";
+			elem.querySelector(".datetxt").textContent += ` (${dateTxt})`;
+		};
 	};
 
 

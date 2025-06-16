@@ -493,7 +493,7 @@ function fillOneGradeDateElem(period, dt, calendarCont, worst, onHover, highligh
 
 	calendarCont.append(dateElem);
 
-	if (!onHover) return;
+	if (!onHover) return dateElem;
 	dateElem.addEventListener("mouseover", () => {
 		onHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade);
 	});
@@ -502,6 +502,9 @@ function fillOneGradeDateElem(period, dt, calendarCont, worst, onHover, highligh
 	});
 
 	//if (highlight) onHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade, true);
+	dateElem.__data = {data: period, dt: dt};
+
+	return dateElem;
 };
 
 
@@ -535,6 +538,10 @@ function fillTwoGradeDateElem(period, dt, calendarCont, highlight) {
 	dateElem.querySelector(".datetxt").innerHTML = dateStr;
 
 	calendarCont.append(dateElem);
+
+	dateElem.__data = {data: period, dt: dt};
+
+	return dateElem;
 };
 
 function FillCalendar(selector, data, duration, calType, dateOnHover, highlights, twoGradeElem) {
@@ -603,7 +610,7 @@ function FillCalendar(selector, data, duration, calType, dateOnHover, highlights
 			if (!period) { pad(dateNow, 1, calendarCont); continue; };
 	
 			
-			if (twoGradeElem) { api.dom.fillTwoGradeDateElem(period,dateNow, calendarCont, false); continue; };
+			if (twoGradeElem) { api.dom.fillTwoGradeDateElem(period, dateNow, calendarCont, false); continue; };
 			api.dom.fillOneGradeDateElem(period, dateNow, calendarCont, false, dateOnHover, highlight);
 		};
 	};
