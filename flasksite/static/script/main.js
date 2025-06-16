@@ -1100,7 +1100,7 @@ function OnLoad() {
 
 	document.querySelector("#logocont").onclick = () => window.location.href = "/";
 
-	for (let elem of document.querySelectorAll("#navbar > a[href]")) {
+	for (let elem of document.querySelectorAll("#navbar > a[href], #default .nav-buttons a[href]")) {
 		let href = elem.getAttribute("href");
 
 		elem.addEventListener("click", function(e) {
