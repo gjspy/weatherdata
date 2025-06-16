@@ -133,7 +133,7 @@
 
 	function selectOrgsAndTime(fcsts, selectedOrg, selectedSubOrg, selectedFcstTime) {
 		if (!selectedOrg) {
-			let possibleOrgs = Array.from(Object.keys(fcsts));
+			let possibleOrgs = Array.from(Object.keys(fcsts.data));
 			let bdIndex = possibleOrgs.indexOf("BD"); // REMOVE BD FROM AUTOSELECT
 
 			if (possibleOrgs.length > 1 && bdIndex !== -1) possibleOrgs.splice(bdIndex);
@@ -145,7 +145,7 @@
 		
 		let possibleSubOrgs = [];
 
-		for (let org of Object.keys(fcsts)) {
+		for (let org of Object.keys(fcsts.data)) {
 			if (!org.startsWith(selectedOrg)) continue;
 			
 			possibleSubOrgs.push(org.replace(selectedOrg, ""));
@@ -166,7 +166,7 @@
 
 		// SET METADATA
 		let dateElem = contents.querySelector(".option-row > .date");
-		dateElem.textContent = "Forecasts of " + new Date(data.data.day_date).toLocaleDateString();
+		dateElem.textContent = "Forecasts of " + new Date(data.fcst.day_date).toLocaleDateString();
 
 		periods.innerHTML = "";
 		
@@ -273,37 +273,34 @@
 
 
 	async function pane3(locId) {
-		function dateOnHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade) {
+		function dateOnHover(dateElemHoveringOver, period, dt, calendarCont, bestOrg, bestGrade) {
 			if (bestOrg === "EQUALS") return;
 
 			let calendar = calendarCont.offsetParent;
 
 			if (calendar.querySelector(".date[floating=\"true\"]")) return;
 
-			let floatElem = api.assets.dateOneGradeTemplate.cloneNode(true);
-			api.dom.fillOneGradeDateElem(floatElem, period, dt, calendarCont, true);
+			let floatElem = api.dom.fillOneGradeDateElem(period, dt, calendarCont, true);
 
 			floatElem.querySelector(".datetxt").remove();
 
 			// boundingRect() returns global space, need to calculate relative
 			let calBounds = calendar.getBoundingClientRect(); 
-			let bounds = dateElem.getBoundingClientRect();
+			let bounds = dateElemHoveringOver.getBoundingClientRect();
 
 			floatElem.style.position = "absolute";
 			floatElem.style.top = String((bounds.top - calBounds.top - 2) + bounds.height) + "px";
 			floatElem.style.left = String(bounds.left - calBounds.left - 1) + "px";
 			floatElem.style["z-index"] = "101";
+			//floatElem.style.opacity = "0";
 			
-
 			floatElem.setAttribute("floating", "true");
-
-			calendarCont.append(floatElem);
 
 			setTimeout(() => {
 				floatElem.style.opacity = "1";
 			});
 			
-			dateElem.addEventListener("mouseleave", () => {
+			dateElemHoveringOver.addEventListener("mouseleave", () => {
 				floatElem.setAttribute("floating", "false");
 				floatElem.style.opacity = "0";
 

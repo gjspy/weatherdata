@@ -493,7 +493,7 @@ function fillOneGradeDateElem(period, dt, calendarCont, worst, onHover, highligh
 
 	calendarCont.append(dateElem);
 
-	if (!onHover) return;
+	if (!onHover) return dateElem;
 	dateElem.addEventListener("mouseover", () => {
 		onHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade);
 	});
@@ -503,6 +503,8 @@ function fillOneGradeDateElem(period, dt, calendarCont, worst, onHover, highligh
 
 	//if (highlight) onHover(dateElem, period, dt, calendarCont, bestOrg, bestGrade, true);
 	dateElem.__data = {data: period, dt: dt};
+
+	return dateElem;
 };
 
 
@@ -538,6 +540,8 @@ function fillTwoGradeDateElem(period, dt, calendarCont, highlight) {
 	calendarCont.append(dateElem);
 
 	dateElem.__data = {data: period, dt: dt};
+
+	return dateElem;
 };
 
 function FillCalendar(selector, data, duration, calType, dateOnHover, highlights, twoGradeElem) {
@@ -992,12 +996,14 @@ function initApi() {
 		navigation: {
 			masterTitle: "Cloudy?",
 			pageTitles: {
-				"/": "Home",
+				"/": "Cloudy With a Chance of Errors",
+				"/national": "Nationally",
 				"/local": "Local",
 				"/changes": "Changes"
 			},
 			cdnURI: {
-				"/": "https://weatherstatic.gtweb.dev/doc/home.html",
+			//	"/": "",
+				"/national": "https://weatherstatic.gtweb.dev/doc/home.html",
 				"/local": "https://weatherstatic.gtweb.dev/doc/local.html",
 				"/changes": "https://weatherstatic.gtweb.dev/doc/changes.html"
 			}
@@ -1089,15 +1095,22 @@ function OnLoad() {
 
 	initApi();
 
-	innerNavigateTo(new URL(window.location.href));
+	let thisURL = new URL(window.location.href)
+	if (thisURL.pathname !== "/") innerNavigateTo();
 
 	for (let elem of document.querySelectorAll("#navbar > a[href]")) {
+		let href = elem.getAttribute("href");
 
 		elem.addEventListener("click", function(e) {
 			e.preventDefault();
 			e.stopImmediatePropagation();
 
-			innerNavigateTo(elem.getAttribute("href"));
+			if (href === "/") {
+				window.location.reload();
+				return;
+			};
+
+			innerNavigateTo(href);
 		});
 
 	};
