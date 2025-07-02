@@ -1146,7 +1146,12 @@ function OnLoad() {
 	initApi();
 
 	let thisURL = new URL(window.location.href)
-	if (thisURL.pathname !== "/") innerNavigateTo(thisURL);
+	if (thisURL.pathname !== "/") {
+		let d = document.querySelector("#default");
+		d && d.remove();
+		
+		innerNavigateTo(thisURL);
+	};
 
 	document.querySelector("#logocont").onclick = () => window.location.href = "/";
 

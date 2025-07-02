@@ -1184,11 +1184,12 @@ def every_10_mins(batch_time: datetime, _testing_hour_fmt: str = None):
 
 	jobs_copy = copy.deepcopy(JOBS)
 
-	msg_to_start_with = ""
-	if (len(db_commit_queue) > 0):
-		msg_to_start_with = f"DB commit queue rolled over into next period, {len(db_commit_queue)} items."
+	if (hour_fmt == "00:00"):
+		msg_to_start_with = ""
+		if (len(db_commit_queue) > 0):
+			msg_to_start_with = f"DB commit queue rolled over into next period, {len(db_commit_queue)} items."
 
-	notify_jobs(hour_fmt, msg_to_start_with)
+		notify_jobs(hour_fmt, msg_to_start_with)
 
 	to_wait_each = min(RUN_SLOW_MAX_COOLDOWN, (EVENT_LOOP_EVERY * 0.8) / len(jobs_copy))
 

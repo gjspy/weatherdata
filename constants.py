@@ -193,14 +193,14 @@ WEATHER_PHOTO_TO_WTS = {
 }
 
 NIGHTTIME = {"max_am_inc": 5, "min_pm_inc": 19}
-NIGHT_WTS_MAP = {2: 0, 3: 1} # sunny -> clear night, sunny intervals -> moony intervals
+NIGHT_WTS_MAP = {"2": 0, "3": 1} # sunny -> clear night, sunny intervals -> moony intervals
 
 def edit_wt_for_client(wt: int, dt: datetime):
 	if (dt.hour > NIGHTTIME["max_am_inc"] and dt.hour < NIGHTTIME["min_pm_inc"]):
 		return wt
 	
-	n = NIGHT_WTS_MAP.get(wt)
-	if (n): return n
+	n = NIGHT_WTS_MAP.get(str(wt))
+	if (n != None): return n
 	
 	return wt
 

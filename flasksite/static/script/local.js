@@ -65,9 +65,6 @@
 				let index = Object.values(api.nightWTsMap).indexOf(wt);
 				if (index !== -1) wt = Object.keys(api.nightWTsMap)[index];
 				
-			} else if (api.nightWTsMap[wt]) {
-				wt = api.nightWTsMap[wt];
-
 			};
 
 			wtElem.setAttribute("src", `https://weatherstatic.gtweb.dev/icon/100/${wt}.png`);
