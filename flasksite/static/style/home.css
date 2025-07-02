@@ -4,6 +4,10 @@
 	--pane2-map-width: min(30vw, 300px);
 }
 
+#homepage .sticky-bkg {
+	height: calc(var(--content-height) * 2);
+}
+
 
 #homepage .hero .flex-grow {
 	--padding-tb: 1%;

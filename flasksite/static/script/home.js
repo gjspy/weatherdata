@@ -92,7 +92,7 @@
 	};
 
 
-	function pane3(weekDataForCalendar, veryBest) {
+	function pane3(weekDataForCalendar) {
 		// need identifier, so we don't worry about hrs/min/sec ****
 		let today = new Date();
 		let yesterdayId = api.datetime.indentifierFromDate(new Date(today.getTime() - (1000 * 60 * 60 * 24))); 
@@ -107,20 +107,14 @@
 			{ [yesterdayId]: "- <i>Yesterday</i>" }
 		);
 
+		let title = document.querySelector("#homepage .pane-3 .title-bar > .main");
+		let veryBest = api.dom.fillInOutperformingData(selector, title);
+
 		api.dom.insertSVGByOrg(document.querySelector("#homepage .pane-3 .title-bar svg"), veryBest);
 
+		
 		let detail = document.querySelector("#homepage .pane-3 .detail");
 		document.querySelector(selector).append(detail);
-
-		let title = document.querySelector("#homepage .pane-3 .title-bar > .main");
-
-		if (veryBest === "MO") {
-			title.textContent = title.textContent.replace("[org]", "The Met Office was");
-		} else if (veryBest === "BBC") {
-			title.textContent = title.textContent.replace("[org]", "BBC Weather was");
-		} else {
-			title.textContent = "Both organisations had the same accuracy";
-		};
 
 		let subtitle = document.querySelector("#homepage .pane-3 .title-bar .sub:last-of-type");
 		subtitle.textContent = subtitle.textContent.replaceAll("[FCST_BUFFER_HOURS]", String(FCST_TIME_BUFFER_DAYS * 24));
@@ -203,52 +197,13 @@
 			{ [todayId]: "- <i>Today</i>" }
 		)
 
-		let elems = document.querySelectorAll(selector + " .calendar-cont > *");
-		let counts = {};
-
-		for (let elem of elems) {
-			let v = elem.getAttribute("best");
-			if (!v || v === "EQUALS") continue;
-
-			if (!counts[v]) counts[v] = 0
-			counts[v] ++;
-		};
-
-		//let countVals = Object.values(counts);
-		//let best = Object.keys(counts)[countVals.indexOf(Math.max(...countVals))];
-
 		let title = document.querySelector("#homepage .pane-4 .title-bar > .main");
 		let subtitle = document.querySelector("#homepage .pane-4 .title-bar > .sub.detail");
 
-		let diff = Math.abs((counts.MO || 0) - (counts.BBC || 0));
-		let diffStr = (diff === 1) ? "1 more outperforming day" : String(diff) + " more outperforming days";
-
-		if ((counts.MO || 0) > (counts.BBC || 0)) {
-			title.textContent = title.textContent.replace("[org]", "The Met Office was");
-			subtitle.textContent = subtitle.textContent
-				.replace("[org1]", "The Met Office")
-				.replace("[time]", diffStr)
-				.replace("[org2]", "BBC Weather");
-
-		} else if ((counts.MO || 0) < (counts.BBC || 0)) {
-			title.textContent = title.textContent.replace("[org]", "BBC Weather was");
-			subtitle.textContent = subtitle.textContent
-				.replace("[org1]", "BBC Weather")
-				.replace("[time]", diffStr)
-				.replace("[org2]", "the Met Office");
-
-		} else {
-			let timeStr = ((counts.MO || 0) === 1) ? "1 day" : String((counts.MO || 0)) + " days";
-
-			title.textContent = "Both organisations had the same accuracy";
-			subtitle.textContent = `Each had ${timeStr} where they outperformed the other.`;
-		};
-
-		
-		
+		api.dom.fillInOutperformingData(selector, title, subtitle);		
 	};
 
-	function onGoogleChartsLoad(yesterdayMO, yesterdayBC, weekDataForCalendar, bestOverWeek) {
+	function onGoogleChartsLoad(yesterdayMO, yesterdayBC, weekDataForCalendar) {
 		api.dom.FillSummaryPieGrades("#homepage .pane-1 .entry.mo .pie-cont", yesterdayMO.data);
 		api.dom.FillSummaryPieGrades("#homepage .pane-1 .entry.bbc .pie-cont", yesterdayBC.data);
 		
@@ -271,12 +226,8 @@
 		let yesterdayBC = api.calc.getOrgFromPeriod(yesterday, "BBC");
 
 		let gradeByLocArr = api.calc.getGradeByLocArr(yesterdayMO.data, yesterdayBC.data);
-		
-		//let moScoreYday = api.calc.averageOfGrades(yesterdayMO.data.map( v => v.ga ), true);
-		//let bcScoreYday = api.calc.averageOfGrades(yesterdayBC.data.map( v => v.ga ), true);
 
 		let bestYesterday = api.calc.getBestOrgFromPeriods([yesterday]);
-		let bestOverWeek = api.calc.getBestOrgFromPeriods(datas);
 
 		let weekDataForCalendar = [];
 		for (let [k,v] of Object.entries(weeklySummary)) {
@@ -286,11 +237,11 @@
 
 		pane1(yesterdayMO, yesterdayBC, gradeByLocArr, bestYesterday);
 		pane2(gradeByLocArr);
-		pane3(weekDataForCalendar, bestOverWeek);
+		pane3(weekDataForCalendar);
 
 		google.charts.load("current", {"packages": ["corechart"]});
-		google.charts.setOnLoadCallback(() => onGoogleChartsLoad(yesterdayMO, yesterdayBC, weekDataForCalendar, bestOverWeek));
-		window.onresize = () => onGoogleChartsLoad(yesterdayMO, yesterdayBC, weekDataForCalendar, bestOverWeek);
+		google.charts.setOnLoadCallback(() => onGoogleChartsLoad(yesterdayMO, yesterdayBC, weekDataForCalendar));
+		window.onresize = () => onGoogleChartsLoad(yesterdayMO, yesterdayBC, weekDataForCalendars);
 
 		document.querySelector("#homepage").setAttribute("rendered", "true");
 

@@ -2,6 +2,10 @@
 	--pane3-bkg: #fcbd70;
 }
 
+#local .sticky-bkg {
+	height: calc(var(--content-height) * 2);
+}
+
 #local .hero .summary-row {
 	--grade-size: 15vmin;
 	--grade-pad: 2vw;

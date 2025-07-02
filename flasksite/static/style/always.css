@@ -280,7 +280,7 @@ body:has(#content > [location-selector="true"]) #loc-card {
 
 .sticky-bkg {
 	width: 100vw;
-	height: calc(var(--content-height) * 2);
+	height: var(--content-height);
 
 	position: absolute;
 }

@@ -762,6 +762,49 @@ function getBestOrgFromPeriods(periods) {
 	else return "EQUALS"
 };
 
+function fillInOutperformingData(calendarSelector, title, subtitle) {
+	let calendarElems = document.querySelectorAll(calendarSelector + " .calendar-cont > *");
+	let counts = {};
+
+	for (let elem of calendarElems) {
+		let v = elem.getAttribute("best");
+		if (!v || v === "EQUALS") continue;
+
+		if (!counts[v]) counts[v] = 0
+		counts[v] ++;
+	};
+
+	let diff = Math.abs((counts.MO || 0) - (counts.BBC || 0));
+	let diffStr = (diff === 1) ? "1 more outperforming day" : String(diff) + " more outperforming days";
+
+	if ((counts.MO || 0) > (counts.BBC || 0)) {
+		title.textContent = title.textContent.replace("[org]", "The Met Office was");
+		if (subtitle) subtitle.textContent = subtitle.textContent
+			.replace("[org1]", "The Met Office")
+			.replace("[time]", diffStr)
+			.replace("[org2]", "BBC Weather");
+		
+		return "MO";
+
+	} else if ((counts.MO || 0) < (counts.BBC || 0)) {
+		title.textContent = title.textContent.replace("[org]", "BBC Weather was");
+		if (subtitle) subtitle.textContent = subtitle.textContent
+			.replace("[org1]", "BBC Weather")
+			.replace("[time]", diffStr)
+			.replace("[org2]", "the Met Office");
+		
+		return "BBC";
+
+	} else {
+		let timeStr = ((counts.MO || 0) === 1) ? "1 day" : String((counts.MO || 0)) + " days";
+
+		title.textContent = "Both organisations had the same accuracy";
+		if (subtitle) subtitle.textContent = `Each had ${timeStr} where they outperformed the other.`;
+
+		return "EQUALS";
+	};
+};
+
 function getAvgObs(obss) {
 	let sums = {};
 	for (let k of Object.keys(obss[0])) sums[k] = [];
@@ -898,6 +941,12 @@ function innerNavigateTo(relativeHref) {
 		relativeHref = relativeHref.pathname;
 	};
 
+	if (relativeHref === undefined) {
+		window.location.href = "/";
+		window.location.reload();
+		return;
+	};
+
 	let cdnURI = api.navigation.cdnURI[relativeHref];
 
 	fetch(cdnURI).then(
@@ -940,7 +989,8 @@ function initApi() {
 			initMap: initMap,
 			insertSVGByOrg: insertSVGByOrg,
 			setLocCardName: setLocCardName,
-			FillSummaryPieGrades: FillSummaryPieGrades
+			FillSummaryPieGrades: FillSummaryPieGrades,
+			fillInOutperformingData: fillInOutperformingData
 		},
 		api: {
 			getContentBody: null,
@@ -1037,10 +1087,10 @@ function initApi() {
 			"F": "#000000"
 		},
 		descriptions: {
-			PIE_CHART_GRADES: "The pie charts show the the number of weather stations which received each grade, per forecaster.",
+			PIE_CHART_GRADES: "The pie charts show the number of weather stations which received each grade, per forecaster.",
 			SUMMARY: "Difference between forecast and actual for yesterday's weather"
 		},
-		nightWTsMap: {2: 0, 3: 1},
+		nightWTsMap: {2: 0, 3: 1}, // 2 = full sun, 0 = moon, 3 = cloud sun, 1 = cloud moon
 		transferKeys: {},
 		summaryTableKeys: {}
 	};
@@ -1096,7 +1146,7 @@ function OnLoad() {
 	initApi();
 
 	let thisURL = new URL(window.location.href)
-	if (thisURL.pathname !== "/") innerNavigateTo();
+	if (thisURL.pathname !== "/") innerNavigateTo(thisURL);
 
 	document.querySelector("#logocont").onclick = () => window.location.href = "/";
 
