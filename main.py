@@ -103,7 +103,7 @@ def notify(message: str):
 		logger.exception("COULDNT POST NOTIFY MESSAGE")
 
 
-def notify_jobs(hour_fmt: str, msg_to_start_with: str):
+def notify_jobs(hour_fmt: str, msg_to_start_with: str, is_on_hr: bool = False):
 	start_msg = f"{msg_to_start_with}\n{hour_fmt} starting jobs:"
 	msg = start_msg
 
@@ -115,14 +115,15 @@ def notify_jobs(hour_fmt: str, msg_to_start_with: str):
 		total_jobs += len(details)
 
 		msg += f"\n{job}: [{items}]"
-	
-	if (total_jobs == 0):
-		if (msg_to_start_with): notify(start_msg + "\nNo jobs running.")
 
-		logger.info(f"{hour_fmt} not notifying jobs, none of them.")
-		return
-	
-	notify(msg)
+	if (total_jobs == 0):
+		if (msg_to_start_with): msg = start_msg + "\nNo jobs running. "
+
+		msg += f"{hour_fmt} not notifying jobs, none of them."
+		# used to return. now don't, cus only report daily.
+
+	if (is_on_hr): notify(msg)
+	else: logger.info(msg)
 
 
 def time_to_str(t: datetime = None, short: bool = False):
@@ -138,14 +139,14 @@ def str_to_time(s: str):
 
 def compass_string_to_degrees(name: str, is_letters: bool = False):
 	name = name.lower().replace(" ","").replace("erly", "")
-	
+
 	if (is_letters):
 		name = name\
 			.replace("N","north")\
 			.replace("E","east")\
 			.replace("S","south")\
 			.replace("W","west")
-		
+
 	# 360 / ... to get degrees per change, X by
 	# distance around compass
 
@@ -180,19 +181,19 @@ def validate_data(func: str, data: dict | str):
 				logger.warning("BBC RESPONSE not XML-ABLE")
 
 				return False
-			
+
 			return True
-		
+
 		case "B1FCST":
 			if (not data): return False
 
 			if (not data.get("forecasts")): return False
 
 			return True
-		
+
 		case "MOBS":
 			if (not data): return False
-			
+
 			d_type = data.get("type")
 
 			if (not d_type): return False
@@ -200,7 +201,7 @@ def validate_data(func: str, data: dict | str):
 			if (d_type == "FeatureCollection"):
 				if (not data.get("features")): return False
 				if (len(data["features"]) == 0): return False
-			
+
 			elif (d_type == "Feature"):
 				properties = data.get("properties")
 
@@ -208,16 +209,16 @@ def validate_data(func: str, data: dict | str):
 				if (not properties.get("reportStartDateTime")): return False
 
 				primary = properties.get("primary")
-				
+
 				if (not primary): return False
 				if (len(primary.keys()) == 0): return False
-			
+
 			else:
 				logger.warning(f"MOOBS DATA FEATURE TYPE NOT RECOGNISED: {d_type}\nDATA: {data}")
 				return False
 
 			return True
-		
+
 		case "M1FCST" | "M3FCST":
 			if (not data): return False
 
@@ -225,7 +226,7 @@ def validate_data(func: str, data: dict | str):
 
 			if (not features): return False
 			if (len(features) == 0): return False
-			
+
 			properties = features[0].get("properties")
 
 			if (not properties): return False
@@ -239,7 +240,7 @@ def validate_data(func: str, data: dict | str):
 			if (len(time_series) == 0): return False
 
 			return True
-		
+
 		case "DOBS":
 			if (not data): return False
 
@@ -255,7 +256,7 @@ def validate_data(func: str, data: dict | str):
 			if (len(location) == 0): return False
 
 			return True
-		
+
 		case "OOBS":
 			if (not data): return False
 
@@ -267,11 +268,11 @@ def validate_data(func: str, data: dict | str):
 			if (len(main.keys()) == 0): return False
 
 			return True
-				
+
 		case _:
 			logger.error(f"WHAT IS {func} FUNC? (VALIDATE DATA)")
 			return False
-		
+
 
 def get_date_from_data(func: str, data: dict | str):
 	date = None
@@ -286,13 +287,13 @@ def get_date_from_data(func: str, data: dict | str):
 		case "B1FCST":
 			date_str = data["lastUpdated"]
 			date = datetime.strptime(date_str, BBC_EXACT_DATE_FMT)
-		
+
 		case "MOBS": # must be specific location, not whole data
 			assert data["type"] == "Feature" # not FeatureCollection
 
 			date_str = data["properties"]["reportStartDateTime"]
 			date = datetime.strptime(date_str, MO_OBS_RESP_DATE_FMT)
-		
+
 		case "M1FCST" | "M3FCST":
 			date_str = data["features"][0]["properties"]["modelRunDate"]
 			date = datetime.strptime(date_str, MO_DEFAULT_DATE_FMT)
@@ -304,11 +305,11 @@ def get_date_from_data(func: str, data: dict | str):
 			# seems to work from system timezone.
 
 			date = datetime.fromtimestamp(dt, TIMEZONE)
-		
+
 		case _:
 			logger.error(f"WHAT IS {func} FUNC? (GET DATA DATE)")
 
-	
+
 	if (not date): return
 
 	date = date.astimezone(TIMEZONE)
@@ -345,7 +346,7 @@ def get_gathered_obs_values(rows: list[DirtyOBS]):
 
 			# DP is horrible, instead of returning null returns 0 sometimes.
 			# would rather have no reading than an incorrect one.
-			if (org == "D" and val == 0): continue 
+			if (org == "D" and val == 0): continue
 
 			chosen_value = val
 			break
@@ -376,7 +377,7 @@ def db_commit_loop(engine: Engine):
 
 				counts[o.__name__] += 1
 
-			task_detail.append(f"add {len(objs)} objs: " + ", ".join(f"{c}x {o.__name__}" for o,c in counts.items()))
+			task_detail.append(f"add {len(objs)} objs: " + ", ".join(f"{c}x {n}" for n,c in counts.items()))
 
 		if (updates): task_detail.append(f"update {len(updates.keys())} items")
 
@@ -395,7 +396,7 @@ def db_commit_loop(engine: Engine):
 
 		s = f"{tracking}completed task {_id}{task_str} with {ql - 1} left. good? {not not good}. returning a {type(good).__name__}{return_str}"
 		return s
-	
+
 
 	def do_item(session: Session, item: dict): # must be QUERY ONLY, or ANY AMOUNT FROM [UPDATES, OBJS]
 		if (item.get("query")): return item["query"](session)
@@ -405,22 +406,22 @@ def db_commit_loop(engine: Engine):
 		if (item.get("objs")):
 			for obj in item["objs"]:
 				session.add(obj)
-			
+
 			return_val = True
 
 		if (item.get("updates")):
 			for obj, new_vals in item["updates"].items():
 				obj = session.merge(obj)
-				
+
 				for k,v in new_vals.items():
 					setattr(obj, k, v)
-			
+
 			return_val = True
-		
+
 		if (return_val != None):
 			session.commit()
-		
-		return return_val	
+
+		return return_val
 
 
 
@@ -453,7 +454,7 @@ def db_commit_loop(engine: Engine):
 
 			session = session_constructor()
 
-			good = do_item(session, next_item)		
+			good = do_item(session, next_item)
 
 		except Exception as err:
 			logger.error(f"{tracking}ERR OCCURED FOR DB COMMIT, rolling back:\n{err}")
@@ -462,7 +463,7 @@ def db_commit_loop(engine: Engine):
 			if ("MySQL Connection not available" in str(err) or "server has gone away" in str(err)):
 				logger.critical("Disposing engine due to connection error")
 				engine.dispose()
-		
+
 		finally:
 			if (session): session.close()
 
@@ -474,12 +475,12 @@ def db_commit_loop(engine: Engine):
 			except Exception as err:  logger.info(f"completed task {_id} with {ql - 1} left. good? {not not good}. (couldnt get debug str {err})")
 
 			db_commit_queue.pop(0)
-		
+
 			if (next_item["return_response"]):
 				db_responses[_id] = good
 
 			did_last_time = True
-		
+
 		else: did_last_time = False
 
 
@@ -491,10 +492,10 @@ def db_commit_thread():
 			if (not engine): engine = connect_to_db()
 
 			db_commit_loop(engine)
-			
+
 		except Exception as err:
 			logger.exception("CRITICAL: db_commit_loop errored")
-		
+
 		time.sleep(2)
 
 
@@ -507,7 +508,7 @@ def wait_for_db_resp_thread(this_id: int, resolve: Callable = None):
 
 	while True:
 		time.sleep(DB_COMMIT_FREQ_SLOW)
-		
+
 		if (time.time() - start > MAX_WAIT_FOR_DB_RESP):
 			return False
 
@@ -546,13 +547,13 @@ def invoke_db(objs: list[DirtyOBS | FCST] = None, query: str = None, updates: di
 		)
 
 		thread.start()
-		
+
 		if (not wait): return
 
-		response = thread.join()		
+		response = thread.join()
 		return response
 
-	
+
 
 def create_session_constructor(engine: Engine) -> Callable[[], Session]:
 	return sessionmaker(bind = engine)
@@ -580,7 +581,7 @@ def daily_fcst_evaluate(detail: str = "COMPAREcompare"):
 
 		if (not grouped.get(key)): grouped[key] = []
 		grouped[key].append(row)
-	
+
 	if (not grouped):
 		JOBS["COMPARE"] = []
 
@@ -588,7 +589,7 @@ def daily_fcst_evaluate(detail: str = "COMPAREcompare"):
 		except: pass
 
 		return
-	
+
 	for k, rows in grouped.items():
 		future_times = [fcst.future_time for fcst in rows]
 
@@ -602,12 +603,14 @@ def daily_fcst_evaluate(detail: str = "COMPAREcompare"):
 
 		obs = invoke_db(
 			query = Queries.get_obs_between_times(
-				min_future, 
-				max_future + timedelta(hours = period), 
+				min_future,
+				max_future + timedelta(hours = period),
 				mid
 			),
 			wait = True
 		)
+
+		changes = []
 
 		try:
 			changes = eval_day_of_forecast_instances(obs, rows, org)
@@ -625,7 +628,7 @@ def daily_fcst_evaluate(detail: str = "COMPAREcompare"):
 
 
 
-	
+
 
 
 
@@ -633,7 +636,7 @@ def hourly_obs_clean(detail: str = "CLEANclean"):
 	#tracking = f"{"OBSCLEAN:":<{TRACKING_STR_LEN}}"
 
 	JOBS["waitingforcommit"].append(detail)
-	
+
 	result = invoke_db(query = Queries.get_dirtyobs_older_than_buffer)
 	grouped = {}
 
@@ -643,7 +646,7 @@ def hourly_obs_clean(detail: str = "CLEANclean"):
 
 		if (not grouped.get(key)): grouped[key] = []
 		grouped[key].append(row)
-	
+
 
 	if (not grouped):
 		JOBS["CLEAN"] = []
@@ -653,7 +656,7 @@ def hourly_obs_clean(detail: str = "CLEANclean"):
 
 		return
 
-	
+
 	for k, rows in grouped.items():
 		#already_clean = invoke_db(
 		#	query = Queries.get_obs(k[0], k[1]),
@@ -679,7 +682,7 @@ def hourly_obs_clean(detail: str = "CLEANclean"):
 			#	"args": []
 			#}
 		)
-	
+
 
 	JOBS["CLEAN"] = []
 
@@ -697,7 +700,7 @@ def bbcd_value_corrector(k: str, v: str | int):
 			temp = re.findall("(\\d+)°C", v)[0] # exclude (farenheight)
 
 			v = int(temp)
-		
+
 		case "Wind Direction":
 			v = compass_string_to_degrees(v)
 
@@ -708,7 +711,7 @@ def bbcd_value_corrector(k: str, v: str | int):
 
 		case "Humidity" | "Pressure":
 			v = int(re.findall("(\\d+)", v)[0])
-		
+
 		case "Visibility":
 			v = bbc_convert_vis_str_to_int(v)
 
@@ -728,12 +731,12 @@ def json_value_corrector(func: str, k: str, v: str | int):
 		elif (k == "mslp"): v /= 100 # 100 NOT 1000!!
 		elif (k == "windSpeed10m" or k == "windGustSpeed10m"): v *= METRE_SEC_TO_KM_HR
 		elif (k == "significantWeatherCode"): v = convert_wt_to_common(func.replace("FCST",""), v)
-	
+
 
 	elif (func == "MOBS"):
 		if (k == "dws"): v *= KNOT_TO_KM
 		elif (k == "dwt"): v = convert_wt_to_common(func.replace("OBS",""), v)
-	
+
 
 	elif (func == "DOBS"):
 		if (k == "V"): v = int(v) / 1000
@@ -743,10 +746,10 @@ def json_value_corrector(func: str, k: str, v: str | int):
 
 
 	elif (func == "OOBS"):
-		if (k == "wind_speed" or k == "wind_gust"): v *= METRE_SEC_TO_KM_HR	
-		elif (k == "visibility"): v /= 1000	
+		if (k == "wind_speed" or k == "wind_gust"): v *= METRE_SEC_TO_KM_HR
+		elif (k == "visibility"): v /= 1000
 		elif (k == "weather_id"): v = convert_wt_to_common("O", v)
-	
+
 	return v
 
 
@@ -804,7 +807,7 @@ def save_from_xml(func: str, mId: str, batch_time: datetime, data_date: datetime
 			except: continue
 
 			to_store.__setattr__(store_key, value)
-		
+
 		all_periods.append(to_store)
 
 	return all_periods
@@ -825,9 +828,9 @@ def save_from_json(func: str, mId: str, batch_time: datetime, data_date: datetim
 		case "M3FCST": condition_names = MOF3_DB_CONDITION_NAMES
 		case "DOBS": condition_names = DP_DB_CONDITION_NAMES
 		case "OOBS": condition_names = OWM_DB_CONDITION_NAMES
-	
+
 	org = func.replace("FCST","").replace("OBS","")
-	
+
 	for report in data:
 		to_store = obj(
 			mid = mId,
@@ -837,7 +840,7 @@ def save_from_json(func: str, mId: str, batch_time: datetime, data_date: datetim
 		if (is_fcst):
 			if ("B1" in func): to_store.fcst_time = batch_time
 			else: to_store.fcst_time = data_date
-		
+
 		else:
 			to_store.dt = data_date - timedelta(minutes = data_date.minute, seconds = data_date.second)
 
@@ -849,12 +852,12 @@ def save_from_json(func: str, mId: str, batch_time: datetime, data_date: datetim
 			except: continue
 
 			to_store.__setattr__(tostore_k, v)
-		
+
 		if (func == "B1FCST"):
 			to_store.future_time = datetime.strptime(report["localDate"] + report["timeslot"], BBC1FCST_DATE_FMT)
-	
+
 		all_periods.append(to_store)
-	
+
 	return all_periods
 
 
@@ -885,11 +888,11 @@ def send_request(func: str, mId: str, batch_time: datetime, fileId: str = None, 
 		case "M3FCST":
 			endpoint = MO3_FCST_ENDPOINT.format(lat = location["lat"], long = location["long"])
 			headers = {"apikey": MO_GS_K}
-		
+
 		case "DOBS": endpoint = DP_OBS_ENDPOINT
 		case "OOBS":
 			endpoint = OWM_OBS_ENDPOINT.format(lat = location["lat"], long = location["long"], key = OWM_K)
-	
+
 
 	logger.debug(f"{tracking}{endpoint}")
 
@@ -902,7 +905,7 @@ def send_request(func: str, mId: str, batch_time: datetime, fileId: str = None, 
 	if (response.status_code != 200):
 		logger.error(f"{tracking}STATUS CODE {response.status_code}\nENDPOINT:{endpoint}\nRESP TEXT:{response.text}")
 		return
-	
+
 	try:
 		data = response.json()
 		return data
@@ -914,7 +917,7 @@ def send_request(func: str, mId: str, batch_time: datetime, fileId: str = None, 
 
 def get(func: str, mId: str, batch_time: datetime, wanted_model_run_time: datetime, tracking: str = ""):
 	allow_non_json = True if (func == "BDFCST" or func == "BOBS") else False
-	
+
 	data = send_request(func, mId, batch_time, tracking = tracking, allow_non_json = allow_non_json)
 
 	if (not data): return
@@ -971,7 +974,7 @@ def get(func: str, mId: str, batch_time: datetime, wanted_model_run_time: dateti
 
 		case _:
 			logger.error(f"{tracking}WHAT IS THIS FUNCTION IM NOT SAVING THAT: {func}")
-	
+
 	return [datas]
 
 
@@ -987,7 +990,7 @@ def get_multi_from_one_request_moobs(func: str, task: list[str], batch_time: dat
 
 
 	datas = []
-	
+
 	for report in data["features"]:
 		if (len(datas) == len(task)): break # got all needed
 
@@ -999,14 +1002,14 @@ def get_multi_from_one_request_moobs(func: str, task: list[str], batch_time: dat
 		if (not mId in task): continue
 
 		data_date = get_date_from_data(func, report)
-		
+
 		if (data_date < wanted_model_run_time):
 			logger.warning(f"{tracking}{mId} returned old data. wanted: {time_to_str(wanted_model_run_time)}, got: {time_to_str(data_date)}")
 			continue
 
 		to_store: list = save_from_json(func, mId, batch_time, data_date, [report["properties"]["primary"]])
 		datas.append(to_store)
-	
+
 	return datas# [[to_store], [to_store]]
 
 
@@ -1020,7 +1023,7 @@ def get_multi_from_one_request_dpobs(func: str, task: list[str], batch_time: dat
 	if (not validate_data(func, data)):
 		logger.warning(f"{tracking}DATA NOT VALID {data}")
 		return
-	
+
 	if (func == "DOBS"):
 		data_date_str = data["SiteRep"]["DV"]["dataDate"]
 		data_date = datetime.strptime(data_date_str, DP_OBS_MAIN_DATE_FMT)
@@ -1031,7 +1034,7 @@ def get_multi_from_one_request_dpobs(func: str, task: list[str], batch_time: dat
 
 
 	datas = []
-	
+
 	for loc in data["SiteRep"]["DV"]["Location"]:
 		if (len(datas) == len(task)): break # got all needed
 
@@ -1057,9 +1060,9 @@ def get_multi_from_one_request_dpobs(func: str, task: list[str], batch_time: dat
 
 				to_store = save_from_json(func, mId, batch_time, data_date, [report])
 				datas_this_loc.append(to_store[0])
-		
+
 		datas.append(datas_this_loc)
-	
+
 	return datas# [[to_store], [to_store]]
 
 
@@ -1082,20 +1085,27 @@ def do_job(func: str, detail: str | list[str], batch_time: datetime, wanted_mode
 		match func:
 			case "BOBS" | "OOBS" | "B1FCST" | "BDFCST" | "M1FCST" | "M3FCST":
 				data_groups = get(func, detail, batch_time, wanted_model_run_time, tracking)
-			
+
 			case "MOBS":
 				data_groups = get_multi_from_one_request_moobs(func, detail, batch_time, wanted_model_run_time, tracking)
 
 			case "DOBS":
 				data_groups = get_multi_from_one_request_dpobs(func, detail, batch_time, wanted_model_run_time, tracking)
-			
+
 			case "CLEAN":
-				hourly_obs_clean("CLEANclean")
+				detail = "CLEANclean"
+				hourly_obs_clean(detail)
 
 			case "COMPARE":
-				daily_fcst_evaluate("COMPAREcompare")
+				daily_fcst_evaluate(detail)
+
 	except Exception:
 		logger.exception(f"ERR DOING JOB {func}{detail}")
+
+		# clear so will recover tomorrow in theory!
+		if ((func == "CLEAN" or func == "COMPARE") and detail in JOBS["waitingforcommit"]):
+			JOBS["waitingforcommit"].remove(detail)
+
 
 	if (not data_groups):
 		logger.debug(f"{tracking}no data")
@@ -1112,7 +1122,7 @@ def do_job(func: str, detail: str | list[str], batch_time: datetime, wanted_mode
 			result = invoke_db(objs = datas)
 		except Exception:
 			logger.exception(f"{tracking}err adding change to db {this_detail}")
-		
+
 
 		try: JOBS["waitingforcommit"].remove(id_)
 		except: pass
@@ -1129,7 +1139,7 @@ def launch_job(func: str, detail: str, batch_time: datetime, wanted_model_run_ti
 	if (id_ in JOBS["waitingforcommit"]):
 		logging.warning(f"{id_} is waiting to commit, not launching job again")
 		return
-	
+
 	t = threading.Thread(
 		target = do_job,
 		name = f"{id_}_{time_to_str(batch_time, True)}",
@@ -1162,7 +1172,6 @@ def register_jobs(hour_fmt: str):
 
 
 	if (hour_fmt.endswith(":00")): refill_jobs("??:00")
-			
 
 	for hour in JOB_SCHEDULE.keys():
 		if (hour_fmt != hour): continue
@@ -1183,13 +1192,15 @@ def every_10_mins(batch_time: datetime, _testing_hour_fmt: str = None):
 	register_jobs(hour_fmt)
 
 	jobs_copy = copy.deepcopy(JOBS)
+	is_on_hr = hour_fmt == "00:00"
 
-	if (hour_fmt == "00:00"):
+	if (is_on_hr):
 		msg_to_start_with = ""
 		if (len(db_commit_queue) > 0):
 			msg_to_start_with = f"DB commit queue rolled over into next period, {len(db_commit_queue)} items."
 
-		notify_jobs(hour_fmt, msg_to_start_with)
+	
+	notify_jobs(hour_fmt, msg_to_start_with, is_on_hr)
 
 	to_wait_each = min(RUN_SLOW_MAX_COOLDOWN, (EVENT_LOOP_EVERY * 0.8) / len(jobs_copy))
 
@@ -1230,7 +1241,7 @@ def ensure_default_obs(query_resp: list[CleanOBS]):
 	if ((query_resp) and len(query_resp) > 0):
 		logger.info("default OBS(id=-1) exists.")
 		return
-	
+
 	new_obj = CleanOBS(
 		id = -1,
 		mid = 0,
@@ -1238,8 +1249,8 @@ def ensure_default_obs(query_resp: list[CleanOBS]):
 	)
 
 	invoke_db(objs = [new_obj])
-	
-	
+
+
 
 
 def main():
@@ -1253,9 +1264,9 @@ def main():
 		try: start_loop()
 		except Exception:
 			logger.exception("loop errored")
-		
+
 		time.sleep(10)
-	
+
 
 def testing(hour_fmt: str):
 	launch_db_commit()

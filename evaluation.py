@@ -425,8 +425,11 @@ def get_obs_by_dt(obs: list[CleanOBS], org: str):
 	period = 3 if org == "M3" else 24
 
 	obs_per_3 = {}
+	obs_keys = obs_per_instance.keys()
 
-	base_t = min(obs_per_instance.keys())
+	if (len(obs_keys) == 0): return obs_per_3
+
+	base_t = min(obs_keys)
 
 	print("obs provided", len(obs), "hours, days = ", len(obs) // 24)
 
@@ -470,14 +473,6 @@ def eval_instance(instance: FCST, obs: CleanOBS, org: str):
 		fcst_id = instance.id,
 		period = 3 if (org == "M3") else 24 if (org == "BD") else 1
 	)
-
-	#for k in OBS_CONDITIONS:
-	#	print(k, obs.__getattribute__(k))
-	
-	#print("temp_min", obs.__getattribute__("temp_min"))
-	#print("temp_max", obs.__getattribute__("temp_max"))
-	#print("weather_types", obs.__getattribute__("weather_types"))
-	#print("precip_rate_sum", obs.__getattribute__("precip_rate_sum"))
 	
 	for i, comparer in comparers.items():
 		if (i in ignore): continue
@@ -503,6 +498,9 @@ def eval_instance(instance: FCST, obs: CleanOBS, org: str):
 
 
 def eval_day_of_forecast_instances(obs: list[CleanOBS], forecasts: list[FCST], org: str):
+	# want this to still run even if there are no obs hours. this updates the fcst objs,
+	# so they don't keep running every day and failing.
+	
 	instance_period = 3 if (org == "M3") else 24 if (org == "BD") else 1
 
 	obs_per_instance = get_obs_by_dt(obs, org)
