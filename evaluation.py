@@ -283,10 +283,23 @@ def eval_precip_day_of_obs(fcsts: list[FCST], obss: list[CleanOBS], org: str):
 
 	# score based on confidence, earlier we scored on rate accuracy.
 	# do this no matter the timing (new method)
+	fcst_by_time = {o.future_time : o for o in fcsts}
+	obs_by_time = {o.dt : o for o in obss}
 
-	confidences = [(
-		min( 100, fcsts[i].precip_prob * ( 1.25 if (obss[i] in observed_rain) else 1 ) )
-	) for i in range(len(fcsts))]
+	keys = fcsts if (len(fcsts) > len(obss)) else obss
+
+	confidences = []
+
+	for i in keys:
+		f = fcst_by_time.get(i)
+		o = obs_by_time.get(i)
+
+		if (not f or not o): continue
+
+		confidences.append(min(
+			100,
+			f.precip_prob * ( 1.25 if (o in observed_rain) else 1)
+		))
 	
 	confidence_score = None
 	if (len(confidences) > 0): confidence_score = sum(confidences) / len(confidences)
