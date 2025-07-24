@@ -305,7 +305,7 @@ def eval_precip_day_of_obs(fcsts: list[FCST], obss: list[CleanOBS], org: str):
 	if (len(confidences) > 0): confidence_score = sum(confidences) / len(confidences)
 
 
-	if (org == "M3" and len(observed_rain) > 0):
+	if (org == "M3" and len(observed_rain) > 0 and confidence_score):
 		max_hrain_prob = max([f.hrain_prob for f in fcsts])
 		observed_precip = [o.wt for o in observed_rain]
 
