@@ -1,0 +1,13 @@
+[Unit]
+Description=Cache updater for weather service. Clunky and terrible.
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/user/weatherdata
+ExecStart=/home/user/weatherdata/.venv/bin/python /home/user/weatherdata/server_cache_refresher.py
+Restart=always
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=default.target

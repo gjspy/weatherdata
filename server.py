@@ -20,7 +20,7 @@ from constants import *
 
 MAPSINIT_LOC = f"flasksite{SLASH}static{SLASH}script{SLASH}mapsinit.js"
 
-MAX_CACHE_AGE = 20 * 60 # seconds
+MAX_CACHE_AGE = 60 * 60 # seconds
 
 
 class CacheEntry():
