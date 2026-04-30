@@ -161,7 +161,7 @@ function actualInitMap({MapConstruct, MarkerConstruct, PinConstruct, selector, p
 		let pinDOMElem = thisPin.element;
 
 		let pinColourBkg = pinDOMElem.querySelector(".RIFvHW-maps-pin-view-background");
-		api.dom.setElemGrade(pinColourBkg, thisGrades[loc.mId]);
+		pinColourBkg && api.dom.setElemGrade(pinColourBkg, thisGrades[loc.mId]);
 
 		madePins.push(thisPin);
 
