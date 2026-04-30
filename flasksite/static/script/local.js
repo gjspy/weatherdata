@@ -353,6 +353,8 @@
 		} else {
 			title.textContent = "Both organisations had the same accuracy";
 		};
+
+		document.querySelector("#local .pane-3").classList.remove("loading");
 	};
 
 

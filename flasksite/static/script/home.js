@@ -121,6 +121,8 @@
 
 		let pieDesc = document.querySelector("#homepage .pane-3 .calendar .detail .info");
 		pieDesc.textContent = pieDesc.textContent.replaceAll("[PIE_CHART_GRADE_DESC]", api.descriptions.PIE_CHART_GRADES);
+
+		document.querySelector("#homepage .pane-3").classList.remove("loading");
 	};
 
 
@@ -200,7 +202,9 @@
 		let title = document.querySelector("#homepage .pane-4 .title-bar > .main");
 		let subtitle = document.querySelector("#homepage .pane-4 .title-bar > .sub.detail");
 
-		api.dom.fillInOutperformingData(selector, title, subtitle);		
+		api.dom.fillInOutperformingData(selector, title, subtitle);	
+		
+		document.querySelector("#homepage .pane-4").classList.remove("loading");
 	};
 
 	function onGoogleChartsLoad(yesterdayMO, yesterdayBC, weekDataForCalendar) {

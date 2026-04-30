@@ -438,6 +438,26 @@ a.map-pin-tooltip {
 	margin-top: 10%;
 }
 
+.content-elem > div.loading > * {
+	display: none !important;	
+}
+
+.content-elem > div.loading::after {
+	content: "Loading more information! This may take up to 30 seconds, sorry for the delay! I'm working to improve this.";
+	font-size: 6vmin;
+	line-height: 6vmin;
+	font-family: Lilita One;
+	color: var(--grade-A);
+	text-align: center;
+	
+	display: block;
+	
+	box-sizing: border-box;
+	width: 100vw;
+	height: 100vh;
+	background: white;
+}
+
 #content:not(:has(.content-elem)) .footer-bar {
 	position: absolute;
 	bottom: 0;
