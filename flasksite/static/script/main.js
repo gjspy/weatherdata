@@ -155,13 +155,14 @@ function actualInitMap({MapConstruct, MarkerConstruct, PinConstruct, selector, p
 			scale: 0.5,
 
 			borderColor: "#464046",
-			glyphColor: "#464046"
+			glyphColor: "#464046",
+			background: thisGrades[loc.mId]
 		});
 
 		let pinDOMElem = thisPin.element;
 
-		let pinColourBkg = pinDOMElem.querySelector(".RIFvHW-maps-pin-view-background");
-		pinColourBkg && api.dom.setElemGrade(pinColourBkg, thisGrades[loc.mId]);
+		//let pinColourBkg = pinDOMElem.querySelector(".RIFvHW-maps-pin-view-background");
+		//pinColourBkg && api.dom.setElemGrade(pinColourBkg, thisGrades[loc.mId]);
 
 		madePins.push(thisPin);
 
